@@ -1,3 +1,14 @@
+// HOW TO USE
+// <InputField
+//   id='' (string)
+//   label='' (string)
+//   required={} (boolean)
+//   type="" (string {text, number})
+//   value={} (string)
+//   disabled={} (boolean)
+//   onChange={} (function (id, name))
+//   isSubmit={} (boolean)
+// />
 import React, { useState, useEffect } from 'react';
 import { TextField } from '@material-ui/core';
 

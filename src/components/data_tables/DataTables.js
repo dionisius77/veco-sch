@@ -1,3 +1,43 @@
+// HOW TO USE
+// <DataTables
+//   tableName='' (string)
+//   page={} (int)
+//   dataLength={} (int)
+//   headCells={headCells} (array object (there's an example at the bottom of this tag))
+//   data={data} (array object)
+//   orderConfig={} (boolean)
+//   orderBy='' (string)
+//   handleDownload={this.handleDownload} (function ())
+//   handleChangePage={this.onChangePage} (function (page, limit))
+//   handleSearch={this.onSearch} (function (value))
+//   handleAdd={this.handleAdd} (function ())
+//   handleEdit={this.handleEdit} (function (checked))
+//   handleDelete={this.handleDelete} (function (checked))
+// />
+// sample data
+// data: [
+//   { uniqueId: 'Cupcake', name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
+//   { uniqueId: 'Donut', name: 'Donut', calories: 452, fat: 25.0, carbs: 51, protein: 4.9 },
+//   { uniqueId: 'Eclair', name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
+//   { uniqueId: 'Frozen yoghurt', name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
+//   { uniqueId: 'Gingerbread', name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
+//   { uniqueId: 'Honeycomb', name: 'Honeycomb', calories: 408, fat: 3.2, carbs: 87, protein: 6.5 },
+//   { uniqueId: 'Ice cream sandwich', name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
+//   { uniqueId: 'Jelly Bean', name: 'Jelly Bean', calories: 375, fat: 0.0, carbs: 94, protein: 0.0 },
+//   { uniqueId: 'KitKat', name: 'KitKat', calories: 518, fat: 26.0, carbs: 65, protein: 7.0 },
+//   { uniqueId: 'Lollipop', name: 'Lollipop', calories: 392, fat: 0.2, carbs: 98, protein: 0.0 },
+//   { uniqueId: 'Marshmallow', name: 'Marshmallow', calories: 318, fat: 0, carbs: 81, protein: 2.0 },
+//   { uniqueId: 'Nougat', name: 'Nougat', calories: 360, fat: 19.0, carbs: 9, protein: 37.0 },
+//   { uniqueId: 'Oreo', name: 'Oreo', calories: 437, fat: 18.0, carbs: 63, protein: 4.0 },
+// ],
+// sample header
+// headCells: [
+//   { id: 'name', numeric: false, disablePadding: true, label: 'Dessert (100g serving)' },
+//   { id: 'calories', numeric: true, disablePadding: false, label: 'Calories' },
+//   { id: 'fat', numeric: true, disablePadding: false, label: 'Fat (g)' },
+//   { id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs (g)' },
+//   { id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
+// ],
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -49,7 +89,15 @@ function stableSort(array, comparator) {
 }
 
 function EnhancedTableHead(props) {
-  const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells, orderConfig } = props;
+  const { classes, onSelectAllClick, order, numSelected, rowCount, onRequestSort, headCells, orderConfig } = props;
+  const [orderBy, setOrderBy] = React.useState('')
+
+  React.useEffect(
+    () => {
+      setOrderBy(props.orderBy)
+    }, [props.orderBy]
+  )
+
   const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
@@ -91,7 +139,7 @@ function EnhancedTableHead(props) {
                 <div>
                   {headCell.label}
                 </div>
-              
+
             }
           </TableCell>
         ))}
@@ -138,6 +186,11 @@ const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
 
+  const handleAdd = () => { props.handleAdd() }
+  const handleDownload = () => { props.handleDownload() }
+  const handleEdit = () => { props.handleEdit() }
+  const handleDelete = () => { props.handleDelete() }
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -157,26 +210,26 @@ const EnhancedTableToolbar = props => {
       {numSelected > 0 ? (
         <div>
           <Tooltip title="Edit">
-            <IconButton aria-label="edit">
+            <IconButton aria-label="edit" onClick={handleEdit}>
               <EditIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete">
-            <IconButton aria-label="delete">
+            <IconButton aria-label="delete" onClick={handleDelete}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
         </div>
       ) : (
           <div>
-            <SearchField searchHandleChange={props.handleSearch}/>
+            <SearchField searchHandleChange={props.handleSearch} />
             <Tooltip title="Add Data" className={classes.icon}>
-              <IconButton aria-label="add Data">
+              <IconButton aria-label="add Data" onClick={handleAdd}>
                 <AddIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Download Excel" className={classes.icon}>
-              <IconButton aria-label="download excel">
+              <IconButton aria-label="download excel" onClick={handleDownload}>
                 <DownloadIcon />
               </IconButton>
             </Tooltip>
@@ -217,7 +270,7 @@ const useStyles = makeStyles(theme => ({
 export default function DataTables(props) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
@@ -228,8 +281,13 @@ export default function DataTables(props) {
   React.useEffect(
     () => {
       setRows(props.data);
-      setPage(props.page)
-    }, [props.data.length]
+    }, [props.data]
+  )
+
+  React.useEffect(
+    () => {
+      setPage(props.page);
+    }, [props.page]
   )
 
   React.useEffect(
@@ -242,6 +300,12 @@ export default function DataTables(props) {
     () => {
       setDense(props.dense);
     }, [props.dense]
+  )
+
+  React.useEffect(
+    () => {
+      setOrderBy(props.orderBy)
+    }, [props.orderBy]
   )
 
   const handleRequestSort = (event, property) => {
@@ -259,12 +323,12 @@ export default function DataTables(props) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, unique) => {
+    const selectedIndex = selected.indexOf(unique);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, unique);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -292,9 +356,15 @@ export default function DataTables(props) {
 
   const handleSearch = value => value.length > 3 ? props.handleSearch(value) : null;
 
-  const handleAdd = () => props.handleAdd;
+  const handleAdd = () => { props.handleAdd() }
 
   const isSelected = name => selected.indexOf(name) !== -1;
+
+  const handleDownload = () => { props.handleDownload() }
+
+  const handleEdit = () => { props.handleEdit(selected) }
+
+  const handleDelete = () => { props.handleDelete(selected) }
 
   return (
     <div className={classes.root}>
@@ -304,6 +374,9 @@ export default function DataTables(props) {
           label={label}
           handleSearch={handleSearch}
           handleAdd={handleAdd}
+          handleDownload={handleDownload}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
         />
         {
           rows.length > 0 &&
@@ -329,17 +402,17 @@ export default function DataTables(props) {
                 {stableSort(rows, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const isItemSelected = isSelected(row.name);
+                    const isItemSelected = isSelected(row.uniqueId);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
                     return (
                       <TableRow
                         hover
-                        onClick={event => handleClick(event, row.name)}
+                        onClick={event => handleClick(event, row.uniqueId)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
-                        key={row.name}
+                        key={row.uniqueId}
                         selected={isItemSelected}
                       >
                         <TableCell padding="checkbox">
@@ -348,13 +421,19 @@ export default function DataTables(props) {
                             inputProps={{ 'aria-labelledby': labelId }}
                           />
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.name}
-                        </TableCell>
-                        <TableCell align="right">{row.calories}</TableCell>
-                        <TableCell align="right">{row.fat}</TableCell>
-                        <TableCell align="right">{row.carbs}</TableCell>
-                        <TableCell align="right">{row.protein}</TableCell>
+                        {
+                          props.headCells.map((cell, i) =>
+                            cell.numeric
+                              ?
+                              <TableCell key={i} align='right'>
+                                {row[cell.id]}
+                              </TableCell>
+                              :
+                              <TableCell key={i} component="th" id={labelId} scope="row" padding="none">
+                                {row[cell.id]}
+                              </TableCell>
+                          )
+                        }
                       </TableRow>
                     );
                   })}

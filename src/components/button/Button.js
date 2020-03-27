@@ -1,3 +1,10 @@
+// HOW TO USE
+// <Button 
+//   type="" (string {negative, default})
+//   disabled={} (boolean)
+//   text="" (string)
+//   onClick={} (function ())
+// />
 import React from 'react';
 import Btn from '@material-ui/core/Button';
 import { useState, useEffect } from 'react';

@@ -1,3 +1,38 @@
+// HOW TO USE
+// <Select
+//   name='' (string)
+//   id='' (string)
+//   label='' (string)
+//   options={} (array object)
+//   value={} (string)
+//   onChange={} (function ())
+//   isSubmit={} (boolean)
+//   disable={} (boolean)
+//   required={} (boolean)
+// />
+// sample for options
+// selectOption: [
+//   {
+//     value: '1',
+//     text: '1'
+//   },
+//   {
+//     value: '2',
+//     text: '2'
+//   },
+//   {
+//     value: '3',
+//     text: '3'
+//   },
+//   {
+//     value: '4',
+//     text: '4'
+//   },
+//   {
+//     value: '5',
+//     text: '5'
+//   },
+// ],
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { FormControl, InputLabel, NativeSelect, FormHelperText } from '@material-ui/core';
