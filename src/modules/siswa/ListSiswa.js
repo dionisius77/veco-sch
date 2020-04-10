@@ -1,16 +1,16 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { pushLoading } from "../../components/layout/ActionLayout";
-import DataTables from "../../components/data_tables/DataTables";
-import Modals from "../../components/modal/Modal";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import DataTables from '../../components/data_tables/DataTables';
+import { pushLoading } from '../../components/layout/ActionLayout';
+import Modals from '../../components/modal/Modal';
 import { Fade } from 'react-reveal';
 
-class MataPelajaran extends Component {
+class ListSiswa extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pageLoaded: false,
-      modalFlag: false
+      modalFlag: false,
     }
     this.onChangePage = this.onChangePage.bind(this);
     this.onSearch = this.onSearch.bind(this);
@@ -37,7 +37,13 @@ class MataPelajaran extends Component {
   }
 
   handleAdd = () => {
-    this.setState({ modalFlag: true });
+    this.setState({
+      pageLoaded: false
+    }, () => {
+      setTimeout(() => {
+        window.location.hash = '#/school/form_siswa/0';
+      }, 300)
+    })
   }
 
   handleDownload = () => {
@@ -64,7 +70,7 @@ class MataPelajaran extends Component {
     return (
       <Fade right opposite when={this.state.pageLoaded} duration={500}>
         <DataTables
-          tableName='Mata Pelajaran'
+          tableName='Data Siswa'
           allowEdit={true}
           page={0}
           dataLength={this.props.dataTables.length}
@@ -111,4 +117,4 @@ const mapDispatchToProps = dispatch => ({
   setLoading: value => dispatch(pushLoading(value))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MataPelajaran);
+export default connect(mapStateToProps, mapDispatchToProps)(ListSiswa)

@@ -2,11 +2,13 @@
 // <InputField
 //   id='' (string)
 //   label='' (string)
+//   variant='' (string [standard | outlined | filled])
 //   required={} (boolean)
 //   type="" (string {text, number})
 //   value={} (string)
 //   disabled={} (boolean)
-//   onChange={} (function (id, name))
+//   onChange={} (function (id, value))
+//   onBlur={} (function (id, value))
 //   isSubmit={} (boolean)
 // />
 import React, { useState, useEffect } from 'react';
@@ -37,11 +39,26 @@ export default function InputField(props) {
 
   const handleChange = (e) => {
     setValue(e.target.value)
-    props.onChange(e.target.id, e.target.value);
+    if(props.onChange){
+      props.onChange(e.target.id, e.target.value);
+    }
+  }
+
+  const handleBlur = (e) => {
+    setValue(e.target.value);
+    if(props.onBlur){
+      props.onBlur(e.target.id, e.target.value);
+    }
   }
 
   return (
     <TextField
+      style={{
+        width: '100%',
+        maxWidth: 700,
+        marginBottom: submit && value === '' ? 0 : 5,
+        marginTop: 10,
+      }}
       id={props.id}
       label={props.label}
       required={props.required}
@@ -49,13 +66,16 @@ export default function InputField(props) {
       value={value}
       helperText={
         submit &&
-        value === ''
-          ? 'Required'
+        value === '' &&
+        props.required
+          ? 'Form ini wajib diisi'
           : ''
       }
       disabled={disabled}
       onInput={handleChange}
-      error={submit && value === ''}
+      onBlur={handleBlur}
+      error={submit && value === '' && props.required}
+      variant={props.variant ? props.variant : 'standard'}
     />
   )
 }

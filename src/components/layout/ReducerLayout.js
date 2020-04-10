@@ -5,7 +5,9 @@ import {
   GET_LOGIN,
   PUSH_LOGIN,
   GET_LOADING,
-  PUSH_LOADING
+  PUSH_LOADING,
+  GET_ALERT,
+  PUSH_ALERT,
 } from './ConfigLayout';
 
 const initialState = {
@@ -15,7 +17,12 @@ const initialState = {
   resAuth: null,
   errAuth: null,
   loggedin: false,
-  loadingFlag: false
+  loadingFlag: false,
+  alert: {
+    isOpen: false,
+    message: '',
+    type: 'success'
+  }
 };
 
 export function ReducerLayout(state = initialState, action) {
@@ -72,6 +79,21 @@ export function ReducerLayout(state = initialState, action) {
         ...state,
         loadingFlag: initialState.loadingFlag,
         action: action.type
+      }
+    
+    case PUSH_ALERT:
+      initialState.alert = action.value;
+      return {
+        ...state,
+        alert: initialState.alert,
+        action: action.type
+      }
+
+    case GET_ALERT:
+      return {
+        ...state,
+        alert: initialState.alert,
+        action: action.type,
       }
 
     default:

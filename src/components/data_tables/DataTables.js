@@ -1,6 +1,7 @@
 // HOW TO USE
 // <DataTables
 //   tableName='' (string)
+//   allowEdit={} (boolean)
 //   page={} (int)
 //   dataLength={} (int)
 //   headCells={headCells} (array object (there's an example at the bottom of this tag))
@@ -13,6 +14,7 @@
 //   handleAdd={this.handleAdd} (function ())
 //   handleEdit={this.handleEdit} (function (checked))
 //   handleDelete={this.handleDelete} (function (checked))
+//   goToDetail={} (function (checked))
 // />
 // sample data
 // data: [
@@ -41,7 +43,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { lighten, makeStyles } from '@material-ui/core/styles';
+import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -59,8 +61,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddBox';
 import EditIcon from '@material-ui/icons/Edit';
-import DownloadIcon from '@material-ui/icons/GetApp'
+import DownloadIcon from '@material-ui/icons/GetApp';
 import SearchField from '../search_field/SearchField';
+import ConfigIcon from '@material-ui/icons/Settings';
+import CloseIcon from '@material-ui/icons/Close';
+import Arrow from '@material-ui/icons/KeyboardArrowRight';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -88,8 +93,27 @@ function stableSort(array, comparator) {
   return stabilizedThis.map(el => el[0]);
 }
 
+const StyledTblCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
+
 function EnhancedTableHead(props) {
-  const { classes, onSelectAllClick, order, numSelected, rowCount, onRequestSort, headCells, orderConfig } = props;
+  const {
+    classes,
+    // onSelectAllClick,
+    order,
+    // numSelected,
+    // rowCount,
+    onRequestSort,
+    headCells,
+    orderConfig
+  } = props;
   const [orderBy, setOrderBy] = React.useState('')
 
   React.useEffect(
@@ -105,16 +129,16 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
+        <StyledTblCell padding="checkbox">
+          {/* <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{ 'aria-label': 'select all desserts' }}
-          />
-        </TableCell>
+          /> */}
+        </StyledTblCell>
         {headCells.map(headCell => (
-          <TableCell
+          <StyledTblCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
@@ -136,12 +160,12 @@ function EnhancedTableHead(props) {
                   ) : null}
                 </TableSortLabel>
                 :
-                <div>
+                <div style={{ fontWeight: 600 }}>
                   {headCell.label}
                 </div>
 
             }
-          </TableCell>
+          </StyledTblCell>
         ))}
       </TableRow>
     </TableHead>
@@ -185,51 +209,73 @@ const useToolbarStyles = makeStyles(theme => ({
 const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
+  const [showConfigs, setShowConfigs] = React.useState(false);
 
-  const handleAdd = () => { props.handleAdd() }
-  const handleDownload = () => { props.handleDownload() }
-  const handleEdit = () => { props.handleEdit() }
-  const handleDelete = () => { props.handleDelete() }
+  const handleConfigs = () => {
+    props.handleConfigs(!showConfigs);
+    setShowConfigs(!showConfigs);
+  }
 
   return (
     <Toolbar
       className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
+        [classes.highlight]: showConfigs,
       })}
     >
-      {numSelected > 0 ? (
+      {showConfigs ? (
         <Typography className={classes.title} color="inherit" variant="subtitle1">
-          {numSelected} selected
+          {
+            (props.handleDelete || props.handleEdit) &&
+            <div>{ numSelected } selected</div>
+          }
         </Typography>
       ) : (
-          <Typography className={classes.title} variant="h6" id="tableTitle">
+          <Typography className={classes.title} variant="h6" id="tableTitle" noWrap>
             {props.label}
           </Typography>
         )}
 
-      {numSelected > 0 ? (
+      {showConfigs ? (
         <div>
-          <Tooltip title="Edit">
-            <IconButton aria-label="edit" onClick={handleEdit}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton aria-label="delete" onClick={handleDelete}>
-              <DeleteIcon />
+          {props.handleAdd &&
+            <Tooltip title="Add Data" className={classes.icon}>
+              <IconButton aria-label="add Data" onClick={() => { props.handleAdd() }}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          }
+          {props.handleEdit &&
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          }
+          {props.handleDelete &&
+            <Tooltip title="Delete">
+              <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          }
+          <Tooltip title="Close">
+            <IconButton aria-label="close" onClick={handleConfigs}>
+              <CloseIcon />
             </IconButton>
           </Tooltip>
         </div>
       ) : (
           <div>
             <SearchField searchHandleChange={props.handleSearch} />
-            <Tooltip title="Add Data" className={classes.icon}>
-              <IconButton aria-label="add Data" onClick={handleAdd}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
+            {props.allowEdit &&
+              <Tooltip title="Configuration" className={classes.icon}>
+                <IconButton aria-label="configuration" onClick={handleConfigs}>
+                  <ConfigIcon />
+                </IconButton>
+              </Tooltip>
+            }
             <Tooltip title="Download Excel" className={classes.icon}>
-              <IconButton aria-label="download excel" onClick={handleDownload}>
+              <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
                 <DownloadIcon />
               </IconButton>
             </Tooltip>
@@ -252,7 +298,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   table: {
-    minWidth: 750,
+    minWidth: 500,
   },
   visuallyHidden: {
     border: 0,
@@ -264,7 +310,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: 20,
     width: 1,
-  },
+  }
 }));
 
 export default function DataTables(props) {
@@ -277,6 +323,14 @@ export default function DataTables(props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
+  const [count, setCount] = React.useState(0);
+  const [showConfigs, setShowConfigs] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      setCount(props.dataLength);
+    }, [props.dataLength]
+  )
 
   React.useEffect(
     () => {
@@ -356,15 +410,26 @@ export default function DataTables(props) {
 
   const handleSearch = value => value.length > 3 ? props.handleSearch(value) : null;
 
-  const handleAdd = () => { props.handleAdd() }
+  // const handleAdd = () => { props.handleAdd() }
 
   const isSelected = name => selected.indexOf(name) !== -1;
 
-  const handleDownload = () => { props.handleDownload() }
+  // const handleDownload = () => { props.handleDownload() }
 
-  const handleEdit = () => { props.handleEdit(selected) }
+  // const handleEdit = () => { props.handleEdit(selected) }
 
-  const handleDelete = () => { props.handleDelete(selected) }
+  // const handleDelete = () => { props.handleDelete(selected) }
+
+  // const handleConfigs = (value) => {
+  //   setShowConfigs(value);
+  //   if (!value) { setSelected([]) }
+  // }
+
+  const goToDetail = (event, clicked) => {
+    if (props.goToDetail !== undefined && !showConfigs) {
+      props.goToDetail(clicked);
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -373,31 +438,40 @@ export default function DataTables(props) {
           numSelected={selected.length}
           label={label}
           handleSearch={handleSearch}
-          handleAdd={handleAdd}
-          handleDownload={handleDownload}
-          handleEdit={handleEdit}
-          handleDelete={handleDelete}
+          handleAdd={props.handleAdd}
+          handleDownload={props.handleDownload}
+          handleEdit={props.handleEdit ? () => { props.handleEdit(selected) } : undefined}
+          handleDelete={props.handleDelete ? () => { props.handleDelete(selected) } : undefined}
+          handleConfigs={(value) => {
+            setShowConfigs(value);
+            if (!value) { setSelected([]) }
+          }}
+          allowEdit={props.allowEdit}
         />
-        {
-          rows.length > 0 &&
-          <TableContainer>
-            <Table
-              className={classes.table}
-              aria-labelledby="tableTitle"
-              size={dense ? 'small' : 'medium'}
-              aria-label="enhanced table"
-            >
-              <EnhancedTableHead
-                classes={classes}
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={rows.length}
-                headCells={props.headCells}
-                orderConfig={props.orderConfig}
-              />
+        <TableContainer>
+          <Table
+            className={classes.table}
+            aria-labelledby="tableTitle"
+            size={dense ? 'small' : 'medium'}
+            aria-label="enhanced table"
+          >
+            {
+              rows.length === 0 &&
+              <caption style={{ textAlign: 'center' }}>Data not found</caption>
+            }
+            <EnhancedTableHead
+              classes={classes}
+              numSelected={selected.length}
+              order={order}
+              orderBy={orderBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={rows.length}
+              headCells={props.headCells}
+              orderConfig={props.orderConfig}
+            />
+            {
+              rows.length > 0 &&
               <TableBody>
                 {stableSort(rows, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -408,43 +482,49 @@ export default function DataTables(props) {
                     return (
                       <TableRow
                         hover
-                        onClick={event => handleClick(event, row.uniqueId)}
+                        onClick={event => goToDetail(event, row.uniqueId)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
                         key={row.uniqueId}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isItemSelected}
-                            inputProps={{ 'aria-labelledby': labelId }}
-                          />
-                        </TableCell>
+                        <StyledTblCell padding="checkbox">
+                          {showConfigs
+                            ?
+                            <Checkbox
+                              onClick={event => handleClick(event, row.uniqueId)}
+                              checked={isItemSelected}
+                              inputProps={{ 'aria-labelledby': labelId }}
+                            />
+                            :
+                            <Arrow />
+                          }
+                        </StyledTblCell>
                         {
                           props.headCells.map((cell, i) =>
                             cell.numeric
                               ?
-                              <TableCell key={i} align='right'>
+                              <StyledTblCell key={i} align='right'>
                                 {row[cell.id]}
-                              </TableCell>
+                              </StyledTblCell>
                               :
-                              <TableCell key={i} component="th" id={labelId} scope="row" padding="none">
+                              <StyledTblCell key={i} component="th" id={labelId} scope="row" padding="none">
                                 {row[cell.id]}
-                              </TableCell>
+                              </StyledTblCell>
                           )
                         }
                       </TableRow>
                     );
                   })}
               </TableBody>
-            </Table>
-          </TableContainer>
-        }
+            }
+          </Table>
+        </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={count}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactLoading from 'react-loading';
 import { Grid, makeStyles } from '@material-ui/core';
+import { Zoom } from 'react-reveal';
 
 const useStyles = makeStyles(theme => ({
   grid: {
@@ -23,20 +24,22 @@ export default function Loading() {
   const classes = useStyles();
   return (
     <div className={classes.block}>
-      <Grid
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justify="center"
-        className={classes.grid}
-      >
+      <Zoom duration={1500}>
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justify="center"
+          className={classes.grid}
+        >
 
-        <Grid item xs={3}>
-          <ReactLoading type={"cylon"} color="white" />
+          <Grid item xs={3}>
+            <ReactLoading type={"cylon"} color="white" />
+          </Grid>
+
         </Grid>
-
-      </Grid>
+      </Zoom>
     </div>
   );
 }

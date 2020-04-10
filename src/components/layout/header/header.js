@@ -68,7 +68,7 @@ import { Switch, Redirect, Route } from "react-router-dom";
 import Routes from "../../../config/Routes";
 import Loading from '../../loading/Loading';
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -144,7 +144,7 @@ export default function MiniDrawer(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading]= useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -223,7 +223,7 @@ export default function MiniDrawer(props) {
             <ListItem button key="notification">
               <ListItemIcon>
                 <Badge badgeContent={18}>
-                  <NotifIcon/>
+                  <NotifIcon />
                 </Badge>
               </ListItemIcon>
               <ListItemText primary="Notifications" />
@@ -236,6 +236,7 @@ export default function MiniDrawer(props) {
         </Drawer>
         <main className={classes.content}>
           <div className={classes.toolbar} />
+
           <Switch>
             {
               Routes.MenuRoutes.map((item, index) =>
@@ -247,7 +248,7 @@ export default function MiniDrawer(props) {
         </main>
         {
           loading && loading !== undefined &&
-          <Loading/>
+          <Loading />
         }
       </div>
     </div>

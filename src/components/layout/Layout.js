@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import Header from "./header/header";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import { pink, red, amber, blue, lightGreen } from "@material-ui/core/colors";
-import { getLoading } from "./ActionLayout";
+import { pink, red, amber, blue, lightGreen, grey } from "@material-ui/core/colors";
+import { getLoading, getAlert, pushAlert } from "./ActionLayout";
+import AlertCustom from "../alert/Alert";
 
 
 class Layout extends Component {
@@ -13,7 +14,8 @@ class Layout extends Component {
       //   main: pink[400]
       // },
       secondary: {
-        main: pink[400]
+        main: pink[400],
+        light: pink[200]
       },
       warning: {
         main: amber[500]
@@ -27,6 +29,9 @@ class Layout extends Component {
       success: {
         main: lightGreen[500]
       },
+      common: {
+        grey: grey[700]
+      }
       // background: {
       //   paper: pink[200],
       //   default: pink[50]
@@ -38,8 +43,14 @@ class Layout extends Component {
     super(props);
     this.state = {
       loggedIn: this.props.login,
-      loadingFlag: true,
+      loadingFlag: false,
+      alert: {
+        open: false,
+        message: '',
+        type: ''
+      }
     }
+    this.closeAlert = this.closeAlert.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -52,11 +63,25 @@ class Layout extends Component {
     if(nextProps.action === "PUSH_LOADING" && nextProps.loadingFlag !== prevState.loadingFlag){
       prevState.loadingFlag = nextProps.loadingFlag
     }
+    if(nextProps.action === "PUSH_ALERT"){
+      prevState.alert = nextProps.alert;
+    }
     return null;
+  }
+
+  closeAlert = () => {
+    let alertConfig = {
+      open: false,
+      message: '',
+      type: 'success'
+    }
+    // this.setState({alert: alertConfig});
+    this.props.onCloseAlert(alertConfig)
   }
 
   componentDidMount() {
     // this.props.onRequestAuth("test");
+    this.props.onGetAlert();
     this.props.onGetLoading();
     if (!this.state.loggedIn) {
       // return <Redirect to={{
@@ -72,6 +97,12 @@ class Layout extends Component {
         <ThemeProvider theme={this.globalTheme1}>
           <Header loadingFlag={this.state.loadingFlag}/>
         </ThemeProvider>
+        <AlertCustom
+          isOpen={this.state.alert.open}
+          message={this.state.alert.message}
+          onClose={this.closeAlert}
+          type={this.state.alert.type}
+        />
       </React.Fragment>
     )
   }
@@ -82,13 +113,16 @@ const mapStateToProps = state => ({
   // res: state.layout.resAuth
   login: state.layout.loggedin,
   loadingFlag: state.layout.loadingFlag,
-  action: state.layout.action
+  action: state.layout.action,
+  alert: state.layout.alert
 });
 
 const mapDispatchToProps = dispatch => ({
   // onRequestAuth: value => dispatch(authFetch(value)),
   // onGetLogin: value => dispatch(getLogin(value))
-  onGetLoading: () => dispatch(getLoading())
+  onGetLoading: () => dispatch(getLoading()),
+  onGetAlert: () => dispatch(getAlert()),
+  onCloseAlert: (value) => dispatch(pushAlert(value))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);
