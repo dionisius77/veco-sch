@@ -4,11 +4,11 @@ import { List, ListItem, ListItemText, Typography } from '@material-ui/core';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Scrollbars } from 'react-custom-scrollbars';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     maxWidth: 700,
-    backgroundColor: 'white',
+    backgroundColor: theme.palette.background.paper,
     position: 'relative',
     // overflow: 'auto',
     maxHeight: 500,
@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 }))
 
 const getItemStyle = (isDragging, draggableStyle) => ({
-  background: isDragging ? 'lightblue' : 'white',
+  background: isDragging ? 'lightblue' : '',
   ...draggableStyle
 })
 

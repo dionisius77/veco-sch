@@ -3,16 +3,16 @@ import { connect } from "react-redux";
 import Header from "./header/header";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { pink, red, amber, blue, lightGreen, grey } from "@material-ui/core/colors";
-import { getLoading, getAlert, pushAlert } from "./ActionLayout";
+import { getLoading, getAlert, pushAlert, getLogin } from "./ActionLayout";
 import AlertCustom from "../alert/Alert";
 
 
 class Layout extends Component {
   globalTheme1 = createMuiTheme({
     palette: {
-      // primary: {
-      //   main: pink[400]
-      // },
+      primary: {
+        main: pink[100]
+      },
       secondary: {
         main: pink[400],
         light: pink[200]
@@ -31,11 +31,25 @@ class Layout extends Component {
       },
       common: {
         grey: grey[700]
-      }
-      // background: {
-      //   paper: pink[200],
-      //   default: pink[50]
-      // },
+      },
+      // for dark mode
+      action: {
+        active: '#fff',
+        disabled: 'rgba(255, 255, 255, 0.3)',
+        hover: 'rgba(255, 255, 255, 0.08)',
+        disabledBackground: 'rgba(255, 255, 255, 0.12)',
+        selected: 'rgba(255, 255, 255, 0.16)',
+      },
+      text: {
+        primary: '#fff',
+        secondary: 'rgba(225, 225, 225, 0.7)',
+        disabled: 'rgba(225, 225, 225, 0.5)',
+      },
+      background: {
+        default: pink[100],
+        paper: '#424242',
+      },
+      divider: 'rgba(255, 255, 255, 0.12)'
     }
   });
 
@@ -57,13 +71,16 @@ class Layout extends Component {
     // if(nextProps.action === "AUTH_SUCCESS"){
     //   prevState.result = nextProps.res
     // }
-    // if(nextProps.login.action === "GET_LOGIN"){
-    //   prevState.loggedIn = nextProps.login.loggedin;
-    // }
-    if(nextProps.action === "PUSH_LOADING" && nextProps.loadingFlag !== prevState.loadingFlag){
+    if (nextProps.action === "GET_LOGIN") {
+      prevState.loggedIn = nextProps.login;
+      if (nextProps.login) {
+        window.location.hash = '/login_page';
+      }
+    }
+    if (nextProps.action === "PUSH_LOADING" && nextProps.loadingFlag !== prevState.loadingFlag) {
       prevState.loadingFlag = nextProps.loadingFlag
     }
-    if(nextProps.action === "PUSH_ALERT"){
+    if (nextProps.action === "PUSH_ALERT") {
       prevState.alert = nextProps.alert;
     }
     return null;
@@ -81,13 +98,14 @@ class Layout extends Component {
 
   componentDidMount() {
     // this.props.onRequestAuth("test");
+    this.props.onGetLogin();
     this.props.onGetAlert();
     this.props.onGetLoading();
     if (!this.state.loggedIn) {
       // return <Redirect to={{
       //   pathname: "/landing_page"
       // }}/>;
-      window.location.hash = '/landing_page';
+      window.location.hash = '/login_page';
     }
   }
 
@@ -95,14 +113,14 @@ class Layout extends Component {
     return (
       <React.Fragment>
         <ThemeProvider theme={this.globalTheme1}>
-          <Header loadingFlag={this.state.loadingFlag}/>
+          <Header loadingFlag={this.state.loadingFlag} />
+          <AlertCustom
+            isOpen={this.state.alert.open}
+            message={this.state.alert.message}
+            onClose={this.closeAlert}
+            type={this.state.alert.type}
+          />
         </ThemeProvider>
-        <AlertCustom
-          isOpen={this.state.alert.open}
-          message={this.state.alert.message}
-          onClose={this.closeAlert}
-          type={this.state.alert.type}
-        />
       </React.Fragment>
     )
   }
@@ -119,7 +137,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   // onRequestAuth: value => dispatch(authFetch(value)),
-  // onGetLogin: value => dispatch(getLogin(value))
+  onGetLogin: () => dispatch(getLogin()),
   onGetLoading: () => dispatch(getLoading()),
   onGetAlert: () => dispatch(getAlert()),
   onCloseAlert: (value) => dispatch(pushAlert(value))

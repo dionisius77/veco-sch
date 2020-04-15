@@ -15,9 +15,9 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     margin: '0px',
     padding: '0px',
-    backgroundColor: 'black',
+    backgroundColor: theme.palette.text.primary,
     zIndex: 97,
-    opacity: 0.3
+    opacity: 0.7
   }
 }));
 export default function Loading() {
@@ -35,7 +35,7 @@ export default function Loading() {
         >
 
           <Grid item xs={3}>
-            <ReactLoading type={"cylon"} color="white" />
+            <ReactLoading type={"cylon"} color="black" />
           </Grid>
 
         </Grid>

@@ -1,46 +1,3 @@
-// import React, { Component } from 'react';
-// import { pushLogin } from '../ActionLayout';
-// import { connect } from 'react-redux';
-
-// class Header extends Component {
-//   constructor(props){
-//     super(props);
-//     this.state = {
-
-//     }
-//     this.goToPage = this.goToPage.bind(this);
-//   }
-
-//   goToPage(page) {
-//     if(page === 'logout'){
-//       this.props.onLogin(false);
-//       window.location.hash = '/landing_page'
-//     } else {
-//       window.location.hash = `/${page}`;
-//     }
-//   }
-
-//   render() {
-//     return(
-//       <div>
-//         <button onClick={() => this.goToPage('home')}>Home</button>
-//         <button onClick={() => this.goToPage('mata_pelajaran')}>Matapelajaran</button>
-//         <button onClick={() => this.goToPage('logout')}>Logout</button>
-//       </div>
-//     )
-//   }
-// }
-
-// const mapStateToProps = state => ({
-
-// });
-
-// const mapDispatchToProps = dispatch => ({
-//   onLogin: value => dispatch(pushLogin(value)),
-// });
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Header);
-
 import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -63,9 +20,10 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ExitIcon from '@material-ui/icons/PowerSettingsNew';
 import NotifIcon from '@material-ui/icons/Notifications';
-import { LEFT_MENU } from '../../../config/Navigation';
+import { LEFT_MENU_TU, LEFT_MENU_GURU } from '../../../config/Navigation';
 import { Switch, Redirect, Route } from "react-router-dom";
 import Routes from "../../../config/Routes";
+import HomeIcon from '@material-ui/icons/Home';
 import Loading from '../../loading/Loading';
 
 const drawerWidth = 200;
@@ -145,6 +103,7 @@ export default function MiniDrawer(props) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const role = localStorage.getItem('role');
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -211,25 +170,40 @@ export default function MiniDrawer(props) {
           </div>
           <Divider />
           <List>
-            {LEFT_MENU.map((item, index) => (
-              <ListItem button key={index} onClick={() => { item.onClick() }}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.name} />
-              </ListItem>
-            ))}
+            <ListItem button key='home' onClick={() => { window.location.hash = '#/school/home'; }}>
+              <ListItemIcon><HomeIcon style={{ color: '#fff' }} /></ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItem>
+            {
+              role === 'TU'
+                ?
+                LEFT_MENU_TU.map((item, index) => (
+                  <ListItem button key={index} onClick={() => { item.onClick() }}>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.name} />
+                  </ListItem>
+                ))
+                :
+                LEFT_MENU_GURU.map((item, index) => (
+                  <ListItem button key={index} onClick={() => { item.onClick() }}>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.name} />
+                  </ListItem>
+                ))
+            }
           </List>
           <Divider />
           <List>
             <ListItem button key="notification">
               <ListItemIcon>
-                <Badge badgeContent={18}>
-                  <NotifIcon />
+                <Badge badgeContent={18} color='secondary'>
+                  <NotifIcon style={{ color: '#fff' }} />
                 </Badge>
               </ListItemIcon>
               <ListItemText primary="Notifications" />
             </ListItem>
             <ListItem button key="logout">
-              <ListItemIcon><ExitIcon /></ListItemIcon>
+              <ListItemIcon><ExitIcon style={{ color: '#fff' }} /></ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItem>
           </List>

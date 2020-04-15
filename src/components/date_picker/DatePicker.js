@@ -4,9 +4,10 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from '@material-ui/pickers';
+import PropTypes from 'prop-types';
 
 export default function DatePicker(props) {
-  const [selectedDate, setSelectedDate] = useState(new Date('2000-01-01T00:00:00'));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [isSubmit, setIsSubmit] = useState(false);
 
   useEffect(
@@ -37,11 +38,11 @@ export default function DatePicker(props) {
         style={{
           width: '100%',
           maxWidth: 700,
-          marginBottom: isSubmit && (selectedDate === '' || selectedDate === new Date('2000-01-01T00:00:00')) ? -5 : 5,
+          marginBottom: isSubmit && selectedDate === '' ? -5 : 5,
           marginTop: 10,
         }}
-        disableToolbar
-        required={props.required}
+        // disableToolbar
+        required={props.required || false}
         inputVariant='outlined'
         format='yyyy-MM-dd'
         margin='normal'
@@ -57,4 +58,13 @@ export default function DatePicker(props) {
       />
     </MuiPickersUtilsProvider>
   )
+}
+
+DatePicker.propTypes = {
+  id: PropTypes.any.isRequired,
+  label: PropTypes.any,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  required: PropTypes.bool,
+  isSubmit: PropTypes.bool
 }

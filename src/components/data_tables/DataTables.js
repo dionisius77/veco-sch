@@ -1,21 +1,3 @@
-// HOW TO USE
-// <DataTables
-//   tableName='' (string)
-//   allowEdit={} (boolean)
-//   page={} (int)
-//   dataLength={} (int)
-//   headCells={headCells} (array object (there's an example at the bottom of this tag))
-//   data={data} (array object)
-//   orderConfig={} (boolean)
-//   orderBy='' (string)
-//   handleDownload={this.handleDownload} (function ())
-//   handleChangePage={this.onChangePage} (function (page, limit))
-//   handleSearch={this.onSearch} (function (value))
-//   handleAdd={this.handleAdd} (function ())
-//   handleEdit={this.handleEdit} (function (checked))
-//   handleDelete={this.handleDelete} (function (checked))
-//   goToDetail={} (function (checked))
-// />
 // sample data
 // data: [
 //   { uniqueId: 'Cupcake', name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
@@ -128,7 +110,7 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow>
+      <TableRow style={{height: 50}}>
         <StyledTblCell padding="checkbox">
           {/* <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -226,7 +208,7 @@ const EnhancedTableToolbar = props => {
         <Typography className={classes.title} color="inherit" variant="subtitle1">
           {
             (props.handleDelete || props.handleEdit) &&
-            <div>{ numSelected } selected</div>
+            <div>{numSelected} selected</div>
           }
         </Typography>
       ) : (
@@ -240,27 +222,27 @@ const EnhancedTableToolbar = props => {
           {props.handleAdd &&
             <Tooltip title="Add Data" className={classes.icon}>
               <IconButton aria-label="add Data" onClick={() => { props.handleAdd() }}>
-                <AddIcon />
+                <AddIcon style={{ color: '#424242' }} />
               </IconButton>
             </Tooltip>
           }
           {props.handleEdit &&
             <Tooltip title="Edit">
               <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
-                <EditIcon />
+                <EditIcon style={{ color: '#424242' }} />
               </IconButton>
             </Tooltip>
           }
           {props.handleDelete &&
             <Tooltip title="Delete">
               <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
-                <DeleteIcon />
+                <DeleteIcon style={{ color: '#424242' }} />
               </IconButton>
             </Tooltip>
           }
           <Tooltip title="Close">
             <IconButton aria-label="close" onClick={handleConfigs}>
-              <CloseIcon />
+              <CloseIcon style={{ color: '#424242' }} />
             </IconButton>
           </Tooltip>
         </div>
@@ -270,13 +252,13 @@ const EnhancedTableToolbar = props => {
             {props.allowEdit &&
               <Tooltip title="Configuration" className={classes.icon}>
                 <IconButton aria-label="configuration" onClick={handleConfigs}>
-                  <ConfigIcon />
+                  <ConfigIcon style={{ color: '#fff' }} />
                 </IconButton>
               </Tooltip>
             }
             <Tooltip title="Download Excel" className={classes.icon}>
               <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
-                <DownloadIcon />
+                <DownloadIcon style={{ color: '#fff' }} />
               </IconButton>
             </Tooltip>
           </div>
@@ -452,7 +434,7 @@ export default function DataTables(props) {
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
+            size='small'
             aria-label="enhanced table"
           >
             {
@@ -481,6 +463,7 @@ export default function DataTables(props) {
 
                     return (
                       <TableRow
+                        style={{height: 40}}
                         hover
                         onClick={event => goToDetail(event, row.uniqueId)}
                         role="checkbox"
@@ -533,4 +516,22 @@ export default function DataTables(props) {
       </Paper>
     </div>
   );
+}
+
+DataTables.propTypes = {
+  tableName: PropTypes.string.isRequired,  //='' (string)
+  allowEdit: PropTypes.bool,  //={} (boolean)
+  page: PropTypes.number.isRequired, //={} (int)
+  dataLength: PropTypes.number.isRequired, //={} (int)
+  headCells: PropTypes.array.isRequired,  //={headCells} (array object (there's an example at the bottom of this tag))
+  data: PropTypes.array.isRequired, //={data} (array object)
+  orderConfig: PropTypes.bool,  //={} (boolean)
+  orderBy: PropTypes.string,  //='' (string)
+  handleDownload: PropTypes.func, //={this.handleDownload} (function ())
+  handleChangePage: PropTypes.func.isRequired, //={this.onChangePage} (function (page, limit))
+  handleSearch: PropTypes.func.isRequired, //={this.onSearch} (function (value))
+  handleAdd: PropTypes.func,  //={this.handleAdd} (function ())
+  handleEdit: PropTypes.func, //={this.handleEdit} (function (checked))
+  handleDelete: PropTypes.func, //={this.handleDelete} (function (checked))
+  goToDetail: PropTypes.func, //={} (function (checked))
 }

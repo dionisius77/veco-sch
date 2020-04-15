@@ -5,6 +5,8 @@ import Layout from "../components/layout/Layout";
 import RouteKelas from "../modules/kelas/kelasRoutes";
 import RouteSiswa from "../modules/siswa/SiswaRoutes";
 import RouteSchedule from "../modules/schedule/scheduleRoutes";
+import RoutesGuru from "../modules/guru/GuruRoutes";
+import RoutesAbsensi from "../modules/guru/absensi/AbsensiRoutes";
 
 const ContainerRoutes = [
   { path: '/school', name: 'layout', component: Layout },
@@ -16,7 +18,9 @@ const MenuRoutes = [
   ...RouteMataPelajaran,
   ...RouteKelas,
   ...RouteSiswa,
-  ...RouteSchedule
+  ...RouteSchedule,
+  ...RoutesGuru,
+  ...RoutesAbsensi,
 ]
 
 export default {

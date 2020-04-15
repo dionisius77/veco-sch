@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextField } from '@material-ui/core';
+import { Input } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
-export default function InputField(props) {
+export default function InputSimple(props) {
   const [value, setValue] = useState('');
-  const [submit, setSubmit] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
   useEffect(
@@ -17,12 +16,6 @@ export default function InputField(props) {
     () => {
       setDisabled(props.disabled)
     }, [props.disabled]
-  )
-
-  useEffect(
-    () => {
-      setSubmit(props.isSubmit)
-    }, [props.isSubmit]
   )
 
   const handleChange = (e) => {
@@ -40,43 +33,31 @@ export default function InputField(props) {
   }
 
   return (
-    <TextField
+    <Input
       style={{
         width: '100%',
         maxWidth: 700,
-        marginBottom: submit && value === '' ? 0 : 5,
-        marginTop: 10,
       }}
+      placeholder={props.label}
       id={props.id}
-      label={props.label || ''}
       required={props.required}
       type={props.type}
       value={value}
-      helperText={
-        submit &&
-        value === '' &&
-        props.required
-          ? 'Form ini wajib diisi'
-          : ''
-      }
       disabled={disabled}
       onInput={handleChange}
       onBlur={handleBlur}
-      error={submit && value === '' && props.required}
-      variant={props.variant ? props.variant : 'standard'}
+      error={value === '' && props.required}
     />
   )
 }
 
-InputField.propTypes = {
+InputSimple.propTypes = {
   id: PropTypes.any.isRequired,
   label: PropTypes.string,
-  variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
   required: PropTypes.bool.isRequired,
   type: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
-  isSubmit: PropTypes.bool,
 };

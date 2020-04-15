@@ -1,43 +1,8 @@
-// HOW TO USE
-// <Select
-//   name='' (string)
-//   id='' (string)
-//   label='' (string)
-//   variant='' (string [standard | filled | outlined])
-//   options={} (array object)
-//   value={} (string)
-//   onChange={} (function ())
-//   isSubmit={} (boolean)
-//   disable={} (boolean)
-//   required={} (boolean)
-// />
-// sample for options
-// selectOption: [
-//   {
-//     value: '1',
-//     text: '1'
-//   },
-//   {
-//     value: '2',
-//     text: '2'
-//   },
-//   {
-//     value: '3',
-//     text: '3'
-//   },
-//   {
-//     value: '4',
-//     text: '4'
-//   },
-//   {
-//     value: '5',
-//     text: '5'
-//   },
-// ],
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { FormControl, InputLabel, Select, FormHelperText, MenuItem, OutlinedInput } from '@material-ui/core';
 import { useRef } from 'react';
+import PropTypes from 'prop-types';
 
 export default function Selects(props) {
   const labelRef = useRef();
@@ -85,9 +50,10 @@ export default function Selects(props) {
         width: '100%',
         maxWidth: 700,
         marginBottom: submit && value === '' ? 0 : 5,
-        marginTop: 10
+        marginTop: props.noMargin ? 0 : 10
       }}
       error={props.required && submit && value === ''}
+      size={props.size || 'medium'}
     >
       <InputLabel ref={labelRef} htmlFor={props.id}>{props.label}</InputLabel>
       <Select
@@ -120,4 +86,19 @@ export default function Selects(props) {
       }
     </FormControl>
   )
+}
+
+Selects.propTypes = {
+  name: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  label: PropTypes.string.isRequired,
+  variant: PropTypes.oneOf(['standard', 'filled', 'outlined']),
+  options: PropTypes.array.isRequired,
+  value: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  isSubmit: PropTypes.bool,
+  disable: PropTypes.bool,
+  required: PropTypes.bool,
+  size: PropTypes.oneOf(['small', 'medium']),
+  noMargin: PropTypes.bool,
 }

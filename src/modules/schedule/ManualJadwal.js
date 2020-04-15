@@ -92,102 +92,105 @@ class ManualJadwal extends Component {
 
   render() {
     const { jadwal, selectedClass, dataLoaded } = this.state;
+    const { classes } = this.props;
     return (
       <Fade right duration={500}>
-        <Grid style={{ marginTop: -20 }} container justify='space-between' alignItems="center">
-          <Grid item xs={2}>
-            <Selects
-              name='kelas'
-              id='kelas'
-              label='Pilih Kelas'
-              variant='outlined'
-              options={this.props.classOption}
-              value={selectedClass}
-              onChange={this.selectOnChange}
-              isSubmit={false}
-              disable={this.idKelas !== 'empty'}
-              required={false}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <h1 style={{ textAlign: 'left' }}>Input Jadwal</h1>
-          </Grid>
-          <Grid item xs={1}>
-            <div style={{ marginLeft: 15 }}>
-              <Button
-                type="default"
-                disabled={false}
-                text="Simpan"
-                onClick={() => { this.onSave() }}
+        <Paper style={{padding: 5, margin: 0}}>
+          <Grid container justify='space-between' alignItems="center">
+            <Grid item xs={2}>
+              <Selects
+                name='kelas'
+                id='kelas'
+                label='Pilih Kelas'
+                variant='outlined'
+                options={this.props.classOption}
+                value={selectedClass}
+                onChange={this.selectOnChange}
+                isSubmit={false}
+                disable={this.idKelas !== 'empty'}
+                required={false}
               />
-            </div>
-          </Grid>
-        </Grid>
-        <Zoom opposite when={dataLoaded} duration={500}>
-          <DragDropContext onDragEnd={this.onDrop}>
-            <Grid container spacing={1}>
-              <Grid item xs={2}>
-                <ListComponent
-                  listData={this.props.listJadwal}
-                  droppableId='listJadwal'
-                />
-              </Grid>
-              <Grid item xs>
-                <TableContainer component={Paper}>
-                  <Table size='medium' border={1} style={{ borderColor: 'grey.100' }}>
-                    <TableHead>
-                      <TableRow>
-                        <StyledTblCell align='center'>Senin</StyledTblCell>
-                        <StyledTblCell align='center'>Selasa</StyledTblCell>
-                        <StyledTblCell align='center'>Rabu</StyledTblCell>
-                        <StyledTblCell align='center'>Kamis</StyledTblCell>
-                        <StyledTblCell align='center'>Jumat</StyledTblCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {['1', '2', '3', 'istirahat 1', '4', '5', '6', 'istirahat 2', '7', '8', '9'].map(jam => (
-                        <TableRow key={jam}>
-                          {['senin', 'selasa', 'rabu', 'kamis', 'jumat'].map((hari, i) => (
-                            <Droppable droppableId={hari + '-' + jam}>
-                              {(provided, snapshot) => {
-                                return (
-                                  <StyledTblCell
-                                    align='center'
-                                    ref={provided.innerRef}
-                                    style={{
-                                      background: snapshot.isDraggingOver ? jam === 'istirahat 1' || jam === 'istirahat 2' ? 'yellow' : 'lightblue' : jam === 'istirahat 1' || jam === 'istirahat 2' ? 'yellow' : 'white',
-                                      height: snapshot.isDraggingOver && jam !== 'istirahat 1' && jam !== 'istirahat 2' ? 80 : 10
-                                    }}
-                                    key={hari}
-                                  >
-                                    {jadwal[hari + '-' + jam] !== undefined
-                                      ?
-                                      jadwal[hari + '-' + jam]
-                                      :
-                                      jam === 'istirahat 1' || jam === 'istirahat 2'
-                                        ?
-                                        jam
-                                        :
-                                        hari === 'jumat' && (jam === 'istirahat 2' || jam === '7' || jam === '8' || jam === '9')
-                                          ?
-                                          ''
-                                          :
-                                          'Empty'
-                                    }
-                                  </StyledTblCell>
-                                )
-                              }}
-                            </Droppable>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
             </Grid>
-          </DragDropContext>
-        </Zoom>
+            <Grid item xs={3}>
+              <h1 style={{ textAlign: 'left' }}>Input Jadwal</h1>
+            </Grid>
+            <Grid item xs={1}>
+              <div>
+                <Button
+                  type="default"
+                  disabled={false}
+                  text="Simpan"
+                  onClick={() => { this.onSave() }}
+                />
+              </div>
+            </Grid>
+          </Grid>
+          <Zoom opposite when={dataLoaded} duration={500}>
+            <DragDropContext onDragEnd={this.onDrop}>
+              <Grid container spacing={1}>
+                <Grid item xs={2}>
+                  <ListComponent
+                    listData={this.props.listJadwal}
+                    droppableId='listJadwal'
+                  />
+                </Grid>
+                <Grid item xs>
+                  <TableContainer component={Paper}>
+                    <Table size='medium' border={1} className={classes.tableStyle}>
+                      <TableHead>
+                        <TableRow>
+                          <StyledTblCell align='center'>Senin</StyledTblCell>
+                          <StyledTblCell align='center'>Selasa</StyledTblCell>
+                          <StyledTblCell align='center'>Rabu</StyledTblCell>
+                          <StyledTblCell align='center'>Kamis</StyledTblCell>
+                          <StyledTblCell align='center'>Jumat</StyledTblCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {['1', '2', '3', 'istirahat 1', '4', '5', '6', 'istirahat 2', '7', '8', '9'].map(jam => (
+                          <TableRow key={jam}>
+                            {['senin', 'selasa', 'rabu', 'kamis', 'jumat'].map((hari, i) => (
+                              <Droppable droppableId={hari + '-' + jam}>
+                                {(provided, snapshot) => {
+                                  return (
+                                    <StyledTblCell
+                                      align='center'
+                                      ref={provided.innerRef}
+                                      style={{
+                                        background: snapshot.isDraggingOver ? jam === 'istirahat 1' || jam === 'istirahat 2' ? 'yellow' : 'lightblue' : jam === 'istirahat 1' || jam === 'istirahat 2' ? 'yellow' : '',
+                                        height: snapshot.isDraggingOver && jam !== 'istirahat 1' && jam !== 'istirahat 2' ? 80 : 10
+                                      }}
+                                      key={hari}
+                                    >
+                                      {jadwal[hari + '-' + jam] !== undefined
+                                        ?
+                                        jadwal[hari + '-' + jam]
+                                        :
+                                        jam === 'istirahat 1' || jam === 'istirahat 2'
+                                          ?
+                                          jam
+                                          :
+                                          hari === 'jumat' && (jam === 'istirahat 2' || jam === '7' || jam === '8' || jam === '9')
+                                            ?
+                                            ''
+                                            :
+                                            'Empty'
+                                      }
+                                    </StyledTblCell>
+                                  )
+                                }}
+                              </Droppable>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+            </DragDropContext>
+          </Zoom>
+        </Paper>
       </Fade >
     )
   }
@@ -217,6 +220,13 @@ const mapDispatchToProps = dispatch => ({
   onSetAlert: value => dispatch(pushAlert(value)),
 });
 
+const useStyles = (theme) => ({
+  tableStyle: {
+    background: theme.palette.background.paper,
+    borderColor: theme.palette.text
+  },
+});
+
 const StyledTblCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.secondary.light,
@@ -229,4 +239,4 @@ const StyledTblCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ManualJadwal);
+export default withStyles(useStyles)(connect(mapStateToProps, mapDispatchToProps)(ManualJadwal));

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Grid, makeStyles } from '@material-ui/core';
 import ListComponent from './ListComponent';
 import { DragDropContext } from 'react-beautiful-dnd';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -64,4 +65,12 @@ export default function MoveableList(props) {
       </Grid>
     </DragDropContext>
   )
+}
+
+MoveableList.propTypes = {
+  listA: PropTypes.array.isRequired,
+  listB: PropTypes.array.isRequired,
+  titleA: PropTypes.string.isRequired,
+  titleB: PropTypes.string.isRequired,
+  takeAction: PropTypes.func.isRequired,
 }

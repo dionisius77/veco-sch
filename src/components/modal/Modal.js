@@ -4,6 +4,7 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade'
 import Button from '../button/Button';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -66,9 +67,9 @@ export default function Modals(props) {
             {props.children}
             <div className={classes.buttonGroup}>
               <div className={classes.spacing}></div>
-              <Button type="default" text="OK" onClick={handleOk}/>
-              {props.type === 'confirm' && 
-                <Button type="negative" text="Cancel" onClick={handleClose}/>
+              <Button type="default" text="OK" onClick={handleOk} />
+              {props.type === 'confirm' &&
+                <Button type="negative" text="Cancel" onClick={handleClose} />
               }
             </div>
           </div>
@@ -76,4 +77,13 @@ export default function Modals(props) {
       </Fade>
     </Modal>
   )
+}
+
+Modals.propTypes = {
+  open: PropTypes.bool.isRequired,
+  modalTitle: PropTypes.string.isRequired,
+  children: PropTypes.any.isRequired,
+  type: PropTypes.oneOf(['confirm', 'alert']),
+  onCloseModal: PropTypes.func.isRequired,
+  onSubmitModal: PropTypes.func
 }

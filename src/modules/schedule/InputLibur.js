@@ -8,6 +8,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modals from '../../components/modal/Modal';
 import InputField from '../../components/input_field/InputField';
 import DatePicker from '../../components/date_picker/DatePicker';
+import { Paper } from '@material-ui/core';
 
 class InputLibur extends Component {
   newEvents;
@@ -38,18 +39,25 @@ class InputLibur extends Component {
     const { start, end } = target;
     let startDateFormated = this.dateFormater(start);
     let endDateFormated = this.dateFormater(end);
-    this.setState({
-      start: startDateFormated,
-      end: endDateFormated,
-      id: Math.floor(Math.random() * 101),
-      title: '',
-      openModal: true
-    });
-    console.log(target)
+    if (start.getDay() !== 0 && start.getDay() !== 6) {
+      this.setState({
+        start: startDateFormated,
+        end: endDateFormated,
+        id: Math.floor(Math.random() * 101),
+        title: '',
+        openModal: true
+      });
+    }
   }
 
   clickEvent = (event) => {
-    console.log(event)
+    this.setState({
+      start: event.start,
+      end: event.end,
+      title: event.title,
+      id: event.id,
+      openModal: true
+    });
   }
 
   closeModal = () => {
@@ -57,14 +65,25 @@ class InputLibur extends Component {
   }
 
   submitModal = () => {
-    let _newEvent = {
-      id: this.state.id,
-      start: this.state.start,
-      end: this.state.end,
-      title: this.state.title
-    };
     let events = this.newEvents;
-    events.push(_newEvent);
+    let hasRegistered;
+    events.map((value, index) => {
+      if (value.id === this.state.id) {
+        hasRegistered = index;
+      }
+      return index;
+    });
+    if (hasRegistered !== undefined) {
+      events[hasRegistered].title = this.state.title;
+    } else {
+      let _newEvent = {
+        id: this.state.id,
+        start: this.state.start,
+        end: this.state.end,
+        title: this.state.title,
+      };
+      events.push(_newEvent);
+    }
     this.setState({
       events: events,
       openModal: false
@@ -87,7 +106,7 @@ class InputLibur extends Component {
     const { start, end, title, events } = this.state;
     return (
       <Fade right duration={500}>
-        <div style={{ height: 600 }}>
+        <Paper style={{ height: 600, padding: 5 }}>
           <Calendar
             events={events}
             views={['month']}
@@ -97,10 +116,11 @@ class InputLibur extends Component {
             onNavigate={this.onNext}
             onSelectSlot={this.clickedCalendar}
             selectable={true}
+            style={{ color: '#fff' }}
             onSelectEvent={(event) => this.clickEvent(event)}
             popup={true}
           />
-        </div>
+        </Paper>
         <Modals
           open={this.state.openModal}
           onCloseModal={() => this.closeModal()}

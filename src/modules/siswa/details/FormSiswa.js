@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { pushLoading } from '../../../components/layout/ActionLayout';
 import { connect } from 'react-redux';
 import { Fade } from 'react-reveal';
-import { Grid } from '@material-ui/core';
+import { Grid, withStyles } from '@material-ui/core';
 import InputField from '../../../components/input_field/InputField';
 import Selects from '../../../components/select/Select';
 import Button from '../../../components/button/Button';
@@ -260,7 +260,8 @@ class FormSiswa extends Component {
       tingkatPrestasi,
       jenisBeasiswa,
       jenisPendaftaran,
-      penerimaKPS
+      penerimaKPS,
+      classes,
     } = this.props;
     return (
       <Fade right opposite when={pageLoaded} duration={500}>
@@ -271,7 +272,7 @@ class FormSiswa extends Component {
           Form Pendaftaran Siswa
         </h1>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Data Pribadi</h2>
           </Grid>
         </Grid>
@@ -328,7 +329,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Data Ayah Kandung</h2>
           </Grid>
         </Grid>
@@ -346,7 +347,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Data Ibu Kandung</h2>
           </Grid>
         </Grid>
@@ -364,7 +365,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Data Wali</h2>
           </Grid>
         </Grid>
@@ -382,7 +383,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Kontak</h2>
           </Grid>
         </Grid>
@@ -396,7 +397,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Data Priodik</h2>
           </Grid>
         </Grid>
@@ -428,7 +429,7 @@ class FormSiswa extends Component {
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Prestasi</h2>
           </Grid>
         </Grid>
@@ -471,7 +472,7 @@ class FormSiswa extends Component {
           <div></div>
         }
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Beasiswa</h2>
           </Grid>
         </Grid>
@@ -502,7 +503,7 @@ class FormSiswa extends Component {
           })
         }
         <Grid container>
-          <Grid item xs={12} style={{ background: 'white' }}>
+          <Grid item xs={12} className={classes.titleHeader}>
             <h2 style={{ textAlign: 'center' }}>Registrasi Peserta Didik</h2>
           </Grid>
         </Grid>
@@ -524,7 +525,7 @@ class FormSiswa extends Component {
           ?
           <div>
             <Grid container>
-              <Grid item xs={12} style={{ background: 'white' }}>
+              <Grid item xs={12} className={classes.titleHeader}>
                 <h2 style={{ textAlign: 'center' }}>Pendaftaran Keluar</h2>
               </Grid>
             </Grid>
@@ -711,8 +712,14 @@ const mapStateToProps = state => ({
   ]
 });
 
+const useStyles = (theme) => ({
+  titleHeader: {
+    background: theme.palette.background.paper
+  }
+})
+
 const mapDispatchToProps = dispatch => ({
   setLoading: value => dispatch(pushLoading(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FormSiswa);
+export default withStyles(useStyles)(connect(mapStateToProps, mapDispatchToProps)(FormSiswa));

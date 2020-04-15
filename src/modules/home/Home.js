@@ -18,7 +18,7 @@ class Home extends Component {
   render() {
     return (
       <Fade right opposite when={this.state.pageLoaded} duration={500}>
-        <h2>HELLO</h2>
+        <h2>{localStorage.getItem('role')}</h2>
         <p>Cras facilisis urna ornare ex volutpat, et
         convallis erat elementum. Ut aliquam, ipsum vitae
         gravida suscipit, metus dui bibendum est, eget rhoncus nibh

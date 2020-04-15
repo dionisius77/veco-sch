@@ -38,7 +38,7 @@ class LandingJadwal extends Component {
     }, () => {
       setTimeout(() => {
         window.location.hash = '#/school/input_jadwal/empty'
-      }, 200)
+      }, 300)
     })
   }
   
@@ -48,7 +48,7 @@ class LandingJadwal extends Component {
     }, () => {
       setTimeout(() => {
         window.location.hash = '#/school/hari_libur'
-      }, 200)
+      }, 300)
     })
   }
 
@@ -67,7 +67,7 @@ class LandingJadwal extends Component {
               <CardActionArea>
                 <CardMedia
                   component="img"
-                  style={{width: 200, marginLeft: '25%'}}
+                  style={{width: 200, marginLeft: '22%'}}
                   image={AutomationImage}
                   title="Otomatis generate jadwal"
                 />
@@ -82,7 +82,7 @@ class LandingJadwal extends Component {
               <CardActionArea style={{marginTop: 20}}>
                 <CardMedia
                   component="img"
-                  style={{width: 180, marginLeft: '27%'}}
+                  style={{width: 180, marginLeft: '25%'}}
                   image={CalendarImage}
                   title="Manual generate jadwal"
                 />
