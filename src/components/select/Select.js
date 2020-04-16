@@ -91,7 +91,7 @@ export default function Selects(props) {
 Selects.propTypes = {
   name: PropTypes.any.isRequired,
   id: PropTypes.any.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   variant: PropTypes.oneOf(['standard', 'filled', 'outlined']),
   options: PropTypes.array.isRequired,
   value: PropTypes.any.isRequired,

@@ -50,6 +50,21 @@ class Layout extends Component {
         paper: '#424242',
       },
       divider: 'rgba(255, 255, 255, 0.12)'
+    },
+    overrides: {
+      MuiOutlinedInput: {
+        notchedOutline: {
+          borderColor: 'rgba(255, 255, 255, 0.23)',
+        }
+      },
+      MuiInputLabel: {
+        outlined: {
+          color: 'rgba(225, 225, 225, 0.9)',
+          '&$focused' : {
+            color: '#fff'
+          },
+        },
+      }
     }
   });
 

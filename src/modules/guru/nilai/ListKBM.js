@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Fade } from 'react-reveal';
 import DataTables from '../../../components/data_tables/DataTables';
-import Modals from '../../../components/modal/Modal';
-import InputField from '../../../components/input_field/InputField';
-import DatePicker from '../../../components/date_picker/DatePicker';
-import Selects from '../../../components/select/Select';
 import { pushLoading } from '../../../components/layout/ActionLayout';
 
 class ListKBM extends Component {

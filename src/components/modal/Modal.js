@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
   },
   spacing: {
     flexGrow: 1
+  },
+  title: {
+    width: '100%',
+    background: theme.palette.secondary.main
   }
 }));
 

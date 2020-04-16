@@ -27,14 +27,14 @@ export default function InputField(props) {
 
   const handleChange = (e) => {
     setValue(e.target.value)
-    if(props.onChange){
+    if (props.onChange) {
       props.onChange(e.target.id, e.target.value);
     }
   }
 
   const handleBlur = (e) => {
     setValue(e.target.value);
-    if(props.onBlur){
+    if (props.onBlur) {
       props.onBlur(e.target.id, e.target.value);
     }
   }
@@ -54,8 +54,7 @@ export default function InputField(props) {
       value={value}
       helperText={
         submit &&
-        value === '' &&
-        props.required
+          value === '' && props.required
           ? 'Form ini wajib diisi'
           : ''
       }

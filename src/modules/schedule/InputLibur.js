@@ -122,6 +122,7 @@ class InputLibur extends Component {
           />
         </Paper>
         <Modals
+          modalTitle='Input Hari Libur'
           open={this.state.openModal}
           onCloseModal={() => this.closeModal()}
           onSubmitModal={() => this.submitModal()}
@@ -131,7 +132,6 @@ class InputLibur extends Component {
             width: 400,
             height: 300
           }}>
-            <h2 style={{ textAlign: 'center' }}>Input Hari Libur</h2>
             <DatePicker id='start' label='Tanggal Mulai' required={true} value={start} onChange={this.dateChange} isSubmit={false} />
             <DatePicker id='end' label='Tanggal Selesai' required={true} value={end} onChange={this.dateChange} isSubmit={false} />
             <InputField id='title' label='Libur' variant='outlined' required={false} type="text" value={title} disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />

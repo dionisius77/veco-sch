@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Grid, TableContainer, Paper, TableHead, TableBody, TableRow, TableCell, Checkbox, Table, withStyles } from '@material-ui/core';
 import Selects from '../../../components/select/Select';
 import Button from '../../../components/button/Button';
-import InputField from '../../../components/input_field/InputField';
 import InputSimple from '../../../components/input_simple/InputSimple';
 
 class InputAbsensi extends Component {
@@ -210,10 +209,6 @@ const mapStateToProps = state => ({
     { id: '2', nama: 'yoshi', checked: false, keterangan: '', ketTambahan: '' },
     { id: '3', nama: 'dimas', checked: false, keterangan: '', ketTambahan: '' },
   ]
-});
-
-const styles = theme => ({
-
 });
 
 const mapDispatchToProps = dispatch => ({

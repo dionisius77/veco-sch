@@ -8,8 +8,32 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modals from '../../../components/modal/Modal';
 import InputField from '../../../components/input_field/InputField';
 import DatePicker from '../../../components/date_picker/DatePicker';
-import { Paper } from '@material-ui/core';
+import { Paper, withStyles, Grid } from '@material-ui/core';
 import Selects from '../../../components/select/Select';
+
+const styles = (theme) => ({
+  toolbar: {
+    marginBottom: 4
+  },
+  buttonGroup: {
+    display: 'inline-block',
+    whiteSpace: 'nowrap'
+  },
+  buttonToolbar: {
+    display: 'inline-block',
+    margin: 0,
+    textAlign: 'center',
+    verticaAlign: 'middle',
+    background: 'none',
+    backgroundmage: 'none',
+    border: '1px solid #ccc',
+    padding: '.375rem 1rem',
+    borderRadius: '4px',
+    lineHeight: 'normal',
+    whiteSpace: 'nowrap',
+    color: '#fff'
+  }
+});
 
 class JadwalUjian extends Component {
   newEvents;
@@ -33,6 +57,47 @@ class JadwalUjian extends Component {
   componentDidMount() {
     this.props.onPushLoading(false);
   }
+
+  CustomToolbar = (toolbar) => {
+    const goToBack = () => {
+      toolbar.date.setMonth(toolbar.date.getMonth() - 1);
+      toolbar.onNavigate('PREV');
+    };
+
+    const goToNext = () => {
+      toolbar.date.setMonth(toolbar.date.getMonth() + 1);
+      toolbar.onNavigate('NEXT');
+    };
+
+    const goToCurrent = () => {
+      const now = new Date();
+      toolbar.date.setMonth(now.getMonth());
+      toolbar.date.setYear(now.getFullYear());
+      toolbar.onNavigate('CURRENT');
+    };
+
+    const label = () => {
+      const date = toolbar.date;
+      return (
+        <span><b>{date.toLocaleString('default', { month: 'long' })}</b><span> {date.getFullYear()}</span></span>
+      );
+    };
+
+    return (
+      <Grid container className={this.props.classes.toolbar}>
+        <Grid item xs={2}>
+          <div className={this.props.classes.buttonGroup}>
+            <button className={this.props.classes.buttonToolbar} onClick={goToBack}>&#8249;</button>
+            <button className={this.props.classes.buttonToolbar} onClick={goToCurrent}>today</button>
+            <button className={this.props.classes.buttonToolbar} onClick={goToNext}>&#8250;</button>
+          </div>
+        </Grid>
+        <Grid item xs={2}>
+          <label>{label()}</label>
+        </Grid>
+      </Grid >
+    );
+  };
 
   dateFormater(date) {
     let month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
@@ -141,9 +206,13 @@ class JadwalUjian extends Component {
     } = this.props;
     return (
       <Fade right duration={500}>
-        <Paper style={{ height: 600, padding: 5 }}>
+        <Paper style={{ padding: '0px 5px 5px 5px', marginTop: -20 }}>
+          <h2 style={{ textAlign: 'center' }}>Jadwal Kegiatan Belajar</h2>
           <Calendar
             events={events}
+            components={{
+              toolbar: this.CustomToolbar
+            }}
             views={['month']}
             localizer={localizer}
             startAccessor="start"
@@ -151,12 +220,13 @@ class JadwalUjian extends Component {
             onNavigate={this.onNext}
             onSelectSlot={this.clickedCalendar}
             selectable={true}
-            style={{ color: '#fff' }}
+            style={{ color: '#fff', height: 600 }}
             onSelectEvent={(event) => this.clickEvent(event)}
             popup={true}
           />
         </Paper>
         <Modals
+          modalTitle='Input Jadwal Kegiatan'
           open={openModal}
           onCloseModal={() => { this.closeModal() }}
           onSubmitModal={() => { this.submitModal() }}
@@ -166,7 +236,6 @@ class JadwalUjian extends Component {
             width: 400,
             height: jenis === 'Tugas' ? 400 : 350
           }}>
-            <h2 style={{ textAlign: 'center' }}>Input Jadwal Kegiatan</h2>
             <Selects name='jenis' id='jenis' label='Jenis Kegiatan' variant='outlined' options={optionJenis} value={jenis} onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
             <InputField id='kegiatan' label='Nama Kegiatan' variant='outlined' required={false} type="text" value={kegiatan} disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
             <DatePicker id='start' label='Tanggal' required={true} value={start} onChange={(id, value) => { this.dateOnChange(id, value) }} isSubmit={false} />
@@ -208,4 +277,4 @@ const mapDispatchToProps = dispatch => ({
   onPushLoading: value => dispatch(pushLoading(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(JadwalUjian);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(JadwalUjian));

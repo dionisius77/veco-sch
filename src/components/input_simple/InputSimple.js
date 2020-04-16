@@ -38,6 +38,7 @@ export default function InputSimple(props) {
         width: '100%',
         maxWidth: 700,
       }}
+      disableUnderline={true}
       placeholder={props.label}
       id={props.id}
       required={props.required}
