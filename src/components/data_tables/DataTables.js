@@ -301,7 +301,7 @@ export default function DataTables(props) {
   const [orderBy, setOrderBy] = React.useState('');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  // const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
@@ -332,11 +332,11 @@ export default function DataTables(props) {
     }, [props.tableName]
   )
 
-  React.useEffect(
-    () => {
-      setDense(props.dense);
-    }, [props.dense]
-  )
+  // React.useEffect(
+  //   () => {
+  //     setDense(props.dense);
+  //   }, [props.dense]
+  // )
 
   React.useEffect(
     () => {

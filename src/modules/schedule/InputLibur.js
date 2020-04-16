@@ -8,7 +8,35 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modals from '../../components/modal/Modal';
 import InputField from '../../components/input_field/InputField';
 import DatePicker from '../../components/date_picker/DatePicker';
-import { Paper } from '@material-ui/core';
+import { Paper, Grid, withStyles } from '@material-ui/core';
+
+const styles = (theme) => ({
+  title: {
+    textAlign: 'center',
+    marginTop: -5
+  },
+  toolbar: {
+    marginBottom: 4
+  },
+  buttonGroup: {
+    display: 'inline-block',
+    whiteSpace: 'nowrap'
+  },
+  buttonToolbar: {
+    display: 'inline-block',
+    margin: 0,
+    textAlign: 'center',
+    verticaAlign: 'middle',
+    background: 'none',
+    backgroundmage: 'none',
+    border: '1px solid #ccc',
+    padding: '.375rem 1rem',
+    borderRadius: '4px',
+    lineHeight: 'normal',
+    whiteSpace: 'nowrap',
+    color: '#fff'
+  }
+});
 
 class InputLibur extends Component {
   newEvents;
@@ -28,6 +56,47 @@ class InputLibur extends Component {
 
   componentDidMount() {
   }
+
+  CustomToolbar = (toolbar) => {
+    const goToBack = () => {
+      toolbar.date.setMonth(toolbar.date.getMonth() - 1);
+      toolbar.onNavigate('PREV');
+    };
+
+    const goToNext = () => {
+      toolbar.date.setMonth(toolbar.date.getMonth() + 1);
+      toolbar.onNavigate('NEXT');
+    };
+
+    const goToCurrent = () => {
+      const now = new Date();
+      toolbar.date.setMonth(now.getMonth());
+      toolbar.date.setYear(now.getFullYear());
+      toolbar.onNavigate('CURRENT');
+    };
+
+    const label = () => {
+      const date = toolbar.date;
+      return (
+        <span><b>{date.toLocaleString('default', { month: 'long' })}</b><span> {date.getFullYear()}</span></span>
+      );
+    };
+
+    return (
+      <Grid container className={this.props.classes.toolbar}>
+        <Grid item xs={2}>
+          <div className={this.props.classes.buttonGroup}>
+            <button className={this.props.classes.buttonToolbar} onClick={goToBack}>&#8249;</button>
+            <button className={this.props.classes.buttonToolbar} onClick={goToCurrent}>today</button>
+            <button className={this.props.classes.buttonToolbar} onClick={goToNext}>&#8250;</button>
+          </div>
+        </Grid>
+        <Grid item xs={2}>
+          <label>{label()}</label>
+        </Grid>
+      </Grid >
+    );
+  };
 
   dateFormater(date) {
     let month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
@@ -106,9 +175,13 @@ class InputLibur extends Component {
     const { start, end, title, events } = this.state;
     return (
       <Fade right duration={500}>
-        <Paper style={{ height: 600, padding: 5 }}>
+        <Paper style={{ padding: 5 }}>
+          <h2 className={this.props.classes.title}>Input Hari Raya</h2>
           <Calendar
             events={events}
+            components={{
+              toolbar: this.CustomToolbar
+            }}
             views={['month']}
             localizer={localizer}
             startAccessor="start"
@@ -116,7 +189,7 @@ class InputLibur extends Component {
             onNavigate={this.onNext}
             onSelectSlot={this.clickedCalendar}
             selectable={true}
-            style={{ color: '#fff' }}
+            style={{ height: 600, color: '#fff' }}
             onSelectEvent={(event) => this.clickEvent(event)}
             popup={true}
           />
@@ -170,4 +243,4 @@ const mapDispatchToProps = dispatch => ({
   onPushLoading: value => dispatch(pushLoading(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(InputLibur);
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(InputLibur));

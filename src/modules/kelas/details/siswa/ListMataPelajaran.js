@@ -29,9 +29,6 @@ class InputMataPelajaran extends Component {
   }
 
   takeAction = (nik, destination, sourceIndex) => {
-    console.log(nik);
-    console.log(destination);
-    console.log(sourceIndex);
     if (destination === 'droppableA') {
       let data = this.newListB[sourceIndex];
       let isAvailable = this.newListA.filter((val) => {

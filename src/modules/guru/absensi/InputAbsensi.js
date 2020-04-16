@@ -47,6 +47,7 @@ class InputAbsensi extends Component {
           this.newDataSiswa[index].keterangan = value;
           this.setState({ dataSiswa: this.newDataSiswa });
         }
+        return null;
       });
       console.log(this.state.dataSiswa)
     }
@@ -60,6 +61,7 @@ class InputAbsensi extends Component {
         this.newDataSiswa[index].ketTambahan = '';
         this.setState({ dataSiswa: this.newDataSiswa });
       }
+      return null;
     });
     console.log(this.state.dataSiswa)
   }
@@ -69,6 +71,7 @@ class InputAbsensi extends Component {
       if (data.id === id) {
         this.newDataSiswa[index].ketTambahan = value;
       }
+      return null
     });
     this.setState({ dataSiswa: this.newDataSiswa });
     console.log(this.state.dataSiswa)
