@@ -15,11 +15,12 @@ const useStyles = makeStyles((theme) => ({
   },
   inline: {
     display: 'inline'
-  }
+  },
 }))
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   background: isDragging ? 'lightblue' : '',
+  color: isDragging ? '#424242' : '',
   ...draggableStyle
 })
 
@@ -36,7 +37,23 @@ export default function ListComponent(props) {
   return (
     <Droppable droppableId={props.droppableId}>
       {(provided, snapshot) => (
-        <Scrollbars className={classes.root} autoHide autoHideDuration={200} autoHideTimeout={1000}>
+        <Scrollbars
+          className={classes.root}
+          // autoHide
+          // autoHideDuration={200}
+          // autoHideTimeout={1000}
+          renderThumbVertical={({ style, ...props }) =>
+            <div
+              {...props}
+              style={{
+                ...style,
+                backgroundColor: '#f8bbd0',
+                width: 4,
+                opacity: 0.5
+              }}
+            />
+          }
+        >
           <List
             ref={provided.innerRef}
           >
@@ -84,7 +101,8 @@ export default function ListComponent(props) {
             }
           </List>
         </Scrollbars>
-      )}
-    </Droppable>
+      )
+      }
+    </Droppable >
   )
 }

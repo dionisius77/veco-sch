@@ -5,7 +5,8 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { pink, red, amber, blue, lightGreen, grey } from "@material-ui/core/colors";
 import { getLoading, getAlert, pushAlert, getLogin } from "./ActionLayout";
 import AlertCustom from "../alert/Alert";
-
+import { Beforeunload } from 'react-beforeunload';
+import axios from 'axios';
 
 class Layout extends Component {
   globalTheme1 = createMuiTheme({
@@ -60,7 +61,7 @@ class Layout extends Component {
       MuiInputLabel: {
         outlined: {
           color: 'rgba(225, 225, 225, 0.9)',
-          '&$focused' : {
+          '&$focused': {
             color: '#fff'
           },
         },
@@ -80,6 +81,13 @@ class Layout extends Component {
       }
     }
     this.closeAlert = this.closeAlert.bind(this);
+  }
+
+  onUnload = () => {
+    axios.interceptors.request.use((config) => {
+      console.log(config);
+    }, (err)=> {console.log(err)});
+    return '';
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -127,15 +135,17 @@ class Layout extends Component {
   render() {
     return (
       <React.Fragment>
-        <ThemeProvider theme={this.globalTheme1}>
-          <Header loadingFlag={this.state.loadingFlag} />
-          <AlertCustom
-            isOpen={this.state.alert.open}
-            message={this.state.alert.message}
-            onClose={this.closeAlert}
-            type={this.state.alert.type}
-          />
-        </ThemeProvider>
+        <Beforeunload onBeforeunload={() => {this.onUnload()}}>
+          <ThemeProvider theme={this.globalTheme1}>
+            <Header loadingFlag={this.state.loadingFlag} />
+            <AlertCustom
+              isOpen={this.state.alert.open}
+              message={this.state.alert.message}
+              onClose={this.closeAlert}
+              type={this.state.alert.type}
+            />
+          </ThemeProvider>
+        </Beforeunload>
       </React.Fragment>
     )
   }

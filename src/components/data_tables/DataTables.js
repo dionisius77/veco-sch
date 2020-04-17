@@ -48,6 +48,7 @@ import SearchField from '../search_field/SearchField';
 import ConfigIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
 import Arrow from '@material-ui/icons/KeyboardArrowRight';
+import { Zoom } from 'react-reveal';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -110,7 +111,7 @@ function EnhancedTableHead(props) {
 
   return (
     <TableHead>
-      <TableRow style={{height: 50}}>
+      <TableRow style={{ height: 50 }}>
         <StyledTblCell padding="checkbox">
           {/* <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -175,10 +176,12 @@ const useToolbarStyles = makeStyles(theme => ({
       ? {
         color: theme.palette.secondary.main,
         backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        transition: 'background-color 0.8s'
       }
       : {
         color: theme.palette.text.primary,
         backgroundColor: theme.palette.secondary.dark,
+        transition: 'background-color 0.8s'
       },
   title: {
     flexGrow: 1,
@@ -192,10 +195,16 @@ const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
   const [showConfigs, setShowConfigs] = React.useState(false);
+  const [showParent, setShowParent] = React.useState(true);
+  const [showChild, setShowChild] = React.useState(false);
 
   const handleConfigs = () => {
     props.handleConfigs(!showConfigs);
     setShowConfigs(!showConfigs);
+    setTimeout(() => {
+      setShowParent(!showParent);
+      setShowChild(!showChild);
+    }, 100);
   }
 
   return (
@@ -218,50 +227,56 @@ const EnhancedTableToolbar = props => {
         )}
 
       {showConfigs ? (
-        <div>
-          {props.handleAdd &&
-            <Tooltip title="Add Data" className={classes.icon}>
-              <IconButton aria-label="add Data" onClick={() => { props.handleAdd() }}>
-                <AddIcon style={{ color: '#424242' }} />
-              </IconButton>
-            </Tooltip>
-          }
-          {props.handleEdit &&
-            <Tooltip title="Edit">
-              <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
-                <EditIcon style={{ color: '#424242' }} />
-              </IconButton>
-            </Tooltip>
-          }
-          {props.handleDelete &&
-            <Tooltip title="Delete">
-              <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
-                <DeleteIcon style={{ color: '#424242' }} />
-              </IconButton>
-            </Tooltip>
-          }
-          <Tooltip title="Close">
-            <IconButton aria-label="close" onClick={handleConfigs}>
-              <CloseIcon style={{ color: '#424242' }} />
-            </IconButton>
-          </Tooltip>
-        </div>
-      ) : (
+        <Zoom opposite duration={500} when={showChild}>
           <div>
-            <SearchField searchHandleChange={props.handleSearch} />
-            {props.allowEdit &&
-              <Tooltip title="Configuration" className={classes.icon}>
-                <IconButton aria-label="configuration" onClick={handleConfigs}>
-                  <ConfigIcon style={{ color: '#fff' }} />
+            {props.handleAdd &&
+              <Tooltip title="Add Data" className={classes.icon}>
+                <IconButton aria-label="add Data" onClick={() => { handleConfigs(); props.handleAdd() }}>
+                  <AddIcon style={{ color: '#424242' }} />
                 </IconButton>
               </Tooltip>
             }
-            <Tooltip title="Download Excel" className={classes.icon}>
-              <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
-                <DownloadIcon style={{ color: '#fff' }} />
+            {props.handleEdit &&
+              <Tooltip title="Edit">
+                <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
+                  <EditIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
+            }
+            {props.handleDelete &&
+              <Tooltip title="Delete">
+                <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
+                  <DeleteIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
+            }
+            <Tooltip title="Close">
+              <IconButton aria-label="close" onClick={handleConfigs}>
+                <CloseIcon style={{ color: '#424242' }} />
               </IconButton>
             </Tooltip>
           </div>
+        </Zoom>
+      ) : (
+          <Zoom opposite duration={500} when={showParent}>
+            <div>
+              <SearchField searchHandleChange={props.handleSearch} />
+              {props.allowEdit &&
+                <Tooltip title="Configuration" className={classes.icon}>
+                  <IconButton aria-label="configuration" onClick={handleConfigs}>
+                    <ConfigIcon style={{ color: '#fff' }} />
+                  </IconButton>
+                </Tooltip>
+              }
+              {props.handleDownload &&
+                <Tooltip title="Download Excel" className={classes.icon}>
+                  <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
+                    <DownloadIcon style={{ color: '#fff' }} />
+                  </IconButton>
+                </Tooltip>
+              }
+            </div>
+          </Zoom>
         )}
     </Toolbar>
   );
@@ -463,7 +478,7 @@ export default function DataTables(props) {
 
                     return (
                       <TableRow
-                        style={{height: 40}}
+                        style={{ height: 40 }}
                         hover
                         onClick={event => goToDetail(event, row.uniqueId)}
                         role="checkbox"
@@ -528,8 +543,8 @@ DataTables.propTypes = {
   orderConfig: PropTypes.bool,  //={} (boolean)
   orderBy: PropTypes.string,  //='' (string)
   handleDownload: PropTypes.func, //={this.handleDownload} (function ())
-  handleChangePage: PropTypes.func.isRequired, //={this.onChangePage} (function (page, limit))
-  handleSearch: PropTypes.func.isRequired, //={this.onSearch} (function (value))
+  handleChangePage: PropTypes.func, //={this.onChangePage} (function (page, limit))
+  handleSearch: PropTypes.func, //={this.onSearch} (function (value))
   handleAdd: PropTypes.func,  //={this.handleAdd} (function ())
   handleEdit: PropTypes.func, //={this.handleEdit} (function (checked))
   handleDelete: PropTypes.func, //={this.handleDelete} (function (checked))

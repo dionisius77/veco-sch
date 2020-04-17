@@ -26,16 +26,18 @@ export default function InputField(props) {
   )
 
   const handleChange = (e) => {
+    let value = props.type === 'number' ? parseInt(e.target.value) : e.target.value;
     setValue(e.target.value)
     if (props.onChange) {
-      props.onChange(e.target.id, e.target.value);
+      props.onChange(e.target.id, value);
     }
   }
 
   const handleBlur = (e) => {
+    let value = props.type === 'number' ? parseInt(e.target.value) : e.target.value;
     setValue(e.target.value);
     if (props.onBlur) {
-      props.onBlur(e.target.id, e.target.value);
+      props.onBlur(e.target.id, value);
     }
   }
 
@@ -73,7 +75,7 @@ InputField.propTypes = {
   variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
   required: PropTypes.bool.isRequired,
   type: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.any.isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { pushLoading } from '../../../components/layout/ActionLayout';
 import { connect } from 'react-redux';
 import { Fade } from 'react-reveal';
-import { Grid, withStyles } from '@material-ui/core';
+import { Grid, withStyles, Paper } from '@material-ui/core';
 import InputField from '../../../components/input_field/InputField';
 import Selects from '../../../components/select/Select';
 import Button from '../../../components/button/Button';
@@ -84,16 +84,7 @@ class FormSiswa extends Component {
         },
         jumlahSaudara: { value: '', isValid: false },
         jumlahPrestasi: 0,
-        prestasi: [
-          {
-            jenis: { value: '', isValid: false },
-            tingkat: { value: '', isValid: false },
-            namaPrestasi: { value: '', isValid: false },
-            tahun: { value: '', isValid: false },
-            penyelenggara: { value: '', isValid: false },
-            peringkat: { value: '', isValid: false },
-          },
-        ],
+        prestasi: [],
         beasiswa: [
           {
             jenis: { value: '', isValid: false },
@@ -191,7 +182,7 @@ class FormSiswa extends Component {
   }
 
   changePrestasi = (id, value) => {
-    let pushTemplate = value - this.newprestasi.length;
+    let pushTemplate = value - this.newFormSiswa.prestasi.length;
     this.newFormSiswa.jumlahPrestasi = value;
     if (pushTemplate > 0) {
       for (let i = 0; i < pushTemplate; i++) {
@@ -206,7 +197,7 @@ class FormSiswa extends Component {
       }
     } else {
       for (let i = 0; i < 0 - pushTemplate; i++) {
-        this.newprestasi.pop();
+        this.newFormSiswa.prestasi.pop();
       }
     }
     this.setState({ formSiswa: this.newFormSiswa });
@@ -264,294 +255,296 @@ class FormSiswa extends Component {
       classes,
     } = this.props;
     return (
-      <Fade right opposite when={pageLoaded} duration={500}>
-        <h1 style={{
-          textAlign: 'left',
-          paddingBottom: 10
-        }}>
-          Form Pendaftaran Siswa
+      <Paper style={{ padding: 5 }}>
+        <Fade right opposite when={pageLoaded} duration={500}>
+          <h1 style={{
+            textAlign: 'center',
+            paddingBottom: 10
+          }}>
+            Form Pendaftaran Siswa
         </h1>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Data Pribadi</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='nama' label='Nama Lengkap' required={true} type="text" value={formSiswa.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='nisn' label='NISN' required={true} type="number" value={formSiswa.nisn.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='tempatLahir' label='Tempat Lahir' required={true} type="text" value={formSiswa.tempatLahir.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='noAkta' label='No. Akta' required={true} type="number" value={formSiswa.noAkta.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='kewarganegaraan' label='Kewarganegaraan' required={true} type="text" value={formSiswa.kewarganegaraan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='alamat' label='Alamat' required={true} type="text" value={formSiswa.alamat.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='kelurahan' label='Kelurahan / Desa' required={true} type="text" value={formSiswa.kelurahan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='tempatTinggal' id='tempatTinggal' label='Tempat Tinggal' variant='outlined' options={tempatTinggal} value={formSiswa.tempatTinggal.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <InputField id='nomorKKS' label='Nomor KKS' required={false} type="number" value={formSiswa.nomorKKS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='penerimaKPS' id='penerimaKPS' label='Penerima KPS/PKH' variant='outlined' options={penerimaKPS} value={formSiswa.penerimaKPS.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Grid container spacing={1}>
-              <Grid item xs={8}>
-                <Selects name='punyaKIP' id='punyaKIP' label='Apakah punya KIP?' variant='outlined' options={punyaKIP} value={formSiswa.punyaKIP.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-              </Grid>
-              <Grid item xs={4}>
-                {formSiswa.punyaKIP.value === 'ya' &&
-                  <InputField id='noKIP' label='No. KIP' required={true} type="number" value={formSiswa.noKIP.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-                }
-              </Grid>
-            </Grid>
-            {formSiswa.punyaKIP.value === 'ya' &&
-              <InputField id='namaKIP' label='Nama tertera di KIP' required={true} type="text" value={formSiswa.namaKIP.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            }
-          </Grid>
-          <Grid item xs>
-            <Selects name='jenisKelamin' id='jenisKelamin' label='Jenis Kelamin' variant='outlined' options={jenisKelamin} value={formSiswa.jenisKelamin.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <InputField id='nik' label='NIK' required={true} type="number" value={formSiswa.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <DatePicker id='tglLahir' label='Tanggal Lahir' required={true} value={formSiswa.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
-            <Selects name='agama' id='agama' label='Agama' variant='outlined' options={agama} value={formSiswa.agama.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Selects name='kebutuhanKhusus' id='kebutuhanKhusus' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={formSiswa.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Grid container spacing={1}>
-              <Grid item xs={3}>
-                <InputField id='rt' label='RT' required={true} type="number" value={formSiswa.rt.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-              <Grid item xs={3}>
-                <InputField id='rw' label='RW' required={true} type="number" value={formSiswa.rw.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-              <Grid item xs={3}>
-                <InputField id='kodePos' label='Kode Pos' required={true} type="number" value={formSiswa.kodePos.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-            </Grid>
-            <InputField id='kecamatan' label='Kecamatan' required={true} type="text" value={formSiswa.kecamatan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='transportasi' id='transportasi' label='Moda Transportasi' variant='outlined' options={transportasi} value={formSiswa.transportasi.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <InputField id='anakKe' label='Anak-ke' required={true} type="number" value={formSiswa.anakKe.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            {formSiswa.penerimaKPS.value === 'ya' &&
-              <InputField id='noKPS' label='No. KPS/PKH' required={true} type="number" value={formSiswa.noKPS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            }
-            <Selects name='alasanPIP' id='alasanPIP' label='Alasan layak PIP' variant='outlined' options={alasanPIP} value={formSiswa.alasanPIP.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Data Ayah Kandung</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='nama-ayah' label='Nama' required={true} type="text" value={ayah.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <DatePicker id='tglLahir-ayah' label='Tanggal Lahir' required={true} value={ayah.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
-            <Selects name='pekerjaan-ayah' id='pekerjaan-ayah' label='Pekerjaan' variant='outlined' options={pekerjaan} value={ayah.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Selects name='kebutuhanKhusus-ayah' id='kebutuhanKhusus-ayah' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={ayah.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-          </Grid>
-          <Grid item xs>
-            <InputField id='nik-ayah' label='NIK' required={true} type="number" value={ayah.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='pendidikan-ayah' id='pendidikan-ayah' label='Pendidikan' variant='outlined' options={pendidikan} value={ayah.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Selects name='penghasilan-ayah' id='penghasilan-ayah' label='Penghasilan' variant='outlined' options={penghasilan} value={ayah.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Data Ibu Kandung</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='nama-ibu' label='Nama' required={true} type="text" value={ibu.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <DatePicker id='tglLahir-ibu' label='Tanggal Lahir' required={true} value={ibu.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
-            <Selects name='pekerjaan-ibu' id='pekerjaan-ibu' label='Pekerjaan' variant='outlined' options={pekerjaan} value={ibu.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Selects name='kebutuhanKhusus-ibu' id='kebutuhanKhusus-ibu' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={ibu.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-          </Grid>
-          <Grid item xs>
-            <InputField id='nik-ibu' label='NIK' required={true} type="number" value={ibu.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='pendidikan-ibu' id='pendidikan-ibu' label='Pendidikan' variant='outlined' options={pendidikan} value={ibu.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <Selects name='penghasilan-ibu' id='penghasilan-ibu' label='Penghasilan' variant='outlined' options={penghasilan} value={ibu.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Data Wali</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='nama-wali' label='Nama' required={false} type="text" value={wali.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <DatePicker id='tglLahir-wali' label='Tanggal Lahir' required={true} value={wali.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
-            <Selects name='pekerjaan-wali' id='pekerjaan-wali' label='Pekerjaan' variant='outlined' options={pekerjaan} value={wali.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
-            <Selects name='kebutuhanKhusus-wali' id='kebutuhanKhusus-wali' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={wali.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
-          </Grid>
-          <Grid item xs>
-            <InputField id='nik-wali' label='NIK' required={false} type="number" value={wali.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <Selects name='pendidikan-wali' id='pendidikan-wali' label='Pendidikan' variant='outlined' options={pendidikan} value={wali.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
-            <Selects name='penghasilan-wali' id='penghasilan-wali' label='Penghasilan' variant='outlined' options={penghasilan} value={wali.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Kontak</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='noTelp' label='No telepon Rumah' required={false} type="number" value={formSiswa.noTelp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='email' label='email' required={true} type="email" value={formSiswa.email.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-          <Grid item xs>
-            <InputField id='noHp' label='No Hand Phone' required={true} type="number" value={formSiswa.noHp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Data Priodik</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <Grid container spacing={1}>
-              <Grid item xs={3}>
-                <InputField id='tinggiBadan' label='Tinggi Badan' required={true} type="number" value={formSiswa.tinggiBadan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-              <Grid item xs={3}>
-                <InputField id='beratBadan' label='Berat Badan' required={true} type="number" value={formSiswa.beratBadan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-            </Grid>
-            <Grid container spacing={1}>
-              <Grid item xs={6}>
-                <h4>Waktu Tempuh ke Sekolah</h4>
-              </Grid>
-              <Grid item xs={3}>
-                <InputField id='jam-waktuTempuh' label='Jam' required={true} type="number" value={waktuTempuh.jam.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-              <Grid item xs={3}>
-                <InputField id='menit-waktuTempuh' label='Menit' required={true} type="number" value={waktuTempuh.menit.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Data Pribadi</h2>
             </Grid>
           </Grid>
-          <Grid item xs>
-            <Selects name='jarak' id='jarak' label='Jarak Penerima KPS/PKH ke Sekolah' variant='outlined' options={jarak} value={formSiswa.jarak.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
-            <InputField id='jumlahSaudara' label='Jumlah Saudara' required={true} type="number" value={formSiswa.jumlahSaudara.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Prestasi</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={0}>
-          <Grid item xs={3}>
-            <InputField id='jumlahPrestasi' label='Jumlah Prestasi' required={false} type="number" value={formSiswa.jumlahPrestasi} disabled={false} onChange={this.changePrestasi} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-        </Grid>
-        {formSiswa.jumlahPrestasi > 0
-          ?
-          prestasi.map((val, i) => {
-            let jenis = `jenis-${i}`;
-            let tingkat = `tingkat-${i}`;
-            let nama = `namaPrestasi-${i}`;
-            let penyelenggara = `penyelenggara-${i}`;
-            let tahun = `tahun-${i}`;
-            let peringkat = `peringkat-${i}`;
-            return (
-              <Grid container spacing={5} key={i}>
-                <Grid item xs>
-                  <Selects name={jenis} id={jenis} label='Jenis Prestasi' variant='outlined' options={jenisPrestasi} value={prestasi[i].jenis.value} onChange={this.changePrestasiSelect} isSubmit={isSubmit} disable={false} required={false} />
-                  <InputField id={nama} label='Nama Prestasi' required={false} type="text" value={prestasi[i].namaPrestasi.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
-                  <Grid container spacing={1}>
-                    <Grid item xs={3}>
-                      <InputField id={tahun} label='Tahun' required={false} type="number" value={prestasi[i].tahun.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <InputField id={peringkat} label='Peringkat ke-' required={false} type="number" value={prestasi[i].peringkat.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
-                    </Grid>
-                  </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='nama' label='Nama Lengkap' required={true} type="text" value={formSiswa.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='nisn' label='NISN' required={true} type="number" value={formSiswa.nisn.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='tempatLahir' label='Tempat Lahir' required={true} type="text" value={formSiswa.tempatLahir.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='noAkta' label='No. Akta' required={true} type="number" value={formSiswa.noAkta.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='kewarganegaraan' label='Kewarganegaraan' required={true} type="text" value={formSiswa.kewarganegaraan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='alamat' label='Alamat' required={true} type="text" value={formSiswa.alamat.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='kelurahan' label='Kelurahan / Desa' required={true} type="text" value={formSiswa.kelurahan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='tempatTinggal' id='tempatTinggal' label='Tempat Tinggal' variant='outlined' options={tempatTinggal} value={formSiswa.tempatTinggal.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <InputField id='nomorKKS' label='Nomor KKS' required={false} type="number" value={formSiswa.nomorKKS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='penerimaKPS' id='penerimaKPS' label='Penerima KPS/PKH' variant='outlined' options={penerimaKPS} value={formSiswa.penerimaKPS.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Grid container spacing={1}>
+                <Grid item xs={8}>
+                  <Selects name='punyaKIP' id='punyaKIP' label='Apakah punya KIP?' variant='outlined' options={punyaKIP} value={formSiswa.punyaKIP.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
                 </Grid>
-                <Grid item xs>
-                  <Selects name={tingkat} id={tingkat} label='Jenis Prestasi' variant='outlined' options={tingkatPrestasi} value={prestasi[i].tingkat.value} onChange={this.changePrestasiSelect} isSubmit={isSubmit} disable={false} required={false} />
-                  <InputField id={penyelenggara} label='Penyelenggara' required={false} type="text" value={prestasi[i].penyelenggara.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
+                <Grid item xs={4}>
+                  {formSiswa.punyaKIP.value === 'ya' &&
+                    <InputField id='noKIP' label='No. KIP' required={true} type="number" value={formSiswa.noKIP.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                  }
                 </Grid>
               </Grid>
-            )
-          })
-          :
-          <div></div>
-        }
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Beasiswa</h2>
+              {formSiswa.punyaKIP.value === 'ya' &&
+                <InputField id='namaKIP' label='Nama tertera di KIP' required={true} type="text" value={formSiswa.namaKIP.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              }
+            </Grid>
+            <Grid item xs>
+              <Selects name='jenisKelamin' id='jenisKelamin' label='Jenis Kelamin' variant='outlined' options={jenisKelamin} value={formSiswa.jenisKelamin.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <InputField id='nik' label='NIK' required={true} type="number" value={formSiswa.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <DatePicker id='tglLahir' label='Tanggal Lahir' required={true} value={formSiswa.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
+              <Selects name='agama' id='agama' label='Agama' variant='outlined' options={agama} value={formSiswa.agama.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Selects name='kebutuhanKhusus' id='kebutuhanKhusus' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={formSiswa.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Grid container spacing={1}>
+                <Grid item xs={3}>
+                  <InputField id='rt' label='RT' required={true} type="number" value={formSiswa.rt.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+                <Grid item xs={3}>
+                  <InputField id='rw' label='RW' required={true} type="number" value={formSiswa.rw.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+                <Grid item xs={3}>
+                  <InputField id='kodePos' label='Kode Pos' required={true} type="number" value={formSiswa.kodePos.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+              </Grid>
+              <InputField id='kecamatan' label='Kecamatan' required={true} type="text" value={formSiswa.kecamatan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='transportasi' id='transportasi' label='Moda Transportasi' variant='outlined' options={transportasi} value={formSiswa.transportasi.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <InputField id='anakKe' label='Anak-ke' required={true} type="number" value={formSiswa.anakKe.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              {formSiswa.penerimaKPS.value === 'ya' &&
+                <InputField id='noKPS' label='No. KPS/PKH' required={true} type="number" value={formSiswa.noKPS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              }
+              <Selects name='alasanPIP' id='alasanPIP' label='Alasan layak PIP' variant='outlined' options={alasanPIP} value={formSiswa.alasanPIP.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+            </Grid>
           </Grid>
-        </Grid>
-        {
-          beasiswa.map((val, i) => {
-            let jenis = `jenis-${i}`;
-            let keterangan = `keterangan-${i}`;
-            let tahunMulai = `tahunMulai-${i}`;
-            let tahunSelesai = `tahunSelesai-${i}`;
-            return (
-              <Grid container spacing={5} key={i}>
-                <Grid item xs>
-                  <Selects name={jenis} id={jenis} label='Jenis Beasiswa' variant='outlined' options={jenisBeasiswa} value={beasiswa[i].jenis.value} onChange={this.changeBeasiswaSelect} isSubmit={isSubmit} disable={false} required={false} />
-                  <Grid container spacing={1}>
-                    <Grid item xs={4}>
-                      <InputField id={tahunMulai} label='Tahun Mulai' required={false} type="number" value={beasiswa[i].tahunMulai.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <InputField id={tahunSelesai} label='Tahun Selesai' required={false} type="number" value={beasiswa[i].tahunSelesai.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Data Ayah Kandung</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='nama-ayah' label='Nama' required={true} type="text" value={ayah.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <DatePicker id='tglLahir-ayah' label='Tanggal Lahir' required={true} value={ayah.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
+              <Selects name='pekerjaan-ayah' id='pekerjaan-ayah' label='Pekerjaan' variant='outlined' options={pekerjaan} value={ayah.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Selects name='kebutuhanKhusus-ayah' id='kebutuhanKhusus-ayah' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={ayah.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+            </Grid>
+            <Grid item xs>
+              <InputField id='nik-ayah' label='NIK' required={true} type="number" value={ayah.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='pendidikan-ayah' id='pendidikan-ayah' label='Pendidikan' variant='outlined' options={pendidikan} value={ayah.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Selects name='penghasilan-ayah' id='penghasilan-ayah' label='Penghasilan' variant='outlined' options={penghasilan} value={ayah.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Data Ibu Kandung</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='nama-ibu' label='Nama' required={true} type="text" value={ibu.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <DatePicker id='tglLahir-ibu' label='Tanggal Lahir' required={true} value={ibu.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
+              <Selects name='pekerjaan-ibu' id='pekerjaan-ibu' label='Pekerjaan' variant='outlined' options={pekerjaan} value={ibu.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Selects name='kebutuhanKhusus-ibu' id='kebutuhanKhusus-ibu' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={ibu.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+            </Grid>
+            <Grid item xs>
+              <InputField id='nik-ibu' label='NIK' required={true} type="number" value={ibu.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='pendidikan-ibu' id='pendidikan-ibu' label='Pendidikan' variant='outlined' options={pendidikan} value={ibu.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <Selects name='penghasilan-ibu' id='penghasilan-ibu' label='Penghasilan' variant='outlined' options={penghasilan} value={ibu.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Data Wali</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='nama-wali' label='Nama' required={false} type="text" value={wali.nama.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <DatePicker id='tglLahir-wali' label='Tanggal Lahir' required={true} value={wali.tglLahir.value} onChange={this.dateChange} isSubmit={isSubmit} />
+              <Selects name='pekerjaan-wali' id='pekerjaan-wali' label='Pekerjaan' variant='outlined' options={pekerjaan} value={wali.pekerjaan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
+              <Selects name='kebutuhanKhusus-wali' id='kebutuhanKhusus-wali' label='Kebutuhan Khusus' variant='outlined' options={kebutuhanKhusus} value={wali.kebutuhanKhusus.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
+            </Grid>
+            <Grid item xs>
+              <InputField id='nik-wali' label='NIK' required={false} type="number" value={wali.nik.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <Selects name='pendidikan-wali' id='pendidikan-wali' label='Pendidikan' variant='outlined' options={pendidikan} value={wali.pendidikan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
+              <Selects name='penghasilan-wali' id='penghasilan-wali' label='Penghasilan' variant='outlined' options={penghasilan} value={wali.penghasilan.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Kontak</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='noTelp' label='No telepon Rumah' required={false} type="number" value={formSiswa.noTelp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='email' label='email' required={true} type="email" value={formSiswa.email.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+            <Grid item xs>
+              <InputField id='noHp' label='No Hand Phone' required={true} type="number" value={formSiswa.noHp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Data Priodik</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <Grid container spacing={1}>
+                <Grid item xs={3}>
+                  <InputField id='tinggiBadan' label='Tinggi Badan' required={true} type="number" value={formSiswa.tinggiBadan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+                <Grid item xs={3}>
+                  <InputField id='beratBadan' label='Berat Badan' required={true} type="number" value={formSiswa.beratBadan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+              </Grid>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <h4>Waktu Tempuh ke Sekolah</h4>
+                </Grid>
+                <Grid item xs={3}>
+                  <InputField id='jam-waktuTempuh' label='Jam' required={true} type="number" value={waktuTempuh.jam.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+                <Grid item xs={3}>
+                  <InputField id='menit-waktuTempuh' label='Menit' required={true} type="number" value={waktuTempuh.menit.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs>
+              <Selects name='jarak' id='jarak' label='Jarak Penerima KPS/PKH ke Sekolah' variant='outlined' options={jarak} value={formSiswa.jarak.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={false} />
+              <InputField id='jumlahSaudara' label='Jumlah Saudara' required={true} type="number" value={formSiswa.jumlahSaudara.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Prestasi</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={0}>
+            <Grid item xs={3}>
+              <InputField id='jumlahPrestasi' label='Jumlah Prestasi' required={false} type="number" value={formSiswa.jumlahPrestasi} disabled={false} onChange={this.changePrestasi} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+          </Grid>
+          {formSiswa.jumlahPrestasi > 0
+            ?
+            prestasi.map((val, i) => {
+              let jenis = `jenis-${i}`;
+              let tingkat = `tingkat-${i}`;
+              let nama = `namaPrestasi-${i}`;
+              let penyelenggara = `penyelenggara-${i}`;
+              let tahun = `tahun-${i}`;
+              let peringkat = `peringkat-${i}`;
+              return (
+                <Grid container spacing={5} key={i}>
+                  <Grid item xs>
+                    <Selects name={jenis} id={jenis} label='Jenis Prestasi' variant='outlined' options={jenisPrestasi} value={prestasi[i].jenis.value} onChange={this.changePrestasiSelect} isSubmit={isSubmit} disable={false} required={false} />
+                    <InputField id={nama} label='Nama Prestasi' required={false} type="text" value={prestasi[i].namaPrestasi.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
+                    <Grid container spacing={1}>
+                      <Grid item xs={3}>
+                        <InputField id={tahun} label='Tahun' required={false} type="number" value={prestasi[i].tahun.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
+                      </Grid>
+                      <Grid item xs={3}>
+                        <InputField id={peringkat} label='Peringkat ke-' required={false} type="number" value={prestasi[i].peringkat.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
+                      </Grid>
                     </Grid>
                   </Grid>
+                  <Grid item xs>
+                    <Selects name={tingkat} id={tingkat} label='Jenis Prestasi' variant='outlined' options={tingkatPrestasi} value={prestasi[i].tingkat.value} onChange={this.changePrestasiSelect} isSubmit={isSubmit} disable={false} required={false} />
+                    <InputField id={penyelenggara} label='Penyelenggara' required={false} type="text" value={prestasi[i].penyelenggara.value} disabled={false} onBlur={this.inputPrestasiOnBlur} isSubmit={isSubmit} variant='outlined' />
+                  </Grid>
+                </Grid>
+              )
+            })
+            :
+            <div></div>
+          }
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Beasiswa</h2>
+            </Grid>
+          </Grid>
+          {
+            beasiswa.map((val, i) => {
+              let jenis = `jenis-${i}`;
+              let keterangan = `keterangan-${i}`;
+              let tahunMulai = `tahunMulai-${i}`;
+              let tahunSelesai = `tahunSelesai-${i}`;
+              return (
+                <Grid container spacing={5} key={i}>
+                  <Grid item xs>
+                    <Selects name={jenis} id={jenis} label='Jenis Beasiswa' variant='outlined' options={jenisBeasiswa} value={beasiswa[i].jenis.value} onChange={this.changeBeasiswaSelect} isSubmit={isSubmit} disable={false} required={false} />
+                    <Grid container spacing={1}>
+                      <Grid item xs={4}>
+                        <InputField id={tahunMulai} label='Tahun Mulai' required={false} type="number" value={beasiswa[i].tahunMulai.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <InputField id={tahunSelesai} label='Tahun Selesai' required={false} type="number" value={beasiswa[i].tahunSelesai.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs>
+                    <InputField id={keterangan} label='Keterangan' required={false} type="text" value={beasiswa[i].keterangan.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
+                  </Grid>
+                </Grid>
+              )
+            })
+          }
+          <Grid container>
+            <Grid item xs={12} className={classes.titleHeader}>
+              <h2 style={{ textAlign: 'center' }}>Registrasi Peserta Didik</h2>
+            </Grid>
+          </Grid>
+          <Grid container spacing={5}>
+            <Grid item xs>
+              <InputField id='kompetensiKeahlian' label='Kompetensi Keahlian (SMK)' required={false} type="text" value={formSiswa.kompetensiKeahlian.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='nis' label='NIS' required={true} type="number" value={formSiswa.nis.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='asalSekolah' label='Asal Sekolah' required={true} type="text" value={formSiswa.asalSekolah.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='noIjazah' label='No. Seri Ijazah' required={true} type="number" value={formSiswa.noIjazah.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+            <Grid item xs>
+              <Selects name='jenisPendaftaran' id='jenisPendaftaran' label='Jenis Pendaftaran' variant='outlined' options={jenisPendaftaran} value={formSiswa.jenisPendaftaran.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+              <InputField id='tglMasuk' label='Tanggal Masuk Sekolah' required={true} type="text" value={formSiswa.tglMasuk.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='nomorPesertaUjian' label='Nomor Peserta Ujian' required={true} type="number" value={formSiswa.nomorPesertaUjian.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+              <InputField id='noSKHUS' label='No. Seri SKHUS' required={true} type="number" value={formSiswa.noSKHUS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
+            </Grid>
+          </Grid>
+          {idSiswa !== '0'
+            ?
+            <div>
+              <Grid container>
+                <Grid item xs={12} className={classes.titleHeader}>
+                  <h2 style={{ textAlign: 'center' }}>Pendaftaran Keluar</h2>
+                </Grid>
+              </Grid>
+              <Grid container spacing={5}>
+                <Grid item xs>
+                  <Selects name='keluarKarena' id='keluarKarena' label='Keluar Karena' variant='outlined' options={keluarKarena} value={formSiswa.keluarKarena.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
+                  <InputField id='tanggalKeluar' label='Tanggal Keluar' required={false} type="number" value={formSiswa.tanggalKeluar.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
                 </Grid>
                 <Grid item xs>
-                  <InputField id={keterangan} label='Keterangan' required={false} type="text" value={beasiswa[i].keterangan.value} disabled={false} onBlur={this.inputBeasiswaOnBlur} isSubmit={isSubmit} variant='outlined' />
+                  <InputField id='alasan' label='Alasan Keluar' required={false} type="text" value={formSiswa.alasan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
                 </Grid>
               </Grid>
-            )
-          })
-        }
-        <Grid container>
-          <Grid item xs={12} className={classes.titleHeader}>
-            <h2 style={{ textAlign: 'center' }}>Registrasi Peserta Didik</h2>
-          </Grid>
-        </Grid>
-        <Grid container spacing={5}>
-          <Grid item xs>
-            <InputField id='kompetensiKeahlian' label='Kompetensi Keahlian (SMK)' required={false} type="text" value={formSiswa.kompetensiKeahlian.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='nis' label='NIS' required={true} type="number" value={formSiswa.nis.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='asalSekolah' label='Asal Sekolah' required={true} type="text" value={formSiswa.asalSekolah.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='noIjazah' label='No. Seri Ijazah' required={true} type="number" value={formSiswa.noIjazah.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-          <Grid item xs>
-            <Selects name='jenisPendaftaran' id='jenisPendaftaran' label='Jenis Pendaftaran' variant='outlined' options={jenisPendaftaran} value={formSiswa.jenisPendaftaran.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-            <InputField id='tglMasuk' label='Tanggal Masuk Sekolah' required={true} type="text" value={formSiswa.tglMasuk.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='nomorPesertaUjian' label='Nomor Peserta Ujian' required={true} type="number" value={formSiswa.nomorPesertaUjian.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-            <InputField id='noSKHUS' label='No. Seri SKHUS' required={true} type="number" value={formSiswa.noSKHUS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-          </Grid>
-        </Grid>
-        {idSiswa !== '0'
-          ?
-          <div>
-            <Grid container>
-              <Grid item xs={12} className={classes.titleHeader}>
-                <h2 style={{ textAlign: 'center' }}>Pendaftaran Keluar</h2>
-              </Grid>
-            </Grid>
-            <Grid container spacing={5}>
-              <Grid item xs>
-                <Selects name='keluarKarena' id='keluarKarena' label='Keluar Karena' variant='outlined' options={keluarKarena} value={formSiswa.keluarKarena.value} onChange={this.changeSelect} isSubmit={isSubmit} disable={false} required={true} />
-                <InputField id='tanggalKeluar' label='Tanggal Keluar' required={false} type="number" value={formSiswa.tanggalKeluar.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-              <Grid item xs>
-                <InputField id='alasan' label='Alasan Keluar' required={false} type="text" value={formSiswa.alasan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={isSubmit} variant='outlined' />
-              </Grid>
-            </Grid>
+            </div>
+            :
+            <div></div>
+          }
+          <div style={{ display: 'flex', marginTop: 50 }}>
+            <div style={{ flexGrow: 1 }}></div>
+            <Button
+              type="default"
+              disabled={buttonDisable}
+              text="Simpan"
+              onClick={this.saveData}
+            />
           </div>
-          :
-          <div></div>
-        }
-        <div style={{ display: 'flex', marginTop: 80 }}>
-          <div style={{ flexGrow: 1 }}></div>
-          <Button
-            type="default"
-            disabled={buttonDisable}
-            text="Simpan"
-            onClick={this.saveData}
-          />
-        </div>
-      </Fade>
+        </Fade>
+      </Paper>
     )
   }
 }
@@ -714,9 +707,9 @@ const mapStateToProps = state => ({
 
 const useStyles = (theme) => ({
   titleHeader: {
-    background: theme.palette.background.paper
+    background: theme.palette.secondary.main
   }
-})
+});
 
 const mapDispatchToProps = dispatch => ({
   setLoading: value => dispatch(pushLoading(value)),
