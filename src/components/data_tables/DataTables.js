@@ -200,11 +200,11 @@ const EnhancedTableToolbar = props => {
 
   const handleConfigs = () => {
     props.handleConfigs(!showConfigs);
-    setShowConfigs(!showConfigs);
+    setShowParent(!showParent);
+    setShowChild(!showChild);
     setTimeout(() => {
-      setShowParent(!showParent);
-      setShowChild(!showChild);
-    }, 100);
+      setShowConfigs(!showConfigs);
+    }, 500);
   }
 
   return (
@@ -227,7 +227,7 @@ const EnhancedTableToolbar = props => {
         )}
 
       {showConfigs ? (
-        <Zoom opposite duration={500} when={showChild}>
+        <Zoom collapse bottom cascade opposite duration={500} when={showChild}>
           <div>
             {props.handleAdd &&
               <Tooltip title="Add Data" className={classes.icon}>
@@ -258,7 +258,7 @@ const EnhancedTableToolbar = props => {
           </div>
         </Zoom>
       ) : (
-          <Zoom opposite duration={500} when={showParent}>
+          <Zoom collapse bottom cascade opposite duration={500} when={showParent}>
             <div>
               <SearchField searchHandleChange={props.handleSearch} />
               {props.allowEdit &&

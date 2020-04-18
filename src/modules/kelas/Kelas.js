@@ -6,7 +6,7 @@ import { Fade } from "react-reveal";
 import Modals from "../../components/modal/Modal";
 import Selects from "../../components/select/Select";
 import InputField from "../../components/input_field/InputField";
-import { HTTP_SERVICE } from "../../services/HhttpServices";
+import { HTTP_SERVICE } from "../../services/HttpServices";
 
 class Kelas extends Component {
   newForm;
@@ -81,6 +81,7 @@ class Kelas extends Component {
         kapasitas: 0,
       }
     });
+    this.newForm = this.state.form;
   }
 
   handleEdit = (checked) => {
@@ -112,7 +113,9 @@ class Kelas extends Component {
   }
 
   closeModal = () => {
-
+    this.setState({
+      openModal: false
+    })
   }
 
   submitModal = async () => {
@@ -193,10 +196,10 @@ class Kelas extends Component {
           type='confirm'
         >
           <div style={{ width: 400, height: 300 }}>
-            <Selects name='kelas' id='kelas' label='Kelas' variant='outlined' options={optionKelas} value={kelas} onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
-            <InputField id='indexKelas' label='Index Kelas' variant='outlined' required={false} type="text" value={indexKelas} disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
-            <Selects name='tahunAjaran' id='tahunAjaran' label='Tahun Ajaran' variant='outlined' options={optionTahunAjaran} value={tahunAjaran} onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
-            <InputField id='kapasitas' label='Kapasitas' variant='outlined' required={false} type="number" value={kapasitas} disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
+            <Selects name='kelas' id='kelas' label='Kelas' variant='outlined' options={optionKelas} value='' onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
+            <InputField id='indexKelas' label='Index Kelas' variant='outlined' required={false} type="text" value='' disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
+            <Selects name='tahunAjaran' id='tahunAjaran' label='Tahun Ajaran' variant='outlined' options={optionTahunAjaran} value='' onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
+            <InputField id='kapasitas' label='Kapasitas' variant='outlined' required={false} type="number" value='' disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
           </div>
         </Modals>
       </Fade>
