@@ -1,7 +1,31 @@
+// sample data
+// data: [
+//   { uniqueId: 'Cupcake', name: 'Cupcake', calories: 305, fat: 3.7, carbs: 67, protein: 4.3 },
+//   { uniqueId: 'Donut', name: 'Donut', calories: 452, fat: 25.0, carbs: 51, protein: 4.9 },
+//   { uniqueId: 'Eclair', name: 'Eclair', calories: 262, fat: 16.0, carbs: 24, protein: 6.0 },
+//   { uniqueId: 'Frozen yoghurt', name: 'Frozen yoghurt', calories: 159, fat: 6.0, carbs: 24, protein: 4.0 },
+//   { uniqueId: 'Gingerbread', name: 'Gingerbread', calories: 356, fat: 16.0, carbs: 49, protein: 3.9 },
+//   { uniqueId: 'Honeycomb', name: 'Honeycomb', calories: 408, fat: 3.2, carbs: 87, protein: 6.5 },
+//   { uniqueId: 'Ice cream sandwich', name: 'Ice cream sandwich', calories: 237, fat: 9.0, carbs: 37, protein: 4.3 },
+//   { uniqueId: 'Jelly Bean', name: 'Jelly Bean', calories: 375, fat: 0.0, carbs: 94, protein: 0.0 },
+//   { uniqueId: 'KitKat', name: 'KitKat', calories: 518, fat: 26.0, carbs: 65, protein: 7.0 },
+//   { uniqueId: 'Lollipop', name: 'Lollipop', calories: 392, fat: 0.2, carbs: 98, protein: 0.0 },
+//   { uniqueId: 'Marshmallow', name: 'Marshmallow', calories: 318, fat: 0, carbs: 81, protein: 2.0 },
+//   { uniqueId: 'Nougat', name: 'Nougat', calories: 360, fat: 19.0, carbs: 9, protein: 37.0 },
+//   { uniqueId: 'Oreo', name: 'Oreo', calories: 437, fat: 18.0, carbs: 63, protein: 4.0 },
+// ],
+// sample header
+// headCells: [
+//   { id: 'name', numeric: false, disablePadding: true, label: 'Dessert (100g serving)' },
+//   { id: 'calories', numeric: true, disablePadding: false, label: 'Calories' },
+//   { id: 'fat', numeric: true, disablePadding: false, label: 'Fat (g)' },
+//   { id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs (g)' },
+//   { id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
+// ],
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { lighten, makeStyles } from '@material-ui/core/styles';
+import { lighten, makeStyles, withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -19,8 +43,12 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/AddBox';
 import EditIcon from '@material-ui/icons/Edit';
-import DownloadIcon from '@material-ui/icons/GetApp'
+import DownloadIcon from '@material-ui/icons/GetApp';
 import SearchField from '../search_field/SearchField';
+import ConfigIcon from '@material-ui/icons/Settings';
+import CloseIcon from '@material-ui/icons/Close';
+import Arrow from '@material-ui/icons/KeyboardArrowRight';
+import { Zoom } from 'react-reveal';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -48,25 +76,52 @@ function stableSort(array, comparator) {
   return stabilizedThis.map(el => el[0]);
 }
 
+const StyledTblCell = withStyles((theme) => ({
+  head: {
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.common.white,
+  },
+  body: {
+    fontSize: 14,
+  },
+}))(TableCell);
+
 function EnhancedTableHead(props) {
-  const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells, orderConfig } = props;
+  const {
+    classes,
+    // onSelectAllClick,
+    order,
+    // numSelected,
+    // rowCount,
+    onRequestSort,
+    headCells,
+    orderConfig
+  } = props;
+  const [orderBy, setOrderBy] = React.useState('')
+
+  React.useEffect(
+    () => {
+      setOrderBy(props.orderBy)
+    }, [props.orderBy]
+  )
+
   const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
 
   return (
     <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
+      <TableRow style={{ height: 50 }}>
+        <StyledTblCell padding="checkbox">
+          {/* <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{ 'aria-label': 'select all desserts' }}
-          />
-        </TableCell>
+          /> */}
+        </StyledTblCell>
         {headCells.map(headCell => (
-          <TableCell
+          <StyledTblCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
@@ -88,12 +143,12 @@ function EnhancedTableHead(props) {
                   ) : null}
                 </TableSortLabel>
                 :
-                <div>
+                <div style={{ fontWeight: 600 }}>
                   {headCell.label}
                 </div>
-              
+
             }
-          </TableCell>
+          </StyledTblCell>
         ))}
       </TableRow>
     </TableHead>
@@ -121,10 +176,12 @@ const useToolbarStyles = makeStyles(theme => ({
       ? {
         color: theme.palette.secondary.main,
         backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        transition: 'background-color 0.8s'
       }
       : {
         color: theme.palette.text.primary,
         backgroundColor: theme.palette.secondary.dark,
+        transition: 'background-color 0.8s'
       },
   title: {
     flexGrow: 1,
@@ -137,50 +194,89 @@ const useToolbarStyles = makeStyles(theme => ({
 const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
+  const [showConfigs, setShowConfigs] = React.useState(false);
+  const [showParent, setShowParent] = React.useState(true);
+  const [showChild, setShowChild] = React.useState(false);
+
+  const handleConfigs = () => {
+    props.handleConfigs(!showConfigs);
+    setShowParent(!showParent);
+    setShowChild(!showChild);
+    setTimeout(() => {
+      setShowConfigs(!showConfigs);
+    }, 500);
+  }
 
   return (
     <Toolbar
       className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
+        [classes.highlight]: showConfigs,
       })}
     >
-      {numSelected > 0 ? (
+      {showConfigs ? (
         <Typography className={classes.title} color="inherit" variant="subtitle1">
-          {numSelected} selected
+          {
+            (props.handleDelete || props.handleEdit) &&
+            <div>{numSelected} selected</div>
+          }
         </Typography>
       ) : (
-          <Typography className={classes.title} variant="h6" id="tableTitle">
+          <Typography className={classes.title} variant="h6" id="tableTitle" noWrap>
             {props.label}
           </Typography>
         )}
 
-      {numSelected > 0 ? (
-        <div>
-          <Tooltip title="Edit">
-            <IconButton aria-label="edit">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton aria-label="delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </div>
-      ) : (
+      {showConfigs ? (
+        <Zoom collapse bottom cascade opposite duration={500} when={showChild}>
           <div>
-            <SearchField searchHandleChange={props.handleSearch}/>
-            <Tooltip title="Add Data" className={classes.icon}>
-              <IconButton aria-label="add Data">
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Download Excel" className={classes.icon}>
-              <IconButton aria-label="download excel">
-                <DownloadIcon />
+            {props.handleAdd &&
+              <Tooltip title="Add Data" className={classes.icon}>
+                <IconButton aria-label="add Data" onClick={() => { handleConfigs(); props.handleAdd() }}>
+                  <AddIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
+            }
+            {props.handleEdit &&
+              <Tooltip title="Edit">
+                <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
+                  <EditIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
+            }
+            {props.handleDelete &&
+              <Tooltip title="Delete">
+                <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
+                  <DeleteIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
+            }
+            <Tooltip title="Close">
+              <IconButton aria-label="close" onClick={handleConfigs}>
+                <CloseIcon style={{ color: '#424242' }} />
               </IconButton>
             </Tooltip>
           </div>
+        </Zoom>
+      ) : (
+          <Zoom collapse bottom cascade opposite duration={500} when={showParent}>
+            <div>
+              <SearchField searchHandleChange={props.handleSearch} />
+              {props.allowEdit &&
+                <Tooltip title="Configuration" className={classes.icon}>
+                  <IconButton aria-label="configuration" onClick={handleConfigs}>
+                    <ConfigIcon style={{ color: '#fff' }} />
+                  </IconButton>
+                </Tooltip>
+              }
+              {props.handleDownload &&
+                <Tooltip title="Download Excel" className={classes.icon}>
+                  <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
+                    <DownloadIcon style={{ color: '#fff' }} />
+                  </IconButton>
+                </Tooltip>
+              }
+            </div>
+          </Zoom>
         )}
     </Toolbar>
   );
@@ -199,7 +295,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   table: {
-    minWidth: 750,
+    minWidth: 500,
   },
   visuallyHidden: {
     border: 0,
@@ -211,25 +307,38 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     top: 20,
     width: 1,
-  },
+  }
 }));
 
 export default function DataTables(props) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  // const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
+  const [count, setCount] = React.useState(0);
+  const [showConfigs, setShowConfigs] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      setCount(props.dataLength);
+    }, [props.dataLength]
+  )
 
   React.useEffect(
     () => {
       setRows(props.data);
-      setPage(props.page)
-    }, [props.data.length]
+    }, [props.data]
+  )
+
+  React.useEffect(
+    () => {
+      setPage(props.page);
+    }, [props.page]
   )
 
   React.useEffect(
@@ -238,10 +347,16 @@ export default function DataTables(props) {
     }, [props.tableName]
   )
 
+  // React.useEffect(
+  //   () => {
+  //     setDense(props.dense);
+  //   }, [props.dense]
+  // )
+
   React.useEffect(
     () => {
-      setDense(props.dense);
-    }, [props.dense]
+      setOrderBy(props.orderBy)
+    }, [props.orderBy]
   )
 
   const handleRequestSort = (event, property) => {
@@ -259,12 +374,12 @@ export default function DataTables(props) {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, unique) => {
+    const selectedIndex = selected.indexOf(unique);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, unique);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -292,9 +407,26 @@ export default function DataTables(props) {
 
   const handleSearch = value => value.length > 3 ? props.handleSearch(value) : null;
 
-  const handleAdd = () => props.handleAdd;
+  // const handleAdd = () => { props.handleAdd() }
 
   const isSelected = name => selected.indexOf(name) !== -1;
+
+  // const handleDownload = () => { props.handleDownload() }
+
+  // const handleEdit = () => { props.handleEdit(selected) }
+
+  // const handleDelete = () => { props.handleDelete(selected) }
+
+  // const handleConfigs = (value) => {
+  //   setShowConfigs(value);
+  //   if (!value) { setSelected([]) }
+  // }
+
+  const goToDetail = (event, clicked) => {
+    if (props.goToDetail !== undefined && !showConfigs) {
+      props.goToDetail(clicked);
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -303,69 +435,94 @@ export default function DataTables(props) {
           numSelected={selected.length}
           label={label}
           handleSearch={handleSearch}
-          handleAdd={handleAdd}
+          handleAdd={props.handleAdd}
+          handleDownload={props.handleDownload}
+          handleEdit={props.handleEdit ? () => { props.handleEdit(selected) } : undefined}
+          handleDelete={props.handleDelete ? () => { props.handleDelete(selected) } : undefined}
+          handleConfigs={(value) => {
+            setShowConfigs(value);
+            if (!value) { setSelected([]) }
+          }}
+          allowEdit={props.allowEdit}
         />
-        {
-          rows.length > 0 &&
-          <TableContainer>
-            <Table
-              className={classes.table}
-              aria-labelledby="tableTitle"
-              size={dense ? 'small' : 'medium'}
-              aria-label="enhanced table"
-            >
-              <EnhancedTableHead
-                classes={classes}
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={rows.length}
-                headCells={props.headCells}
-                orderConfig={props.orderConfig}
-              />
+        <TableContainer>
+          <Table
+            className={classes.table}
+            aria-labelledby="tableTitle"
+            size='small'
+            aria-label="enhanced table"
+          >
+            {
+              rows.length === 0 &&
+              <caption style={{ textAlign: 'center' }}>Data not found</caption>
+            }
+            <EnhancedTableHead
+              classes={classes}
+              numSelected={selected.length}
+              order={order}
+              orderBy={orderBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={rows.length}
+              headCells={props.headCells}
+              orderConfig={props.orderConfig}
+            />
+            {
+              rows.length > 0 &&
               <TableBody>
                 {stableSort(rows, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const isItemSelected = isSelected(row.name);
+                    const isItemSelected = isSelected(row.uniqueId);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
                     return (
                       <TableRow
+                        style={{ height: 40 }}
                         hover
-                        onClick={event => handleClick(event, row.name)}
+                        onClick={event => goToDetail(event, row.uniqueId)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
-                        key={row.name}
+                        key={row.uniqueId}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isItemSelected}
-                            inputProps={{ 'aria-labelledby': labelId }}
-                          />
-                        </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.name}
-                        </TableCell>
-                        <TableCell align="right">{row.calories}</TableCell>
-                        <TableCell align="right">{row.fat}</TableCell>
-                        <TableCell align="right">{row.carbs}</TableCell>
-                        <TableCell align="right">{row.protein}</TableCell>
+                        <StyledTblCell padding="checkbox">
+                          {showConfigs
+                            ?
+                            <Checkbox
+                              onClick={event => handleClick(event, row.uniqueId)}
+                              checked={isItemSelected}
+                              inputProps={{ 'aria-labelledby': labelId }}
+                            />
+                            :
+                            <Arrow />
+                          }
+                        </StyledTblCell>
+                        {
+                          props.headCells.map((cell, i) =>
+                            cell.numeric
+                              ?
+                              <StyledTblCell key={i} align='right'>
+                                {row[cell.id]}
+                              </StyledTblCell>
+                              :
+                              <StyledTblCell key={i} component="th" id={labelId} scope="row" padding="none">
+                                {row[cell.id]}
+                              </StyledTblCell>
+                          )
+                        }
                       </TableRow>
                     );
                   })}
               </TableBody>
-            </Table>
-          </TableContainer>
-        }
+            }
+          </Table>
+        </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={count}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -374,4 +531,22 @@ export default function DataTables(props) {
       </Paper>
     </div>
   );
+}
+
+DataTables.propTypes = {
+  tableName: PropTypes.string.isRequired,  //='' (string)
+  allowEdit: PropTypes.bool,  //={} (boolean)
+  page: PropTypes.number.isRequired, //={} (int)
+  dataLength: PropTypes.number.isRequired, //={} (int)
+  headCells: PropTypes.array.isRequired,  //={headCells} (array object (there's an example at the bottom of this tag))
+  data: PropTypes.array.isRequired, //={data} (array object)
+  orderConfig: PropTypes.bool,  //={} (boolean)
+  orderBy: PropTypes.string,  //='' (string)
+  handleDownload: PropTypes.func, //={this.handleDownload} (function ())
+  handleChangePage: PropTypes.func, //={this.onChangePage} (function (page, limit))
+  handleSearch: PropTypes.func, //={this.onSearch} (function (value))
+  handleAdd: PropTypes.func,  //={this.handleAdd} (function ())
+  handleEdit: PropTypes.func, //={this.handleEdit} (function (checked))
+  handleDelete: PropTypes.func, //={this.handleDelete} (function (checked))
+  goToDetail: PropTypes.func, //={} (function (checked))
 }

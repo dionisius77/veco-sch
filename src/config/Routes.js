@@ -1,7 +1,8 @@
 import RoutesLanding from "../modules/landing_page/LandingRoutes";
 import RoutesHome from "../modules/home/homeRoutes";
-import RouteMataPelajaran from "../modules/mata_pelajaran/mataPelajaranRoutes";
 import Layout from "../components/layout/Layout";
+import RoutesGuru from "../modules/guru/GuruRoutes";
+import RouteTU from "../modules/tu/TURoutes";
 
 const ContainerRoutes = [
   { path: '/school', name: 'layout', component: Layout },
@@ -10,7 +11,8 @@ const ContainerRoutes = [
 
 const MenuRoutes = [
   ...RoutesHome,
-  ...RouteMataPelajaran
+  ...RouteTU,
+  ...RoutesGuru,
 ]
 
 export default {

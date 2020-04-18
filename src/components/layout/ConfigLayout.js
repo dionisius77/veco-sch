@@ -8,3 +8,6 @@ export const GET_LOGIN = 'GET_LOGIN';
 
 export const PUSH_LOADING = 'PUSH_LOADING';
 export const GET_LOADING = 'GET_LOADING';
+
+export const PUSH_ALERT = 'PUSH_ALERT';
+export const GET_ALERT = 'GET_ALERT';

@@ -1,6 +1,7 @@
 import React from 'react';
 import Btn from '@material-ui/core/Button';
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 export default function Button(props) {
   const [disable, setDisable] = useState(false);
@@ -19,7 +20,7 @@ export default function Button(props) {
     let btnColor;
     switch (type) {
       case 'negative':
-        btnColor = 'default';
+        btnColor = 'primary';
         break;
       default:
         btnColor = 'secondary';
@@ -28,8 +29,15 @@ export default function Button(props) {
     return btnColor;
   }
   return (
-    <Btn variant="contained" disabled={disable} color={colorFn(props.type)} onClick={handleClick}>
+    <Btn style={{width: 80, marginLeft: 5}} variant="contained" disabled={disable} color={colorFn(props.type)} onClick={handleClick}>
       {props.text}
     </Btn>
   )
+}
+
+Button.propTypes = {
+  type: PropTypes.oneOf(['negative', 'default']),
+  disabled: PropTypes.bool,
+  text: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
 }

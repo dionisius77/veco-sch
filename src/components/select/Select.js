@@ -1,8 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { FormControl, InputLabel, NativeSelect, FormHelperText } from '@material-ui/core';
+import { FormControl, InputLabel, Select, FormHelperText, MenuItem, OutlinedInput } from '@material-ui/core';
+import { useRef } from 'react';
+import PropTypes from 'prop-types';
 
-export default function Select(props) {
+export default function Selects(props) {
+  const labelRef = useRef();
+  const labelWidth = labelRef.current ? labelRef.current.clientWidth : 0;
   const [disable, setDisable] = useState(false);
   const [value, setValue] = useState('');
   const [options, setOptions] = useState([]);
@@ -34,32 +38,67 @@ export default function Select(props) {
 
   const handleChange = (e) => {
     setValue(e.target.value);
-    props.onChange(e.target.name, e.target.value);
+    props.onChange(e.target.name, e.target.value, props.required ? e.target.value !== '' : true);
   }
 
   return (
-    <FormControl disabled={props.disable || disable} required={props.required || false} style={{minWidth: 120}}>
-      <InputLabel htmlFor={props.id}>{props.label}</InputLabel>
-      <NativeSelect
+    <FormControl
+      variant={props.variant ? props.variant : 'standard'}
+      disabled={props.disable || disable}
+      required={props.required || false}
+      style={{
+        width: '100%',
+        maxWidth: 700,
+        marginBottom: submit && value === '' ? 0 : 5,
+        marginTop: props.noMargin ? 0 : 10
+      }}
+      error={props.required && submit && value === ''}
+      size={props.size || 'medium'}
+    >
+      <InputLabel ref={labelRef} htmlFor={props.id}>{props.label}</InputLabel>
+      <Select
+        // labelId={props.id}
+        // id={props.id}
         value={value}
         onChange={handleChange}
-        inputProps= {{
-          name: props.name,
-          id: props.id
-        }}
+        // name={props.name}
+        input={
+          props.variant !== 'standard' &&
+          <OutlinedInput
+            labelWidth={value === '' ? 0 : labelWidth}
+            name={props.name}
+            id={props.id}
+            notched
+          />
+        }
       >
-        <option aria-label="None" value="" />
+        <MenuItem value="">None</MenuItem>
         {
           options.length > 0 &&
-          options.map((opt, key) => 
-            <option key={key} value={opt.value}>{opt.text}</option>
+          options.map((opt, key) =>
+            <MenuItem key={key} value={opt.value}>{opt.text}</MenuItem>
           )
         }
-      </NativeSelect>
+      </Select>
       {
         props.required && submit && value === '' &&
-        <FormHelperText error={true}>Required</FormHelperText>
+        <FormHelperText error={true}>Form ini wajib diisi</FormHelperText>
       }
     </FormControl>
-    )
+  )
+}
+
+Selects.propTypes = {
+  name: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  label: PropTypes.string,
+  variant: PropTypes.oneOf(['standard', 'filled', 'outlined']),
+  options: PropTypes.array.isRequired,
+  value: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  isSubmit: PropTypes.bool,
+  disable: PropTypes.bool,
+  required: PropTypes.bool,
+  size: PropTypes.oneOf(['small', 'medium']),
+  noMargin: PropTypes.bool,
 }

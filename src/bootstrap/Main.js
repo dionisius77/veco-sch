@@ -49,10 +49,10 @@ class Main extends Component {
           {/* <IntlProvider locale={locale} key={locale} messages={flatten(messages)}> */}
           <HashRouter>
             <Switch>
-              <Redirect exact from="/" to="/login_page" />
               {Routes.ContainerRoutes.map(
                 (item, index) => <Route key={index.toString()} path={item.path} name={item.name} component={item.component} />,
               )}
+              <Redirect exact from="**" to="/login_page" />
             </Switch>
           </HashRouter>
           {/* </IntlProvider> */}
