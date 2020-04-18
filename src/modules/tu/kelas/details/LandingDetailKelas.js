@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { pushLoading } from '../../../components/layout/ActionLayout';
-import CardsWithPeople from '../../../components/cards/Card';
+import { pushLoading } from '../../../../components/layout/ActionLayout';
+import CardsWithPeople from '../../../../components/cards/Card';
 import { Grid } from '@material-ui/core';
-import DataTables from '../../../components/data_tables/DataTables';
+import DataTables from '../../../../components/data_tables/DataTables';
 import { Fade } from 'react-reveal';
 
 class LandingDetailKelas extends Component {

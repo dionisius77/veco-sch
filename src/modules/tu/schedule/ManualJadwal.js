@@ -3,10 +3,10 @@ import { Fade, Zoom } from 'react-reveal';
 import { connect } from 'react-redux';
 import { Grid, Table, TableContainer, Paper, TableHead, TableBody, TableRow, withStyles, TableCell } from '@material-ui/core';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import ListComponent from '../../components/moveable_list/ListComponent';
-import Selects from '../../components/select/Select';
-import Button from '../../components/button/Button';
-import { pushLoading, pushAlert } from '../../components/layout/ActionLayout';
+import ListComponent from '../../../components/moveable_list/ListComponent';
+import Selects from '../../../components/select/Select';
+import Button from '../../../components/button/Button';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 
 class ManualJadwal extends Component {
   newJadwal;

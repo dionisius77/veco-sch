@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { pushLoading } from '../../../components/layout/ActionLayout';
+import { pushLoading } from '../../../../components/layout/ActionLayout';
 import { connect } from 'react-redux';
 import { Fade } from 'react-reveal';
 import { Grid, withStyles, Paper, Stepper, StepLabel, StepContent, Step } from '@material-ui/core';
-import InputField from '../../../components/input_field/InputField';
-import Selects from '../../../components/select/Select';
-import Button from '../../../components/button/Button';
-import DatePicker from '../../../components/date_picker/DatePicker';
+import InputField from '../../../../components/input_field/InputField';
+import Selects from '../../../../components/select/Select';
+import Button from '../../../../components/button/Button';
+import DatePicker from '../../../../components/date_picker/DatePicker';
 
 class FormSiswa extends Component {
   newFormSiswa;

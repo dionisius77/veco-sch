@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { pushLoading, pushAlert } from '../../../../components/layout/ActionLayout';
+import { pushLoading, pushAlert } from '../../../../../components/layout/ActionLayout';
 import { Fade } from 'react-reveal';
-import MoveableList from '../../../../components/moveable_list/MoveableList';
+import MoveableList from '../../../../../components/moveable_list/MoveableList';
 import { Grid } from '@material-ui/core';
 
 class ListSiswa extends Component {

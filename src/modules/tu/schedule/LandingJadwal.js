@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
-import { pushLoading, pushAlert } from '../../components/layout/ActionLayout';
-import AutomationImage from '../../shared/automation.png';
-import CalendarImage from '../../shared/calendar.png';
-import MarkOffDay from '../../shared/libur.png';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
+import AutomationImage from '../../../shared/automation.png';
+import CalendarImage from '../../../shared/calendar.png';
+import MarkOffDay from '../../../shared/libur.png';
 import { Grid, Card, CardActionArea, CardContent, Typography, CardMedia } from '@material-ui/core';
 
 class LandingJadwal extends Component {
