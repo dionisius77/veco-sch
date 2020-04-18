@@ -26,18 +26,18 @@ export default function InputField(props) {
   )
 
   const handleChange = (e) => {
-    let value = props.type === 'number' ? parseInt(e.target.value) : e.target.value;
-    setValue(e.target.value)
+    let value = props.type === 'number' ? e.target.value !== '' ? parseInt(e.target.value) : 0 : e.target.value;
+    setValue(e.target.value);
     if (props.onChange) {
-      props.onChange(e.target.id, value);
+      props.onChange(e.target.id, value, props.required ? e.target.value !== '' : true);
     }
   }
 
   const handleBlur = (e) => {
-    let value = props.type === 'number' ? parseInt(e.target.value) : e.target.value;
+    let value = props.type === 'number' ? e.target.value !== '' ? parseInt(e.target.value) : 0 : e.target.value;
     setValue(e.target.value);
     if (props.onBlur) {
-      props.onBlur(e.target.id, value);
+      props.onBlur(e.target.id, value, props.required ? e.target.value !== '' : true);
     }
   }
 
@@ -65,6 +65,7 @@ export default function InputField(props) {
       onBlur={handleBlur}
       error={submit && value === '' && props.required}
       variant={props.variant ? props.variant : 'standard'}
+      autoFocus={props.setFocus}
     />
   )
 }
@@ -80,4 +81,5 @@ InputField.propTypes = {
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
   isSubmit: PropTypes.bool,
+  setFocus: PropTypes.bool,
 };

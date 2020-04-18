@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import {
@@ -24,7 +24,6 @@ import { LEFT_MENU_TU, LEFT_MENU_GURU } from '../../../config/Navigation';
 import { Switch, Redirect, Route } from "react-router-dom";
 import Routes from "../../../config/Routes";
 import HomeIcon from '@material-ui/icons/Home';
-import Loading from '../../loading/Loading';
 
 const drawerWidth = 200;
 
@@ -102,7 +101,6 @@ export default function MiniDrawer(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const role = localStorage.getItem('role');
 
   const handleDrawerOpen = () => {
@@ -113,11 +111,9 @@ export default function MiniDrawer(props) {
     setOpen(false);
   };
 
-  useEffect(
-    () => {
-      setLoading(props.loadingFlag);
-    }, [props.loadingFlag]
-  )
+  const logOut = () => {
+    props.onLogout();
+  }
 
   return (
     <div>
@@ -202,7 +198,7 @@ export default function MiniDrawer(props) {
               </ListItemIcon>
               <ListItemText primary="Notifications" />
             </ListItem>
-            <ListItem button key="logout">
+            <ListItem button key="logout" onClick={() => { logOut() }}>
               <ListItemIcon><ExitIcon style={{ color: '#fff' }} /></ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItem>
@@ -220,10 +216,6 @@ export default function MiniDrawer(props) {
             < Redirect exact from="**" to="/school/home" />
           </Switch>
         </main>
-        {
-          loading && loading !== undefined &&
-          <Loading />
-        }
       </div>
     </div>
   );

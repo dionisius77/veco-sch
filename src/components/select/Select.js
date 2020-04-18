@@ -38,7 +38,7 @@ export default function Selects(props) {
 
   const handleChange = (e) => {
     setValue(e.target.value);
-    props.onChange(e.target.name, e.target.value);
+    props.onChange(e.target.name, e.target.value, props.required ? e.target.value !== '' : true);
   }
 
   return (

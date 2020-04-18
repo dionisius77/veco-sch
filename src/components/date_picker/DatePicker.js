@@ -9,6 +9,8 @@ import PropTypes from 'prop-types';
 export default function DatePicker(props) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isSubmit, setIsSubmit] = useState(false);
+  const [currentDates, setCurrentDates] = useState('');
+  const [inputDates, setInputDates] = useState('');
 
   useEffect(
     () => {
@@ -26,10 +28,16 @@ export default function DatePicker(props) {
 
   const handleChangeDate = (date) => {
     setSelectedDate(date);
+    const current = new Date();
+    let curMonth = current.getMonth() + 1 < 10 ? '0' + (current.getMonth() + 1) : current.getMonth() + 1;
+    let curDates = current.getDate() < 10 ? '0' + current.getDate() : current.getDate();
+    let currentDate = current.getFullYear() + '-' + curMonth + '-' + curDates;
+    setCurrentDates(currentDate);
     let month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
     let dates = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
     let formattedDate = date.getFullYear() + '-' + month + '-' + dates;
-    props.onChange(props.id, formattedDate);
+    setInputDates(formattedDate);
+    props.onChange(props.id, formattedDate, props.required ? currentDate !== formattedDate : true);
   }
 
   return (
@@ -50,8 +58,8 @@ export default function DatePicker(props) {
         label={props.label}
         value={selectedDate}
         onChange={handleChangeDate}
-        helperText={props.required && isSubmit && selectedDate === '' ? 'Tanggal Tidak Valid' : ''}
-        error={props.required && props.isSubmit}
+        helperText={props.required && isSubmit && currentDates === inputDates ? 'Tanggal Tidak Valid' : ''}
+        error={props.required && props.isSubmit && currentDates === inputDates}
         KeyboardButtonProps={{
           'arial-label': 'ganti tanggal'
         }}

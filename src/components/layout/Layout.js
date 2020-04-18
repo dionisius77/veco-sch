@@ -3,10 +3,11 @@ import { connect } from "react-redux";
 import Header from "./header/header";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { pink, red, amber, blue, lightGreen, grey } from "@material-ui/core/colors";
-import { getLoading, getAlert, pushAlert, getLogin } from "./ActionLayout";
+import { pushAlert, pushLogin, pushLoading } from "./ActionLayout";
 import AlertCustom from "../alert/Alert";
 import { Beforeunload } from 'react-beforeunload';
 import axios from 'axios';
+import Loading from "../loading/Loading";
 
 class Layout extends Component {
   globalTheme1 = createMuiTheme({
@@ -86,20 +87,11 @@ class Layout extends Component {
   onUnload = () => {
     axios.interceptors.request.use((config) => {
       console.log(config);
-    }, (err)=> {console.log(err)});
+    }, (err) => { console.log(err) });
     return '';
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    // if(nextProps.action === "AUTH_SUCCESS"){
-    //   prevState.result = nextProps.res
-    // }
-    if (nextProps.action === "GET_LOGIN") {
-      prevState.loggedIn = nextProps.login;
-      if (nextProps.login) {
-        window.location.hash = '/login_page';
-      }
-    }
     if (nextProps.action === "PUSH_LOADING" && nextProps.loadingFlag !== prevState.loadingFlag) {
       prevState.loadingFlag = nextProps.loadingFlag
     }
@@ -115,35 +107,42 @@ class Layout extends Component {
       message: '',
       type: 'success'
     }
-    // this.setState({alert: alertConfig});
     this.props.onCloseAlert(alertConfig)
   }
 
   componentDidMount() {
-    // this.props.onRequestAuth("test");
-    this.props.onGetLogin();
-    this.props.onGetAlert();
-    this.props.onGetLoading();
     if (!this.state.loggedIn) {
-      // return <Redirect to={{
-      //   pathname: "/landing_page"
-      // }}/>;
       window.location.hash = '/login_page';
     }
+  }
+
+  logOut() {
+    this.props.onPushLoading(true);
+    this.setState({
+      loggedIn: false,
+    }, () => {
+      setTimeout(() => {
+        this.props.onLogin(false);
+        window.location.hash = '/login_page';
+      }, 3000);
+    })
   }
 
   render() {
     return (
       <React.Fragment>
-        <Beforeunload onBeforeunload={() => {this.onUnload()}}>
+        <Beforeunload onBeforeunload={() => { this.onUnload() }}>
           <ThemeProvider theme={this.globalTheme1}>
-            <Header loadingFlag={this.state.loadingFlag} />
+            <Header onLogout={() => { this.logOut() }} />
             <AlertCustom
               isOpen={this.state.alert.open}
               message={this.state.alert.message}
               onClose={this.closeAlert}
               type={this.state.alert.type}
             />
+            {this.state.loadingFlag &&
+              <Loading color='black'/>
+            }
           </ThemeProvider>
         </Beforeunload>
       </React.Fragment>
@@ -151,21 +150,22 @@ class Layout extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  // action: state.layout.action,
-  // res: state.layout.resAuth
-  login: state.layout.loggedin,
-  loadingFlag: state.layout.loadingFlag,
-  action: state.layout.action,
-  alert: state.layout.alert
-});
+const mapStateToProps = state => {
+  console.log(state);
+  return {
+    // action: state.layout.action,
+    // res: state.layout.resAuth
+    login: state.layout.loggedin,
+    loadingFlag: state.layout.loadingFlag,
+    action: state.layout.action,
+    alert: state.layout.alert
+  }
+}
 
 const mapDispatchToProps = dispatch => ({
-  // onRequestAuth: value => dispatch(authFetch(value)),
-  onGetLogin: () => dispatch(getLogin()),
-  onGetLoading: () => dispatch(getLoading()),
-  onGetAlert: () => dispatch(getAlert()),
-  onCloseAlert: (value) => dispatch(pushAlert(value))
+  onCloseAlert: (value) => dispatch(pushAlert(value)),
+  onLogin: (value) => dispatch(pushLogin(value)),
+  onPushLoading: (value) => dispatch(pushLoading(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);

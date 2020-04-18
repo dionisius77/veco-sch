@@ -42,7 +42,7 @@ class ListSiswa extends Component {
     }, () => {
       setTimeout(() => {
         window.location.hash = '#/school/form_siswa/0';
-      }, 300)
+      }, 500)
     })
   }
 

@@ -16,6 +16,7 @@ import {
   Checkbox
 } from "@material-ui/core";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Loading from "../../components/loading/Loading";
 
 function Copyright() {
   return (
@@ -69,6 +70,7 @@ class LandingPage extends React.Component {
       loggedIn: this.props.login.loggedin,
       email: '',
       password: '',
+      loadingFlag: true
     }
     this.login = this.login.bind(this);
   }
@@ -82,11 +84,12 @@ class LandingPage extends React.Component {
 
   componentDidMount() {
     if (this.state.loggedIn) {
-      window.location.hash = '/school';
+      window.location.hash = '/school/home';
     } else {
       this.setState({
         email: this.cachedValue.email,
         password: this.cachedValue.password,
+        loadingFlag: false,
       });
     }
   }
@@ -101,99 +104,110 @@ class LandingPage extends React.Component {
   }
 
   login = (event) => {
+    event.preventDefault();
     const {
       email,
       password,
       remember
     } = event.target;
-    event.preventDefault();
-    if (remember.checked) {
-      localStorage.setItem('session', JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }));
-    }
-    localStorage.setItem('role', 'TU');
-    this.props.onLogin(true);
+    this.setState({ loadingFlag: true }, () => {
+      setTimeout(() => {
+        if (remember.checked) {
+          localStorage.setItem('session', JSON.stringify({
+            email: email.value,
+            password: password.value,
+          }));
+        }
+        localStorage.setItem('role', 'TU');
+        this.props.onLogin(true);
+      }, 3000);
+    })
   }
 
   render() {
     const { classes } = this.props;
-    const { email, password } = this.state;
+    const { email, password, loadingFlag } = this.state;
 
     return (
-      <Grid container component="main" className={classes.root}>
-        <CssBaseline />
-        <Grid item xs={false} sm={4} md={7} className={classes.image} />
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-          <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              VeCo Sch
+      <div>
+        <Grid container component="main" className={classes.root}>
+          <CssBaseline />
+          <Grid item xs={false} sm={4} md={7} className={classes.image} />
+          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+            <div className={classes.paper}>
+              <Avatar className={classes.avatar}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                VeCo Sch
           </Typography>
-            <form className={classes.form} onSubmit={this.login}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => { this.inputOnChange(event) }}
-                autoFocus
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                value={password}
-                onChange={(event) => { this.inputOnChange(event) }}
-                autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox name="remember" value="remember" color="primary" />}
-                label="Remember me"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="secondary"
-                className={classes.submit}
-              >
-                Log In
+              <form className={classes.form} onSubmit={this.login}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => { this.inputOnChange(event) }}
+                  autoFocus
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(event) => { this.inputOnChange(event) }}
+                  autoComplete="current-password"
+                />
+                <FormControlLabel
+                  control={<Checkbox name="remember" value="remember" color="primary" />}
+                  label="Remember me"
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submit}
+                >
+                  Log In
             </Button>
-              <Grid container>
-                <Grid item xs={4}>
-                  <Link href="#" variant="body2">
-                    Lupa password?
+                <Grid container>
+                  <Grid item xs={4}>
+                    <Link href="#" variant="body2">
+                      Lupa password?
                   </Link>
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Box mt={5}>
-                <Copyright />
-              </Box>
-            </form>
-          </div>
+                <Box mt={5}>
+                  <Copyright />
+                </Box>
+              </form>
+            </div>
+          </Grid>
         </Grid>
-      </Grid>
+        {loadingFlag &&
+          <Loading color='white' />
+        }
+      </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  login: state.layout
-});
+const mapStateToProps = state => {
+  return {
+    login: state.layout
+  }
+};
 
 const mapDispatchToProps = dispatch => ({
   onLogin: value => dispatch(pushLogin(value)),

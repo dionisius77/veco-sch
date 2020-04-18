@@ -9,7 +9,8 @@ const useStyles = makeStyles(theme => ({
     zIndex: 99
   },
   block: {
-    position: "fixed",
+    position: "absolute",
+    top: 0,
     display: 'inline-block',
     width: '100%',
     height: '100%',
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.7
   }
 }));
-export default function Loading() {
+export default function Loading(props) {
   const classes = useStyles();
   return (
     <div className={classes.block}>
@@ -35,7 +36,7 @@ export default function Loading() {
         >
 
           <Grid item xs={3}>
-            <ReactLoading type={"cylon"} color="black" />
+            <ReactLoading type={"cylon"} color={props.color} />
           </Grid>
 
         </Grid>

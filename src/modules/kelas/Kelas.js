@@ -160,12 +160,6 @@ class Kelas extends Component {
       openModal
     } = this.state;
     const {
-      kelas,
-      indexKelas,
-      tahunAjaran,
-      kapasitas,
-    } = this.state.form;
-    const {
       headCells,
       optionKelas
     } = this.props;
