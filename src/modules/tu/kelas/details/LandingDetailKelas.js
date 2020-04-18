@@ -37,7 +37,7 @@ class LandingDetailKelas extends Component {
       pageLoaded: false
     }, () => {
       setTimeout(() => {
-        window.location.hash = `#/school/list_siswa/${this.idKelas}`
+        window.location.hash = `#/school/list_siswa_kelas/${this.idKelas}`
       }, 300)
     });
   }
