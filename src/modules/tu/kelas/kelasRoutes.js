@@ -1,5 +1,3 @@
-// import Loadable from "react-loadable";
-// import Loading from "../../components/loading/Loading";
 import ListSiswa from "./details/siswa/ListSiswa";
 import Kelas from "./Kelas";
 import LandingDetailKelas from "./details/LandingDetailKelas";

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { pushLoading } from "../../components/layout/ActionLayout";
-import DataTables from "../../components/data_tables/DataTables";
+import { pushLoading } from "../../../components/layout/ActionLayout";
+import DataTables from "../../../components/data_tables/DataTables";
 import { Fade } from "react-reveal";
-import Modals from "../../components/modal/Modal";
-import Selects from "../../components/select/Select";
-import InputField from "../../components/input_field/InputField";
-import { HTTP_SERVICE } from "../../services/HttpServices";
+import Modals from "../../../components/modal/Modal";
+import Selects from "../../../components/select/Select";
+import InputField from "../../../components/input_field/InputField";
+import { HTTP_SERVICE } from "../../../services/HttpServices";
 
 class Kelas extends Component {
   newForm;

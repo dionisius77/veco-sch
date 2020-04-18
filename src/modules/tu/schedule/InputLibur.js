@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
-import { pushLoading } from '../../components/layout/ActionLayout';
+import { pushLoading } from '../../../components/layout/ActionLayout';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import Modals from '../../components/modal/Modal';
-import InputField from '../../components/input_field/InputField';
-import DatePicker from '../../components/date_picker/DatePicker';
+import Modals from '../../../components/modal/Modal';
+import InputField from '../../../components/input_field/InputField';
+import DatePicker from '../../../components/date_picker/DatePicker';
 import { Paper, Grid, withStyles } from '@material-ui/core';
 
 const styles = (theme) => ({

@@ -1,4 +1,3 @@
-// import Loadable from "react-loadable";
 import MataPelajaran from "./MataPelajaran";
 
 const RouteMataPelajaran = [

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { pushLoading } from "../../components/layout/ActionLayout";
-import DataTables from "../../components/data_tables/DataTables";
-import Modals from "../../components/modal/Modal";
+import { pushLoading } from "../../../components/layout/ActionLayout";
+import DataTables from "../../../components/data_tables/DataTables";
+import Modals from "../../../components/modal/Modal";
 import { Fade } from 'react-reveal';
 
 class MataPelajaran extends Component {
