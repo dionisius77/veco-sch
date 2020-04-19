@@ -9,13 +9,26 @@ const ContainerRoutes = [
   ...RoutesLanding,
 ];
 
-const MenuRoutes = [
-  ...RoutesHome,
+const MenuRoutesHome = [
+  ...RoutesHome
+]
+
+const MenuRoutesTU = [
   ...RouteTU,
+]
+
+const MenuRoutesGuru = [
   ...RoutesGuru,
+]
+
+const MenuRoutesWali = [
+
 ]
 
 export default {
   ContainerRoutes,
-  MenuRoutes
+  MenuRoutesHome,
+  MenuRoutesTU,
+  MenuRoutesGuru,
+  MenuRoutesWali,
 }

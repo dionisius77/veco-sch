@@ -103,6 +103,19 @@ export default function MiniDrawer(props) {
   const [open, setOpen] = useState(false);
   const role = localStorage.getItem('role');
 
+  const menuRoutesByRole = (roles) => {
+    switch (roles) {
+      case 'TU':
+        return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesTU];
+      case 'GURU':
+        return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesGuru];
+      case 'WALI':
+        return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesTU];
+      default:
+        return [...Routes.MenuRoutesHome];
+    }
+  }
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -209,7 +222,7 @@ export default function MiniDrawer(props) {
 
           <Switch>
             {
-              Routes.MenuRoutes.map((item, index) =>
+              menuRoutesByRole(role).map((item, index) =>
                 <Route key={index.toString()} path={item.path} name={item.name} component={item.component} />
               )
             }
