@@ -66,6 +66,13 @@ class Layout extends Component {
             color: '#fff'
           },
         },
+      },
+      MuiStepLabel: {
+        root: {
+          display: 'flex',
+          alignItems: 'center',
+          height: 15
+        }
       }
     }
   });
