@@ -4,13 +4,23 @@ import { pushLoading } from "../../../components/layout/ActionLayout";
 import DataTables from "../../../components/data_tables/DataTables";
 import Modals from "../../../components/modal/Modal";
 import { Fade } from 'react-reveal';
+import InputField from "../../../components/input_field/InputField";
+import Selects from "../../../components/select/Select";
 
 class MataPelajaran extends Component {
+  newFormData;
+  newDataTables;
   constructor(props) {
     super(props);
     this.state = {
       pageLoaded: false,
-      modalFlag: false
+      modalFlag: false,
+      formData: {
+        mataPelajaran: { value: '', isValid: false },
+        jam: { value: '', isValid: false },
+        kelompok: { value: '', isValid: false },
+      },
+      dataTables: this.props.dataTables
     }
     this.onChangePage = this.onChangePage.bind(this);
     this.onSearch = this.onSearch.bind(this);
@@ -20,6 +30,9 @@ class MataPelajaran extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.submitModal = this.submitModal.bind(this);
+    this.inputOnChange = this.inputOnChange.bind(this);
+    this.newFormData = this.state.formData;
+    this.newDataTables = this.state.dataTables;
   }
 
   componentDidMount() {
@@ -57,19 +70,35 @@ class MataPelajaran extends Component {
   }
 
   submitModal = () => {
-    this.setState({ modalFlag: false })
+    const { formData } = this.state;
+    let newMataPelajaran = {
+      uniqueId: '001',
+      matapelajaran: formData.mataPelajaran.value,
+      kelompok: formData.kelompok.value,
+      jam: formData.jam.value,
+    }
+    this.newDataTables.unshift(newMataPelajaran);
+    this.setState({ dataTables: this.newDataTables });
+    this.handleCloseModal();
+  }
+
+  inputOnChange = (id, value, isValid) => {
+    this.newFormData[id].value = value;
+    this.newFormData[id].isValid = isValid;
+    this.setState({ formData: this.newFormData });
   }
 
   render() {
+    const { formData, dataTables, modalFlag } = this.state;
     return (
       <Fade right opposite when={this.state.pageLoaded} duration={500}>
         <DataTables
           tableName='Mata Pelajaran'
           allowEdit={true}
           page={0}
-          dataLength={this.props.dataTables.length}
+          dataLength={dataTables.length}
           headCells={this.props.headCells}
-          data={this.props.dataTables}
+          data={dataTables}
           orderConfig={false}
           orderBy='name'
           handleDownload={this.handleDownload}
@@ -80,13 +109,15 @@ class MataPelajaran extends Component {
           handleDelete={this.handleDelete}
         />
         <Modals
-          open={this.state.modalFlag}
-          modalTitle="Alert"
-          type="alert"
+          open={modalFlag}
+          modalTitle="Input Mata Pelajaran"
+          type="confirm"
           onCloseModal={this.handleCloseModal}
           onSubmitModal={this.submitModal}
         >
-          Test 123456789012346789 123768123 123123
+          <InputField id='mataPelajaran' label='Mata Pelajaran' required={true} type="text" value='' disabled={false} onBlur={this.inputOnChange} isSubmit={false} variant='outlined' setFocus={true} />
+          <InputField id='jam' label='Jam Pelajaran' required={true} type="number" value='' disabled={false} onBlur={this.inputOnChange} isSubmit={false} variant='outlined' />
+          <Selects name='kelompok' id='kelompok' label='Kelompok' variant='outlined' options={this.props.optKelompok} value='' onChange={this.inputOnChange} isSubmit={false} disable={false} required={true} />
         </Modals>
       </Fade>
     );
@@ -105,6 +136,11 @@ const mapStateToProps = state => ({
     { id: 'kelompok', numeric: true, disablePadding: false, label: 'Kelompok' },
     { id: 'jam', numeric: true, disablePadding: false, label: 'Jam Pelajaran (45 min)' },
   ],
+  optKelompok: [
+    { value: 'A (Wajib)', text: 'A (Wajib)' },
+    { value: 'B (Wajib)', text: 'B (Wajib)' },
+    { value: 'C', text: 'C' },
+  ]
 });
 
 const mapDispatchToProps = dispatch => ({
