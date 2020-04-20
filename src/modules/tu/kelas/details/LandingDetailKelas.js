@@ -5,31 +5,30 @@ import CardsWithPeople from '../../../../components/cards/Card';
 import { Grid } from '@material-ui/core';
 import DataTables from '../../../../components/data_tables/DataTables';
 import { Fade } from 'react-reveal';
+import Modals from '../../../../components/modal/Modal';
+import Selects from '../../../../components/select/Select';
 
 class LandingDetailKelas extends Component {
   idKelas = this.props.match.params.idKelas;
   constructor(props) {
     super(props);
     this.state = {
-      pageLoaded: false
+      pageLoaded: false,
+      openModal: false,
+      formGuru: ''
     }
     this.handleChangeButton = this.handleChangeButton.bind(this);
   }
 
   componentDidMount() {
-    this.setState({pageLoaded: true});
+    this.setState({ pageLoaded: true });
     this.props.setLoading(false);
   }
 
   handleChangeButton = () => {
-    // this.props.setLoading(true);
     this.setState({
-      pageLoaded: false
-    },() => {
-      setTimeout(() => {
-        this.setState({pageLoaded: true})
-      }, 5)
-    })
+      openModal: true
+    });
   }
 
   goToSiswa = () => {
@@ -41,7 +40,7 @@ class LandingDetailKelas extends Component {
       }, 300)
     });
   }
-  
+
   goToMataPelajaran = () => {
     this.setState({
       pageLoaded: false
@@ -60,6 +59,18 @@ class LandingDetailKelas extends Component {
         window.location.hash = `#/school/input_jadwal/${this.idKelas}`;
       }, 300);
     })
+  }
+
+  inputOnChange = (id, value, isValid) => {
+    this.setState({ formGuru: value });
+  }
+
+  closeModal = () => {
+    this.setState({ openModal: false });
+  }
+
+  submitModal = () => {
+    this.setState({ openModal: false });
   }
 
   render() {
@@ -108,6 +119,15 @@ class LandingDetailKelas extends Component {
             </Grid>
           </Grid>
         </div>
+        <Modals
+          modalTitle='Pilih Wali Kelas'
+          open={this.state.openModal}
+          onCloseModal={() => this.closeModal()}
+          onSubmitModal={() => this.submitModal()}
+          type="confirm"
+        >
+          <Selects name='guru' id='guru' label='Guru' variant='outlined' options={this.props.optGuru} value={this.state.formGuru} onChange={this.inputOnChange} isSubmit={false} disable={false} required={true} />
+        </Modals>
       </Fade>
     )
   }
@@ -124,6 +144,10 @@ const mapStateToProps = state => ({
     { id: 'kelas', numeric: false, disablePadding: true, label: 'Kelas' },
     { id: 'tahun', numeric: true, disablePadding: false, label: 'Tahun' },
     { id: 'tanggal', numeric: true, disablePadding: false, label: 'Tanggal Pembuatan' },
+  ],
+  optGuru: [
+    { value: 'dion', text: 'Dion' },
+    { value: 'yoshi', text: 'Yoshi' },
   ]
 });
 
