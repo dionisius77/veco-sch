@@ -118,7 +118,7 @@ class LandingPage extends React.Component {
             password: password.value,
           }));
         }
-        localStorage.setItem('role', 'GURU');
+        localStorage.setItem('role', 'TU');
         this.props.onLogin(true);
       }, 3000);
     })

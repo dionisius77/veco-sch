@@ -110,7 +110,7 @@ export default function MiniDrawer(props) {
       case 'GURU':
         return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesGuru];
       case 'WALI':
-        return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesTU];
+        return [...Routes.MenuRoutesHome, ...Routes.MenuRoutesWali, ...Routes.MenuRoutesGuru];
       default:
         return [...Routes.MenuRoutesHome];
     }
