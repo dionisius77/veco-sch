@@ -7,13 +7,20 @@ import MateriIcon from '@material-ui/icons/LibraryBooks';
 import AbsensiIcon from '@material-ui/icons/Ballot';
 import NilaiIcon from '@material-ui/icons/Assignment';
 import UjianIcon from '@material-ui/icons/EventNote';
+import StaffIcon from '@material-ui/icons/SupervisorAccount';
 
 const LEFT_MENU_TU = [
   {
-    name: 'MataPelajaran',
+    name: 'Mata Pelajaran',
     translateId: '',
     onClick: () => { window.location.hash = '#/school/mata_pelajaran'; },
     icon: <BookIcon style={{color:'#fff'}}/>,
+  },
+  {
+    name: 'Data Staff',
+    translateId: '',
+    onClick: () => { window.location.hash = '#/school/data_staff'; },
+    icon: <StaffIcon style={{color:'#fff'}}/>,
   },
   {
     name: 'Siswa',

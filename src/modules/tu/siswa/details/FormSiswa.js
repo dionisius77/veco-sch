@@ -750,7 +750,7 @@ class FormSiswa extends Component {
                   <Grid item xs>
                     <p>
                       Semua form sudah di isi. Silahkan check kembali data yang sudah anda input atau click finish jika data sudah benar.
-              </p>
+                    </p>
                   </Grid>
                   <Grid item xs>
                     <div style={{ display: 'flex', marginTop: 30 }}>
