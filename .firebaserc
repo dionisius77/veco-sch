@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "veco-school",
+    "veco-school": "veco-school"
+  }
+}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Children } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
 import { pushLoading } from '../../../components/layout/ActionLayout';
@@ -51,6 +51,8 @@ class JadwalUjian extends Component {
       jenis: '',
     }
     this.clickedCalendar = this.clickedCalendar.bind(this);
+    this.customEvent = this.customEvent.bind(this);
+    this.customCells = this.customCells.bind(this);
     this.newEvents = this.state.events;
   }
 
@@ -190,6 +192,45 @@ class JadwalUjian extends Component {
     }
   }
 
+  customCells = ({ children, value }) => {
+    return (
+      React.cloneElement(Children.only(children), {
+        style: {
+          ...children.style,
+          backgroundColor: value.toLocaleDateString() === new Date().toLocaleDateString() ? '#ff5b92' : '#424242',
+        },
+      })
+    )
+  }
+
+  customEvent = (e) => {
+    return (
+      <div
+        tabIndex={e.event.id}
+        style={{
+          border: 'none',
+          boxSizing: 'border-box',
+          boxShadow: 'none',
+          margin: '0',
+          padding: '2px 5px',
+          backgroundColor: '#3174ad',
+          borderRadius: '5px',
+          color: '#fff',
+          cursor: 'pointer',
+          width: '100 %',
+          textAlign: 'left',
+        }}
+        onContextMenu={(event) => { this.onRightClickEvent(event, e.event.id) }}
+      >
+        {e.event.title}
+      </div >
+    )
+  }
+
+  onRightClickEvent = async (e, id) => {
+    e.preventDefault();
+  }
+
   render() {
     const {
       start,
@@ -211,7 +252,9 @@ class JadwalUjian extends Component {
           <Calendar
             events={events}
             components={{
-              toolbar: this.CustomToolbar
+              toolbar: this.CustomToolbar,
+              event: this.customEvent,
+              dateCellWrapper: this.customCells,
             }}
             views={['month']}
             localizer={localizer}

@@ -2,12 +2,16 @@ import {
   AUTH_FETCH,
   AUTH_FAILED,
   AUTH_SUCCESS,
+  AUTH_DEFAULT,
   GET_LOGIN,
   PUSH_LOGIN,
   GET_LOADING,
   PUSH_LOADING,
   GET_ALERT,
   PUSH_ALERT,
+  MASTER_DATA_SUCCESS,
+  MASTER_DATA_FETCH,
+  MASTER_DATA_FAILED,
 } from './ConfigLayout';
 
 const initialState = {
@@ -19,10 +23,13 @@ const initialState = {
   loggedin: false,
   loadingFlag: false,
   alert: {
-    isOpen: false,
+    open: false,
     message: '',
     type: 'success'
-  }
+  },
+  fetchMasterData: true,
+  sendMasterData: null,
+  resMasterData: null
 };
 
 export function ReducerLayout(state = initialState, action) {
@@ -50,6 +57,14 @@ export function ReducerLayout(state = initialState, action) {
         errAuth: action.err,
         action: action.type,
       };
+
+    case AUTH_DEFAULT:
+      initialState.resAuth = null;
+      return {
+        ...state,
+        resAuth: initialState.resAuth,
+        action: action.type
+      }
 
     case PUSH_LOGIN:
       initialState.loggedin = action.value;
@@ -80,7 +95,7 @@ export function ReducerLayout(state = initialState, action) {
         loadingFlag: initialState.loadingFlag,
         action: action.type
       }
-    
+
     case PUSH_ALERT:
       initialState.alert = action.value;
       return {
@@ -94,6 +109,31 @@ export function ReducerLayout(state = initialState, action) {
         ...state,
         alert: initialState.alert,
         action: action.type,
+      }
+
+    case MASTER_DATA_FETCH:
+      return {
+        ...state,
+        fetchMasterData: true,
+        sendMasterData: action.send,
+        action: action.type
+      }
+
+    case MASTER_DATA_SUCCESS:
+      state.resMasterData = action.res;
+      return {
+        ...state,
+        fetchMasterData: false,
+        resMasterData: state.resMasterData,
+        action: action.type
+      }
+
+    case MASTER_DATA_FAILED:
+      return {
+        ...state,
+        fetchMasterData: false,
+        errMasterData: action.err,
+        action: action.type
       }
 
     default:

@@ -22,6 +22,7 @@ export default function DatePicker(props) {
     () => {
       if (props.value !== '') {
         setSelectedDate(props.value);
+        setInputDates(props.value);
       }
     }, [props.value]
   )

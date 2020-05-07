@@ -49,7 +49,6 @@ class InputAbsensi extends Component {
         }
         return null;
       });
-      console.log(this.state.dataSiswa)
     }
   }
 
@@ -63,7 +62,6 @@ class InputAbsensi extends Component {
       }
       return null;
     });
-    console.log(this.state.dataSiswa)
   }
 
   inputOnBlur = (id, value) => {
@@ -74,7 +72,6 @@ class InputAbsensi extends Component {
       return null
     });
     this.setState({ dataSiswa: this.newDataSiswa });
-    console.log(this.state.dataSiswa)
   }
 
   onSave = () => {

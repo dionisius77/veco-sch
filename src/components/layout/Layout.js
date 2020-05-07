@@ -3,11 +3,12 @@ import { connect } from "react-redux";
 import Header from "./header/header";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { pink, red, amber, blue, lightGreen, grey } from "@material-ui/core/colors";
-import { pushAlert, pushLogin, pushLoading } from "./ActionLayout";
+import { pushAlert, pushLogin, pushLoading, masterDataFetch, authDefault } from "./ActionLayout";
 import AlertCustom from "../alert/Alert";
 import { Beforeunload } from 'react-beforeunload';
 import axios from 'axios';
 import Loading from "../loading/Loading";
+import { HTTP_SERVICE } from "../../services/HttpServices";
 
 class Layout extends Component {
   globalTheme1 = createMuiTheme({
@@ -16,7 +17,7 @@ class Layout extends Component {
         main: pink[100]
       },
       secondary: {
-        main: pink[400],
+        main: '#ff5b92',
         light: pink[200]
       },
       warning: {
@@ -82,6 +83,7 @@ class Layout extends Component {
     this.state = {
       loggedIn: this.props.login,
       loadingFlag: false,
+      userProfile: this.props.userProfile,
       alert: {
         open: false,
         message: '',
@@ -93,7 +95,7 @@ class Layout extends Component {
 
   onUnload = () => {
     axios.interceptors.request.use((config) => {
-      console.log(config);
+      // console.log(config);
     }, (err) => { console.log(err) });
     return '';
   }
@@ -104,6 +106,9 @@ class Layout extends Component {
     }
     if (nextProps.action === "PUSH_ALERT") {
       prevState.alert = nextProps.alert;
+    }
+    if (nextProps.action === "AUTH_SUCCESS") {
+      prevState.userProfile = nextProps.userProfile;
     }
     return null;
   }
@@ -118,9 +123,22 @@ class Layout extends Component {
   }
 
   componentDidMount() {
-    if (!this.state.loggedIn) {
+    if (this.props.userProfile === null) {
       window.location.hash = '/login_page';
+    } else {
+      this.verify();
     }
+  }
+
+  verify = () => {
+    HTTP_SERVICE.getUserInfoLoggedIn().onAuthStateChanged(user => {
+      // console.log(user);
+      if (user) {
+        this.props.getMasterdata({ collection: 'masterdata' });
+      } else {
+        this.logOut();
+      }
+    });
   }
 
   logOut() {
@@ -128,10 +146,9 @@ class Layout extends Component {
     this.setState({
       loggedIn: false,
     }, () => {
-      setTimeout(() => {
-        this.props.onLogin(false);
-        window.location.hash = '/login_page';
-      }, 3000);
+      this.props.onLogin(false);
+      this.props.onDeleteProfile();
+      window.location.hash = '/login_page';
     })
   }
 
@@ -140,7 +157,7 @@ class Layout extends Component {
       <React.Fragment>
         <Beforeunload onBeforeunload={() => { this.onUnload() }}>
           <ThemeProvider theme={this.globalTheme1}>
-            <Header onLogout={() => { this.logOut() }} />
+            <Header userProfile={this.state.userProfile} onNotif={() => { this.verify() }} onLogout={() => { this.logOut() }} />
             <AlertCustom
               isOpen={this.state.alert.open}
               message={this.state.alert.message}
@@ -148,7 +165,7 @@ class Layout extends Component {
               type={this.state.alert.type}
             />
             {this.state.loadingFlag &&
-              <Loading color='black'/>
+              <Loading color='black' />
             }
           </ThemeProvider>
         </Beforeunload>
@@ -158,10 +175,9 @@ class Layout extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
   return {
     // action: state.layout.action,
-    // res: state.layout.resAuth
+    userProfile: state.layout.resAuth,
     login: state.layout.loggedin,
     loadingFlag: state.layout.loadingFlag,
     action: state.layout.action,
@@ -171,8 +187,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   onCloseAlert: (value) => dispatch(pushAlert(value)),
+  onDeleteProfile: () => dispatch(authDefault(null)),
   onLogin: (value) => dispatch(pushLogin(value)),
   onPushLoading: (value) => dispatch(pushLoading(value)),
+  getMasterdata: value => dispatch(masterDataFetch(value))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);

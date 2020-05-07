@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { pushLoading } from "../../../components/layout/ActionLayout";
+import { pushLoading, pushAlert } from "../../../components/layout/ActionLayout";
 import DataTables from "../../../components/data_tables/DataTables";
 import { Fade } from "react-reveal";
 import Modals from "../../../components/modal/Modal";
 import Selects from "../../../components/select/Select";
 import InputField from "../../../components/input_field/InputField";
 import { HTTP_SERVICE } from "../../../services/HttpServices";
+import Alert from "@material-ui/lab/Alert";
 
 class Kelas extends Component {
   newForm;
@@ -21,10 +22,12 @@ class Kelas extends Component {
       form: {
         kelas: '',
         indexKelas: '',
-        tahunAjaran: '',
         kapasitas: 0,
       },
       openModal: false,
+      limit: 5,
+      modalConfirm: false,
+      confirmValue: [],
     }
 
     this.onChangePage = this.onChangePage.bind(this);
@@ -34,29 +37,45 @@ class Kelas extends Component {
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.goToDetail = this.goToDetail.bind(this);
-    // this.handleCloseModal = this.handleCloseModal.bind(this);
-    // this.submitModal = this.submitModal.bind(this);
     this.newDataTables = this.props.dataTables;
     this.newForm = this.state.form;
   }
 
   componentDidMount() {
-    this.createListTahunAjaran();
+    this.props.setLoading(true);
+    this.getData(this.state.limit);
     this.setState({ dataTables: this.props.dataTables });
-    this.props.setLoading(false);
     this.setState({ pageLoaded: true });
   }
 
-  createListTahunAjaran = () => {
-    let now = new Date();
-    let list = [];
-    let prev = `${now.getFullYear() - 1}/${now.getFullYear()}`;
-    let current = `${now.getFullYear()}/${now.getFullYear() + 1}`;
-    let next = `${now.getFullYear() + 1}/${now.getFullYear() + 2}`;
-    list.push({ value: prev, text: prev });
-    list.push({ value: current, text: current });
-    list.push({ value: next, text: next });
-    this.setState({ optionTahunAjaran: list });
+  getData = async (limit) => {
+    const request = {
+      collection: 'datakelas',
+      limit: limit,
+      lastVisible: '',
+      orderBy: "uniqueId",
+      directions: "asc",
+      params: 'active',
+      operator: '==',
+      value: true,
+    }
+    await HTTP_SERVICE.getFBFilter(request).then(res => {
+      res.forEach(doc => {
+        this.newDataTables.push({
+          uniqueId: doc.id,
+          kelas: doc.data().kelas,
+          wali: doc.data().wali || '-',
+          tahun: doc.data().tahun,
+          kapasitas: doc.data().kapasitas,
+          tanggal: doc.data().tanggal,
+        });
+      });
+      this.setState({ dataTables: this.newDataTables })
+      this.props.setLoading(false);
+    }).catch(err => {
+      this.props.setLoading(false);
+      // console.log(err);
+    });
   }
 
   handleDownload = () => {
@@ -64,7 +83,7 @@ class Kelas extends Component {
   }
 
   onChangePage = (page, limit) => {
-
+    this.getData(limit);
   }
 
   onSearch = (value) => {
@@ -77,7 +96,6 @@ class Kelas extends Component {
       form: {
         kelas: '',
         indexKelas: '',
-        tahunAjaran: '',
         kapasitas: 0,
       }
     });
@@ -96,10 +114,13 @@ class Kelas extends Component {
     this.setState({
       pageLoaded: false
     }, () => {
+      const selected = this.newDataTables.filter(data => {
+        return data.uniqueId === clicked;
+      })
       setTimeout(() => {
-        window.location.hash = `#/school/detail_kelas/${clicked}`;
+        window.location.hash = `#/school/detail_kelas/${clicked}/${selected[0].kapasitas}`;
       }, 400)
-    })
+    });
   }
 
   selectOnChange = (name, value) => {
@@ -122,33 +143,65 @@ class Kelas extends Component {
     this.setState({
       openModal: false
     });
+    let now = new Date();
+    let current = `${now.getFullYear()}/${now.getFullYear() + 1}`;
+    this.props.setLoading(true);
     const {
       kelas,
       indexKelas,
-      tahunAjaran,
       kapasitas,
     } = this.state.form;
-    let id = Math.floor(Math.random() * 101);
-    let now = new Date();
     let newRow = {
-      uniqueId: id.toString(),
+      uniqueId: kelas + '-' + indexKelas,
       kelas: kelas + '-' + indexKelas,
-      wali: '-',
-      tahun: tahunAjaran,
+      wali: '',
+      tahun: current,
       kapasitas: kapasitas,
       tanggal: now.getDate() + ' ' + now.toLocaleString('default', { month: 'long' }) + ' ' + now.getFullYear(),
+      active: true,
+      author: this.props.userProfile.email,
+      authorId: this.props.userProfile.author,
     }
-    this.newDataTables.unshift(newRow);
-    this.setState({
-      dataTables: this.newDataTables,
-    })
     let request = {
-      url: 'api/v1/testSekolah',
+      collection: 'datakelas',
+      doc: `${kelas}-${indexKelas}-${now.getFullYear()}`,
       data: newRow
     }
-    HTTP_SERVICE.post(request).then(res => {
-      console.log(res)
-    }).catch(err => {console.log(err)});
+    await HTTP_SERVICE.getFb(request)
+    .then(async res => {
+      if(!res.exists){
+        await HTTP_SERVICE.inputFb(request).then(res => {
+          this.newDataTables.unshift(newRow);
+          this.setState({
+            dataTables: this.newDataTables,
+          })
+            this.props.setLoading(false);
+          }).catch(err => {
+            this.props.setLoading(false);
+          })
+        } else {
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Kelas sudah terdaftar',
+            type: 'error',
+          });
+        }
+      })
+      .catch(err => {
+        // console.log(err);
+      });
+  }
+  
+  confirmDelete = (checked) => {
+    this.setState({
+      modalConfirm: true,
+      confirmValue: checked,
+    });
+  }
+
+  handleCloseConfirmModal = () => {
+    this.setState({ modalConfirm: false });
   }
 
   render() {
@@ -156,20 +209,21 @@ class Kelas extends Component {
       pageLoaded,
       page,
       dataTables,
-      optionTahunAjaran,
-      openModal
+      openModal,
+      modalConfirm,
+      confirmValue
     } = this.state;
     const {
       headCells,
       optionKelas
     } = this.props;
+    const deleteVal = confirmValue.length > 0 ? confirmValue.join(', ') : '';
     return (
       <Fade right opposite when={pageLoaded} duration={500}>
         <DataTables
           tableName='Daftar Kelas'
           allowEdit={true}
           page={page}
-          dataLength={dataTables.length}
           headCells={headCells}
           data={dataTables}
           orderConfig={false}
@@ -179,7 +233,7 @@ class Kelas extends Component {
           handleSearch={this.onSearch}
           handleAdd={this.handleAdd}
           handleEdit={this.handleEdit}
-          handleDelete={this.handleDelete}
+          handleDelete={(checked) => this.confirmDelete(checked)}
           goToDetail={this.goToDetail}
         />
         <Modals
@@ -192,9 +246,17 @@ class Kelas extends Component {
           <div style={{ width: 400, height: 300 }}>
             <Selects name='kelas' id='kelas' label='Kelas' variant='outlined' options={optionKelas} value='' onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
             <InputField id='indexKelas' label='Index Kelas' variant='outlined' required={false} type="text" value='' disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
-            <Selects name='tahunAjaran' id='tahunAjaran' label='Tahun Ajaran' variant='outlined' options={optionTahunAjaran} value='' onChange={(name, value) => { this.selectOnChange(name, value) }} isSubmit={false} disable={false} required={true} />
             <InputField id='kapasitas' label='Kapasitas' variant='outlined' required={false} type="number" value='' disabled={false} onBlur={(id, value) => this.onBlurInput(id, value)} isSubmit={false} />
           </div>
+        </Modals>
+        <Modals
+          open={modalConfirm}
+          modalTitle={`Hapus Data`}
+          type="confirm"
+          onCloseModal={this.handleCloseConfirmModal}
+          onSubmitModal={this.handleDelete}
+        >
+          <Alert variant="standard" severity="warning" color="error">Apakah anda yakin akan menghapus {deleteVal}?</Alert>
         </Modals>
       </Fade>
     )
@@ -202,12 +264,7 @@ class Kelas extends Component {
 }
 
 const mapStateToProps = state => ({
-  dataTables: [
-    { uniqueId: '001', kelas: 'VII-A', wali: 'Ahahaha', tahun: '2019/2020', kapasitas: 40, tanggal: '6 June 2019' },
-    { uniqueId: '002', kelas: 'VII-B', wali: 'Ehehehe', tahun: '2019/2020', kapasitas: 40, tanggal: '6 June 2019' },
-    { uniqueId: '003', kelas: 'VIII-A', wali: 'Ohohoho', tahun: '2019/2020', kapasitas: 40, tanggal: '6 June 2019' },
-    { uniqueId: '004', kelas: 'IX-A', wali: 'Uhuhuhu', tahun: '2019/2020', kapasitas: 40, tanggal: '6 June 2019' },
-  ],
+  dataTables: [],
   headCells: [
     { id: 'kelas', numeric: false, disablePadding: true, label: 'Kelas' },
     { id: 'wali', numeric: false, disablePadding: true, label: 'Wali Kelas' },
@@ -222,11 +279,13 @@ const mapStateToProps = state => ({
     { value: 'X', text: 'X' },
     { value: 'XI', text: 'XI' },
     { value: 'XII', text: 'XII' },
-  ]
+  ],
+  userProfile: state.layout.resAuth,
 });
 
 const mapDispatchToProps = dispatch => ({
-  setLoading: value => dispatch(pushLoading(value))
+  setLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Kelas)

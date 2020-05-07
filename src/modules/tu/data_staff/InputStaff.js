@@ -7,10 +7,12 @@ import Selects from '../../../components/select/Select';
 import DatePicker from '../../../components/date_picker/DatePicker';
 import SelectMultiple from '../../../components/select/SelectMultiple';
 import Button from '../../../components/button/Button';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 
 class InputStaff extends Component {
   idStaff = this.props.match.params.idStaff;
-  newFomGuru;
+  newFormGuru;
   constructor(props) {
     super(props);
     this.state = {
@@ -22,76 +24,197 @@ class InputStaff extends Component {
         pendidikanTerakhir: { value: '', isValid: false },
         jurusan: { value: '', isValid: false },
         tahun: { value: '', isValid: false },
-        jabatan: { value: '', isValid: false },
+        jabatan: { value: [], isValid: false },
         masaKerja: { value: '', isValid: false },
         status: { value: '', isValid: false },
         tanggalSK: { value: '', isValid: false },
+        email: { value: '', isValid: false },
+        nik: { value: '', isValid: false },
       },
       isSubmit: false,
       finish: false,
+      optBidangStudi: []
     }
     this.inputOnChange = this.inputOnChange.bind(this);
-    this.newFomGuru = this.state.formGuru;
+    this.newFormGuru = this.state.formGuru;
   }
 
   componentDidMount() {
+    this.props.onLoading(true);
+    this.getBidangStudi();
+    if (this.idStaff !== '0') {
+      this.getDataStaff();
+    }
+  }
+
+  getDataStaff = async () => {
+    const request = {
+      collection: 'datastaff',
+      doc: this.idStaff
+    }
+    await HTTP_SERVICE.getFb(request).then(async res => {
+      let doc = res.data();
+      this.newFormGuru.nama.value = doc.nama;
+      this.newFormGuru.nama.isValid = true;
+      this.newFormGuru.tempatLahir.value = doc.tempatLahir;
+      this.newFormGuru.tempatLahir.isValid = true;
+      this.newFormGuru.tanggalLahir.value = doc.tanggalLahir;
+      this.newFormGuru.tanggalLahir.isValid = true;
+      let jabatan = [];
+      if(typeof(doc.jabatan) === 'string'){
+        jabatan.push(doc.jabatan);
+      } else {
+        jabatan = doc.jabatan;
+      }
+      this.newFormGuru.jabatan.value = jabatan;
+      this.newFormGuru.jabatan.isValid = true;
+      this.newFormGuru.pendidikanTerakhir.value = doc.pendidikanTerakhir;
+      this.newFormGuru.pendidikanTerakhir.isValid = true;
+      this.newFormGuru.jurusan.value = doc.jurusan;
+      this.newFormGuru.jurusan.isValid = true;
+      this.newFormGuru.tahun.value = doc.tahun;
+      this.newFormGuru.tahun.isValid = true;
+      this.newFormGuru.bidangStudi.value = doc.bidangStudi;
+      this.newFormGuru.bidangStudi.isValid = true;
+      this.newFormGuru.masaKerja.value = doc.masaKerja;
+      this.newFormGuru.masaKerja.isValid = true;
+      this.newFormGuru.status.value = doc.status;
+      this.newFormGuru.status.isValid = true;
+      this.newFormGuru.nik.value = doc.nik;
+      this.newFormGuru.nik.isValid = true;
+      this.newFormGuru.tanggalSK.value = doc.tanggalSK;
+      this.newFormGuru.tanggalSK.isValid = true;
+      this.newFormGuru.email.value = doc.email;
+      this.newFormGuru.email.isValid = true;
+      this.setState({ formGuru: this.newFormGuru })
+    }).catch(err => {
+      // console.log(err)
+    });
+  }
+
+  getBidangStudi = async () => {
+    const request = {
+      collection: 'matapelajaran'
+    }
+    await HTTP_SERVICE.getFb(request).then(async res => {
+      let tempBidangStudi = [{
+        value: '',
+        text: 'None'
+      }];
+      res.forEach(data => {
+        tempBidangStudi.push({
+          value: data.id,
+          text: data.data().matapelajaran
+        })
+      });
+      this.setState({ optBidangStudi: tempBidangStudi });
+      this.props.onLoading(false);
+    }).catch(err => {
+      // console.log(err)
+    });
   }
 
   inputOnChange = (id, value, isValid) => {
-    this.newFomGuru[id].value = value;
-    this.newFomGuru[id].isValid = isValid;
+    this.newFormGuru[id].value = value;
+    this.newFormGuru[id].isValid = isValid;
     if (id === 'jabatan') {
 
     }
-    this.setState({ formGuru: this.newFomGuru });
-    this.validate();
+    this.setState({ formGuru: this.newFormGuru });
   }
 
   onSubmit = () => {
     const { formGuru } = this.state;
-    console.log(formGuru)
+    // console.log(formGuru)
     this.setState({ isSubmit: true });
     if (
       (formGuru.jabatan.value === 'KTU' || formGuru.jabatan.value === 'STU' || formGuru.jabatan.value === 'pembina umum')
     ) {
-      this.newFomGuru.bidangStudi.isValid = true;
-      this.newFomGuru.bidangStudi.value = [];
-      this.setState({ formGuru: this.newFomGuru });
+      this.newFormGuru.bidangStudi.isValid = true;
+      this.newFormGuru.bidangStudi.value = [];
+      this.setState({ formGuru: this.newFormGuru });
     } else {
-      this.newFomGuru.bidangStudi.isValid = this.newFomGuru.bidangStudi.value.length !== 0;
-      this.setState({ formGuru: this.newFomGuru });
+      this.newFormGuru.bidangStudi.isValid = this.newFormGuru.bidangStudi.value.length !== 0;
+      this.setState({ formGuru: this.newFormGuru });
     }
     if (formGuru.status.value !== 'GT') {
-      this.newFomGuru.tanggalSK.isValid = true;
-      this.newFomGuru.tanggalSK.value = '';
-      this.setState({ formGuru: this.newFomGuru });
+      this.newFormGuru.tanggalSK.isValid = true;
+      this.newFormGuru.tanggalSK.value = '';
+      this.setState({ formGuru: this.newFormGuru });
     } else {
-      this.newFomGuru.tanggalSK.isValid = this.newFomGuru.tanggalSK.value !== '';
-      this.setState({ formGuru: this.newFomGuru });
+      this.newFormGuru.tanggalSK.isValid = this.newFormGuru.tanggalSK.value !== '';
+      this.setState({ formGuru: this.newFormGuru });
     }
     if (
       formGuru.nama.isValid && formGuru.jabatan.isValid && formGuru.tempatLahir.isValid &&
       formGuru.tanggalLahir.isValid && formGuru.pendidikanTerakhir.isValid && formGuru.jurusan.isValid &&
       formGuru.tahun.isValid && formGuru.masaKerja.isValid && formGuru.status.isValid && formGuru.bidangStudi.isValid &&
-      formGuru.tanggalSK.isValid
+      formGuru.tanggalSK.isValid && formGuru.email.isValid && formGuru.nik.isValid
     ) {
-      console.log('mantap')
+      this.props.onLoading(true);
+      this.sendData();
     } else {
-      console.log('blm lengkap')
+      // console.log('blm lengkap')
     }
   }
 
-  validate = () => {
+  sendData = async () => {
+    const { formGuru } = this.state;
+    const request = {
+      collection: 'datastaff',
+      doc: formGuru.nik.value,
+      data: {
+        nama: formGuru.nama.value,
+        jabatan: formGuru.jabatan.value,
+        tempatLahir: formGuru.tempatLahir.value,
+        tanggalLahir: formGuru.tanggalLahir.value,
+        pendidikanTerakhir: formGuru.pendidikanTerakhir.value,
+        jurusan: formGuru.jurusan.value,
+        tahun: formGuru.tahun.value,
+        masaKerja: formGuru.masaKerja.value,
+        status: formGuru.status.value,
+        bidangStudi: (formGuru.jabatan.value === 'KTU' || formGuru.jabatan.value === 'STU' || formGuru.jabatan.value === 'pembina umum') ? [] : formGuru.bidangStudi.value,
+        tanggalSK: formGuru.status.value !== 'GT' ? '' : formGuru.tanggalSK.value,
+        email: formGuru.email.value,
+        nik: formGuru.nik.value,
+        author: this.props.userProfile.email,
+        authorId: this.props.userProfile.author,
+      }
+    }
+    await HTTP_SERVICE.inputFb(request).then(res => {
+      this.daftarAccount(formGuru.email.value, formGuru.nik.value, formGuru.jabatan.value);
+      this.props.onSetAlert({
+        open: true,
+        message: 'Data berhasil diinput',
+        type: 'success'
+      });
+      window.location.hash = '#/school/data_staff';
+    }).catch(err => {
+      this.props.onSetAlert({
+        open: true,
+        message: 'Data gagal diinput',
+        type: 'warning'
+      });
+      this.props.onLoading(false);
+    });
+  }
+  
+  daftarAccount = (email, password, role) => {
+    HTTP_SERVICE.registerAcc({
+      email: email,
+      password: password,
+      role: role,
+    })
+    this.props.onLoading(false);
   }
 
   render() {
     const {
       formGuru,
       isSubmit,
-      finish
+      optBidangStudi
     } = this.state;
     const {
-      optBidangStudi,
       optPendidikanTerakhir,
       optJabatan,
       optStatus
@@ -104,7 +227,7 @@ class InputStaff extends Component {
               textAlign: 'center',
               paddingBottom: 10
             }}>
-              Form Pendaftaran Siswa
+              Form Pendaftaran Guru
             </h1>
           </div>
           <Grid container spacing={5}>
@@ -119,9 +242,10 @@ class InputStaff extends Component {
                 formGuru.status.value === 'GT' &&
                 <DatePicker id='tanggalSK' label='Tanggal SK' required={true} value={formGuru.tanggalSK.value} onChange={this.inputOnChange} isSubmit={isSubmit} />
               }
+              <InputField id='nik' label='NIP' required={true} type="text" value={formGuru.nik.value} disabled={false} onBlur={this.inputOnChange} isSubmit={isSubmit} variant='outlined' setFocus={true} />
             </Grid>
             <Grid item xs>
-              <Selects name='jabatan' id='jabatan' label='Jabatan' variant='outlined' options={optJabatan} value={formGuru.jabatan.value} onChange={this.inputOnChange} isSubmit={isSubmit} disable={false} required={true} />
+              <SelectMultiple name='jabatan' id='jabatan' label='Tugas tambahan' variant='outlined' options={optJabatan} value={formGuru.jabatan.value} onChange={this.inputOnChange} isSubmit={isSubmit} disable={false} required={true} />
               <DatePicker id='tanggalLahir' label='Tanggal Lahir' required={true} value={formGuru.tanggalLahir.value} onChange={this.inputOnChange} isSubmit={isSubmit} />
               <Grid container spacing={1}>
                 <Grid item xs={8}>
@@ -139,6 +263,7 @@ class InputStaff extends Component {
                   <Selects name='status' id='status' label='Status' variant='outlined' options={optStatus} value={formGuru.status.value} onChange={this.inputOnChange} isSubmit={isSubmit} disable={false} required={true} />
                 </Grid>
               </Grid>
+              <InputField id='email' label='Email' required={true} type="email" value={formGuru.email.value} disabled={false} onBlur={this.inputOnChange} isSubmit={isSubmit} variant='outlined' setFocus={true} />
             </Grid>
           </Grid>
           <div style={{ margin: 10 }}>
@@ -160,37 +285,31 @@ class InputStaff extends Component {
 }
 
 const mapStateToProps = state => {
+  // console.log(state);
   return {
-    optBidangStudi: [
-      { value: '220011', text: 'Matematika' },
-      { value: '210011', text: 'IPA' },
-    ],
-    optPendidikanTerakhir: [
-      { value: 5, text: 'SMA Sederajat' },
-      { value: 6, text: 'D1' },
-      { value: 7, text: 'D2' },
-      { value: 8, text: 'D3' },
-      { value: 9, text: 'D4 / S1' },
-      { value: 10, text: 'S2' },
-      { value: 11, text: 'S3' },
-    ],
+    optPendidikanTerakhir: state.layout.resMasterData.pendidikan,
     optJabatan: [
       { value: 'none', text: 'Tidak Ada' },
       { value: 'kepsek', text: 'Kepala Sekolah' },
       { value: 'kurikulum', text: 'Sie. Kurikulum' },
       { value: 'KTU', text: 'Kepala TU' },
       { value: 'STU', text: 'Staff TU' },
-      { value: 'pembina umum', text: 'Pembina Umum' },
+      { value: 'PU', text: 'Pembina Umum' },
+      { value: 'kesiswaan', text: 'Sie. Kesiswaan' },
+      { value: 'BK', text: 'BK / BP' },
+      { value: 'humas', text: 'Humas' },
     ],
     optStatus: [
       { value: 'GT', text: 'Tetap' },
       { value: 'GTT', text: 'Tidak Tetap' },
-    ]
+    ],
+    userProfile: state.layout.resAuth,
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-
+  onLoading: value => dispatch(pushLoading(value)),
+  onSetAlert: value => dispatch(pushAlert(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputStaff);

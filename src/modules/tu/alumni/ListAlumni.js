@@ -5,9 +5,8 @@ import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout'
 import Modals from '../../../components/modal/Modal';
 import { Fade } from 'react-reveal';
 import { HTTP_SERVICE } from '../../../services/HttpServices';
-import Alert from '@material-ui/lab/Alert';
 
-class ListSiswa extends Component {
+class ListAlumni extends Component {
   newListData;
   constructor(props) {
     super(props);
@@ -15,18 +14,17 @@ class ListSiswa extends Component {
       pageLoaded: false,
       modalFlag: false,
       lastVisible: '',
+      dataLength: 0,
       hashMore: true,
       limit: 5,
-      listData: [],
-      modalConfirm: false,
-      confirmValue: [],
+      listData: []
     }
     this.onChangePage = this.onChangePage.bind(this);
     this.onSearch = this.onSearch.bind(this);
-    this.handleAdd = this.handleAdd.bind(this);
     this.handleDownload = this.handleDownload.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.submitModal = this.submitModal.bind(this);
     this.newListData = this.state.listData;
   }
 
@@ -46,9 +44,9 @@ class ListSiswa extends Component {
       lastVisible: page !== 0 ? this.state.lastVisible : '',
       orderBy: "dataPribadi.nama",
       directions: "asc",
-      params: 'lulus',
+      params: 'pendaftaranKeluar.keluarKarena',
       operator: '==',
-      value: false,
+      value: 1,
     }
     await HTTP_SERVICE.getFBFilter(request).then(res => {
       if (res.docs.length < limit) {
@@ -59,7 +57,7 @@ class ListSiswa extends Component {
           uniqueId: data.id,
           nisn: data.data().dataPribadi.nisn,
           nama: data.data().dataPribadi.nama,
-          jenisKelamin: this.getJenisKelaminText(data.data().dataPribadi.jenisKelamin),
+          jenisKelamin: data.data().dataPribadi.jenisKelamin,
           tanggalLahir: data.data().dataPribadi.tglLahir,
           kelas: data.data().dataPribadi.kelas || '-'
         })
@@ -71,15 +69,8 @@ class ListSiswa extends Component {
     this.props.setLoading(false);
   }
 
-  getJenisKelaminText = (val) => {
-    let selected = this.props.jenisKelamin.filter(e => {
-      return e.value === val;
-    });
-    return selected[0].text;
-  }
-
   onChangePage = (page, limit) => {
-    if (this.state.hashMore) {
+    if ((page + 1) * limit > this.state.dataLength && this.state.hashMore) {
       this.props.setLoading(true);
       this.getData(limit, page);
     }
@@ -107,55 +98,22 @@ class ListSiswa extends Component {
     window.location.hash = `#/school/form_siswa/${checked}`
   }
 
-  handleDelete = async () => {
-    this.setState({ modalConfirm: false });
-    this.props.setLoading(true);
-    let checked = this.state.confirmValue;
-    for (let i = 0; i < checked.length; i++) {
-      await HTTP_SERVICE.deleteFB({
-        collection: 'datasiswa',
-        doc: checked[i],
-      }).then(res => {
-        if (i === checked.length - 1) {
-          this.props.setAlert({
-            message: 'Data berhasil dihapus',
-            open: true,
-            type: 'success',
-          });
-        }
-      }).catch(err => {
-        if (i === checked.length - 1) {
-          this.props.setAlert({
-            message: 'Data gagal dihapus',
-            open: true,
-            type: 'error',
-          });
-        }
-      })
-    }
-    this.getData(this.state.limit, 0);
+  handleCloseModal = () => {
+    this.setState({ modalFlag: false });
   }
 
-  confirmDelete = (checked) => {
-    this.setState({
-      modalConfirm: true,
-      confirmValue: checked,
-    });
-  }
-
-  handleCloseConfirmModal = () => {
-    this.setState({ modalConfirm: false });
+  submitModal = () => {
+    this.setState({ modalFlag: false })
   }
 
   render() {
-    const { modalConfirm, confirmValue } = this.state;
-    const deleteVal = confirmValue.length > 0 ? confirmValue.join(', ') : '';
     return (
       <Fade right opposite when={this.state.pageLoaded} duration={500}>
         <DataTables
-          tableName='Data Siswa'
-          allowEdit={true}
+          tableName='Data Alumni'
+          allowEdit={false}
           page={0}
+          dataLength={this.state.dataLength}
           headCells={this.props.headCells}
           data={this.state.listData}
           orderConfig={false}
@@ -163,18 +121,16 @@ class ListSiswa extends Component {
           handleDownload={this.handleDownload}
           handleChangePage={this.onChangePage}
           handleSearch={this.onSearch}
-          handleAdd={this.handleAdd}
           goToDetail={this.handleEdit}
-          handleDelete={(checked) => this.confirmDelete(checked)}
         />
         <Modals
-          open={modalConfirm}
-          modalTitle={`Hapus Data`}
-          type="confirm"
-          onCloseModal={this.handleCloseConfirmModal}
-          onSubmitModal={this.handleDelete}
+          open={this.state.modalFlag}
+          modalTitle="Alert"
+          type="alert"
+          onCloseModal={this.handleCloseModal}
+          onSubmitModal={this.submitModal}
         >
-          <Alert variant="standard" severity="warning" color="error">Apakah anda yakin akan menghapus {deleteVal}?</Alert>
+          Test 123456789012346789 123768123 123123
         </Modals>
       </Fade>
     );
@@ -190,7 +146,6 @@ const mapStateToProps = state => ({
     { id: 'tanggalLahir', numeric: true, disablePadding: false, label: 'Tgl Lahir' },
     { id: 'kelas', numeric: true, disablePadding: false, label: 'Kelas' },
   ],
-  jenisKelamin: state.layout.resMasterData.jenisKelamin,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -198,4 +153,4 @@ const mapDispatchToProps = dispatch => ({
   setAlert: value => dispatch(pushAlert(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListSiswa)
+export default connect(mapStateToProps, mapDispatchToProps)(ListAlumni)

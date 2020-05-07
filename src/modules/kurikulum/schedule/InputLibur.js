@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, Children } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
-import { pushLoading } from '../../../components/layout/ActionLayout';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -9,6 +9,7 @@ import Modals from '../../../components/modal/Modal';
 import InputField from '../../../components/input_field/InputField';
 import DatePicker from '../../../components/date_picker/DatePicker';
 import { Paper, Grid, withStyles } from '@material-ui/core';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
 
 const styles = (theme) => ({
   title: {
@@ -50,11 +51,59 @@ class InputLibur extends Component {
       start: '',
       end: '',
     }
+    this.onRightClickEvent = this.onRightClickEvent.bind(this);
+    this.customEvent = this.customEvent.bind(this);
+    this.customCells = this.customCells.bind(this);
     this.clickedCalendar = this.clickedCalendar.bind(this);
     this.newEvents = this.state.events;
   }
 
   componentDidMount() {
+    this.props.onPushLoading(true);
+    this.getDataLibur();
+  }
+
+  getDataLibur = async () => {
+    const current = new Date();
+    const localeStringDate = current.toLocaleDateString();
+    const temp = localeStringDate.split('/');
+    const currentFormated = `${temp[2]}-${temp[0].length === 1 ? '0' + temp[0] : temp[0]}-${temp[1].length === 1 ? '0' + temp[1] : temp[1]}`
+    let req = {
+      collection: 'datalibur',
+      params: 'end',
+      operator: '>=',
+      value: currentFormated,
+      orderBy: 'end',
+      directions: 'asc',
+      limit: 500,
+      lastVisible: '',
+    }
+    await HTTP_SERVICE.getFBFilter(req)
+      .then(res => {
+        res.docs.forEach(doc => {
+          this.newEvents.push({
+            id: doc.id,
+            start: doc.data().start,
+            end: doc.data().end,
+            title: doc.data().title,
+          });
+        });
+        this.setState({ events: this.newEvents });
+        this.props.onPushLoading(false);
+        this.props.setAlert({
+          open: true,
+          message: 'Gunakan klik kanan untuk menghapus',
+          type: 'warning',
+        });
+      })
+      .catch(err => {
+        this.props.onPushLoading(false);
+        this.props.setAlert({
+          open: true,
+          message: 'Data tidak berhasil dimuat',
+          type: 'error',
+        });
+      })
   }
 
   CustomToolbar = (toolbar) => {
@@ -133,7 +182,9 @@ class InputLibur extends Component {
     this.setState({ openModal: false });
   }
 
-  submitModal = () => {
+  submitModal = async () => {
+    this.props.onPushLoading(true);
+    this.setState({ openModal: false });
     let events = this.newEvents;
     let hasRegistered;
     events.map((value, index) => {
@@ -143,20 +194,61 @@ class InputLibur extends Component {
       return index;
     });
     if (hasRegistered !== undefined) {
-      events[hasRegistered].title = this.state.title;
+      let reqUpdate = {
+        collection: 'datalibur',
+        doc: events[hasRegistered].id,
+        data: {
+          title: this.state.title,
+          start: this.state.start,
+          end: this.state.end,
+        }
+      }
+      await HTTP_SERVICE.updateFB(reqUpdate)
+        .then(res => {
+          this.props.onPushLoading(false);
+          events[hasRegistered].title = this.state.title;
+          events[hasRegistered].start = this.state.start;
+          events[hasRegistered].end = this.state.end;
+        })
+        .catch(err => {
+          this.props.onPushLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Data gagal di update',
+            type: 'error',
+          });
+        })
     } else {
-      let _newEvent = {
-        id: this.state.id,
-        start: this.state.start,
-        end: this.state.end,
-        title: this.state.title,
-      };
-      events.push(_newEvent);
+      let request = {
+        collection: 'datalibur',
+        data: {
+          start: this.state.start,
+          end: this.state.end,
+          title: this.state.title,
+        }
+      }
+      await HTTP_SERVICE.inputFb(request)
+        .then(res => {
+          console.log(res);
+          let _newEvent = {
+            id: res.id,
+            start: this.state.start,
+            end: this.state.end,
+            title: this.state.title,
+          };
+          events.push(_newEvent);
+          this.props.onPushLoading(false)
+        })
+        .catch(err => {
+          this.props.onPushLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Data gagal di input',
+            type: 'error',
+          });
+        });
     }
-    this.setState({
-      events: events,
-      openModal: false
-    });
+    this.setState({ events: events });
   }
 
   onBlurInput = (id, value) => {
@@ -171,6 +263,68 @@ class InputLibur extends Component {
     }
   }
 
+  customCells = ({ children, value }) => {
+    return (
+      React.cloneElement(Children.only(children), {
+        style: {
+          ...children.style,
+          backgroundColor: value.toLocaleDateString() === new Date().toLocaleDateString() ? '#ff5b92' : '#424242',
+        },
+      })
+    )
+  }
+
+  customEvent = (e) => {
+    return (
+      <div
+        tabIndex={e.event.id}
+        style={{
+          border: 'none',
+          boxSizing: 'border-box',
+          boxShadow: 'none',
+          margin: '0',
+          padding: '2px 5px',
+          backgroundColor: '#3174ad',
+          borderRadius: '5px',
+          color: '#fff',
+          cursor: 'pointer',
+          width: '100 %',
+          textAlign: 'left',
+        }}
+        onContextMenu={(event) => { this.onRightClickEvent(event, e.event.id) }}
+      >
+        {e.event.title}
+      </div >
+    )
+  }
+
+  onRightClickEvent = async (e, id) => {
+    e.preventDefault();
+    this.props.onPushLoading(true);
+    let events = this.newEvents;
+    let hasRegistered;
+    events.map((value, index) => {
+      if (value.id === id) {
+        hasRegistered = index;
+      }
+      return index;
+    });
+    await HTTP_SERVICE.deleteFB({ collection: 'datalibur', doc: id })
+      .then(res => {
+        events.splice(hasRegistered, 1);
+        this.setState({ events: events });
+        this.props.onPushLoading(false);
+      })
+      .catch(err => {
+        this.props.setAlert({
+          open: true,
+          message: 'Data tidak berhasil di hapus',
+          type: 'error',
+        });
+        this.props.onPushLoading(false);
+      });
+  }
+
   render() {
     const { start, end, title, events } = this.state;
     return (
@@ -180,7 +334,9 @@ class InputLibur extends Component {
           <Calendar
             events={events}
             components={{
-              toolbar: this.CustomToolbar
+              toolbar: this.CustomToolbar,
+              dateCellWrapper: this.customCells,
+              event: this.customEvent,
             }}
             views={['month']}
             localizer={localizer}
@@ -241,6 +397,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   onPushLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(InputLibur));

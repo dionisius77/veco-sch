@@ -7,39 +7,123 @@ import ListComponent from '../../../components/moveable_list/ListComponent';
 import Selects from '../../../components/select/Select';
 import Button from '../../../components/button/Button';
 import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
 
 class ManualJadwal extends Component {
   newJadwal;
+  newListMataPelajaran;
   idKelas = this.props.match.params.idKelas;
   constructor(props) {
     super(props);
     this.state = {
       jadwal: {},
       selectedClass: '',
-      dataLoaded: false
+      dataLoaded: false,
+      classOption: [],
+      listMataPelajaran: [],
     }
     this.newJadwal = this.state.jadwal;
     this.onDrop = this.onDrop.bind(this);
+    this.newListMataPelajaran = this.state.listMataPelajaran;
   }
 
   componentDidMount() {
-    if (this.idKelas !== 'empty') {
-      this.props.onSetLoading(true);
-      this.setState({
-        selectedClass: this.idKelas,
-      }, () => {
-        setTimeout(() => {
-          this.setState({ dataLoaded: true });
+    this.props.onSetLoading(true);
+    this.getListKelas();
+  }
+
+  getListKelas = async () => {
+    let newListKelas = [];
+    await HTTP_SERVICE.getFb({ collection: 'datakelas' })
+      .then(res => {
+        res.forEach(doc => {
+          newListKelas.push({ value: doc.id, text: doc.id });
+        });
+        this.setState({ classOption: newListKelas });
+        if (this.idKelas !== 'empty') {
+          this.setState({
+            selectedClass: this.idKelas,
+          });
+          this.getListMataPelajaran(this.idKelas);
+        } else {
           this.props.onSetLoading(false);
-        }, 3000);
-      });
-    } else {
-      this.props.onSetAlert({
-        open: true,
-        message: 'Silahkan pilih kelas terlebih dahulu',
-        type: 'warning'
+          this.props.onSetAlert({
+            open: true,
+            message: 'Silahkan pilih kelas terlebih dahulu',
+            type: 'warning'
+          })
+        }
       })
+      .catch(err => {
+        this.props.onSetLoading(false);
+        this.props.onSetAlert({
+          open: true,
+          message: 'Gagal mengambil data',
+          type: 'error'
+        });
+      });
+  }
+
+  getListMataPelajaran = async (idKelas) => {
+    const request = {
+      collection: 'datakelas',
+      doc: idKelas,
+      subCollection: 'matapelajaran',
     }
+    await HTTP_SERVICE.getFbSubCollection(request)
+      .then(res => {
+        if (res.docs.length > 0) {
+          res.docs.forEach(e => {
+            this.newListMataPelajaran.push({ id: e.id, title: e.data().matapelajaran, description: e.data().staff });
+          });
+          this.setState({ listMataPelajaran: this.newListMataPelajaran });
+          this.getJadwal();
+        } else {
+          this.props.onSetAlert({
+            open: true,
+            message: 'Silahkan input Mata Pelajaran untuk kelas terlebih dahulu',
+            type: 'error',
+          });
+          window.history.back();
+        }
+      })
+      .catch(err => {
+        // console.log(err);
+      })
+  }
+
+  getJadwal = async () => {
+    const req = {
+      collection: 'datakelas',
+      doc: this.state.selectedClass,
+    }
+    await HTTP_SERVICE.getFb(req)
+      .then(res => {
+        if (res.data().jadwal) {
+          this.props.onSetLoading(false);
+          this.props.onSetAlert({
+            open: true,
+            message: 'Click dan seret untuk mengubah nilai',
+            type: 'warning'
+          });
+          this.newJadwal = res.data().jadwal;
+          this.setState({
+            dataLoaded: true,
+            jadwal: res.data().jadwal,
+          });
+        } else {
+          this.props.onSetLoading(false);
+          this.props.onSetAlert({
+            open: true,
+            message: 'Click dan seret untuk mengubah nilai',
+            type: 'warning'
+          });
+          this.setState({ dataLoaded: true });
+        }
+      })
+      .catch(err => {
+        // console.log(err);
+      });
   }
 
   onDrop = (result) => {
@@ -47,7 +131,7 @@ class ManualJadwal extends Component {
     if (source.droppableId !== destination.droppableId) {
       if (destination.droppableId) {
         let jam = destination.droppableId.split('-');
-        let droppedAt = this.props.listJadwal.filter((val) => {
+        let droppedAt = this.state.listMataPelajaran.filter((val) => {
           return val.id === result.draggableId;
         })
         if (
@@ -55,14 +139,18 @@ class ManualJadwal extends Component {
           jam[1] !== 'istirahat 2' &&
           destination.droppableId !== 'jumat-7' &&
           destination.droppableId !== 'jumat-8' &&
-          destination.droppableId !== 'jumat-9'
+          destination.droppableId !== 'jumat-9' &&
+          destination.droppableId !== 'senin-1'
         ) {
-          this.newJadwal[destination.droppableId] = droppedAt[0].title;
+          let newDataJadwal = {
+            id: droppedAt[0].id,
+            text: droppedAt[0].title,
+          };
+          this.newJadwal[destination.droppableId] = newDataJadwal;
           this.setState({ jadwal: this.newJadwal });
         }
       }
     }
-    console.log(this.state.jadwal);
   }
 
   selectOnChange = (name, value) => {
@@ -71,31 +159,76 @@ class ManualJadwal extends Component {
       selectedClass: value,
       dataLoaded: false
     }, () => {
-      setTimeout(() => {
-        this.props.onSetLoading(false);
-        this.setState({ dataLoaded: true });
-      }, 3000);
+      this.getListMataPelajaran(value);
     });
   }
 
-  onSave = () => {
+  onSave = async () => {
     this.props.onSetLoading(true);
-    setTimeout(() => {
-      this.props.onSetLoading(false);
+    const { jadwal, selectedClass } = this.state;
+    const reqDataKelas = {
+      collection: 'datakelas',
+      doc: selectedClass,
+      data: {
+        jadwal: jadwal,
+        author: this.props.userProfile.email,
+        authorId: this.props.userProfile.author,
+      }
+    }
+    await HTTP_SERVICE.updateFB(reqDataKelas).then(async res => {
+      let failed = 0;
+      for (let item in jadwal) {
+        let idMP = jadwal[item].id.split('_');
+        let key = `jadwal.${item}`;
+        let newobject = {}
+        newobject[key] = {
+          kelas: this.state.selectedClass,
+          id: jadwal[item].id,
+          text: jadwal[item].text,
+        }
+        let requestDataStaff = {
+          collection: 'datastaff',
+          doc: idMP[1],
+          data: newobject,
+        }
+        await HTTP_SERVICE.updateFB(requestDataStaff)
+          .then(res => {
+
+          })
+          .catch(err => {
+            failed += 1;
+          });
+      }
+      if (failed > 0) {
+        this.props.onSetAlert({
+          open: true,
+          message: 'Jadwal gagal di simpan, silahkan coba lagi',
+          type: 'error'
+        });
+      } else {
+        this.props.onSetAlert({
+          open: true,
+          message: 'Jadwal berhasil simpan',
+          type: 'success'
+        });
+        window.history.back();
+      }
+    }).catch(err => {
+      this.props.onSetLoading(false)
       this.props.onSetAlert({
         open: true,
-        message: 'Jadwal berhasil di simpan',
-        type: 'success'
-      })
-    }, 3000);
+        message: 'Jadwal gagal di simpan, silahkan coba lagi',
+        type: 'error'
+      });
+    });
   }
 
   render() {
-    const { jadwal, selectedClass, dataLoaded } = this.state;
+    const { jadwal, selectedClass, dataLoaded, classOption, listMataPelajaran } = this.state;
     const { classes } = this.props;
     return (
       <Fade right duration={500}>
-        <Paper style={{padding: 5, margin: 0}}>
+        <Paper style={{ padding: 5, margin: 0 }}>
           <Grid container justify='space-between' alignItems="center">
             <Grid item xs={2}>
               <Selects
@@ -103,7 +236,7 @@ class ManualJadwal extends Component {
                 id='kelas'
                 label='Pilih Kelas'
                 variant='outlined'
-                options={this.props.classOption}
+                options={classOption}
                 value={selectedClass}
                 onChange={this.selectOnChange}
                 isSubmit={false}
@@ -130,7 +263,7 @@ class ManualJadwal extends Component {
               <Grid container spacing={1}>
                 <Grid item xs={2}>
                   <ListComponent
-                    listData={this.props.listJadwal}
+                    listData={listMataPelajaran}
                     droppableId='listJadwal'
                   />
                 </Grid>
@@ -150,7 +283,7 @@ class ManualJadwal extends Component {
                         {['1', '2', '3', 'istirahat 1', '4', '5', '6', 'istirahat 2', '7', '8', '9'].map(jam => (
                           <TableRow key={jam}>
                             {['senin', 'selasa', 'rabu', 'kamis', 'jumat'].map((hari, i) => (
-                              <Droppable droppableId={hari + '-' + jam}>
+                              <Droppable droppableId={hari + '-' + jam} key={i}>
                                 {(provided, snapshot) => {
                                   return (
                                     <StyledTblCell
@@ -164,7 +297,7 @@ class ManualJadwal extends Component {
                                     >
                                       {jadwal[hari + '-' + jam] !== undefined
                                         ?
-                                        jadwal[hari + '-' + jam]
+                                        jadwal[hari + '-' + jam].text
                                         :
                                         jam === 'istirahat 1' || jam === 'istirahat 2'
                                           ?
@@ -174,7 +307,11 @@ class ManualJadwal extends Component {
                                             ?
                                             ''
                                             :
-                                            'Empty'
+                                            hari === 'senin' && jam === '1'
+                                              ?
+                                              'Upacara'
+                                              :
+                                              'Empty'
                                       }
                                     </StyledTblCell>
                                   )
@@ -207,12 +344,7 @@ const mapStateToProps = state => ({
     { id: '6', title: 'Bahasa Sunda', description: 'Bebby' },
     { id: '7', title: 'Olahraga', description: 'Marcel' },
   ],
-  classOption: [
-    { value: '001', text: 'VII A' },
-    { value: '002', text: 'VII B' },
-    { value: '003', text: 'VIII' },
-    { value: '004', text: 'IX' },
-  ]
+  userProfile: state.layout.resAuth
 });
 
 const mapDispatchToProps = dispatch => ({

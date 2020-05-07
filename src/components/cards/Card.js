@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
-// import CardActions from '@material-ui/core/CardActions';
+import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +15,8 @@ const useStyles = makeStyles({
     maxHeight: 300,
   },
   buttonWrap: {
-    display: 'flex'
+    display: 'flex',
+    marginTop: -20
   },
   spacing: {
     flexGrow: 1
@@ -24,9 +25,27 @@ const useStyles = makeStyles({
 
 export default function CardsWithPeople(props) {
   const classes = useStyles();
+  const [image, setImage] = useState('');
+  const [nama, setNama] = useState('');
+
+  useEffect(
+    () => {
+      setImage(props.image);
+    }, [props.image]
+  )
+
+  useEffect(
+    () => {
+      setNama(props.nama)
+    }, [props.nama]
+  )
 
   const test = () => {
     props.changeButton();
+  }
+
+  const hapus = () => {
+    props.onDeleteWali();
   }
 
   return (
@@ -36,26 +55,37 @@ export default function CardsWithPeople(props) {
           component="img"
           alt="Contemplative Reptile"
           width="100%"
-          image={ImageDefault}
+          image={image !== '' ? image : ImageDefault}
           title="Contemplative Reptile"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h4" noWrap>
-            Prof dadadaddadadadad
+            {nama || 'Pilih Wali Kelas'}
           </Typography>
-          <div className={classes.buttonWrap}>
-            <div className={classes.spacing}></div>
-            <Button
-              type="default"
-              disabled={false}
-              text="Change"
-              onClick={test}
-            />
-          </div>
         </CardContent>
       </CardActionArea>
-      {/* <CardActions>
-      </CardActions> */}
+      <CardActions>
+        <div className={classes.buttonWrap}>
+          <div className={classes.spacing}></div>
+          {
+            nama === ''
+              ?
+              <Button
+                type="default"
+                disabled={false}
+                text="Pilih"
+                onClick={test}
+              />
+              :
+              <Button
+                type="negative"
+                disabled={false}
+                text="Hapus"
+                onClick={hapus}
+              />
+          }
+        </div>
+      </CardActions>
     </Card>
   );
 }
