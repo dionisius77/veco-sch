@@ -236,7 +236,7 @@ const EnhancedTableToolbar = props => {
                 </IconButton>
               </Tooltip>
             }
-            {props.handleEdit &&
+            {props.handleEdit && props.multipleEdit &&
               <Tooltip title="Edit">
                 <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
                   <EditIcon style={{ color: '#424242' }} />
@@ -320,14 +320,7 @@ export default function DataTables(props) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
-  const [count, setCount] = React.useState(0);
   const [showConfigs, setShowConfigs] = React.useState(false);
-
-  React.useEffect(
-    () => {
-      setCount(props.dataLength);
-    }, [props.dataLength]
-  )
 
   React.useEffect(
     () => {
@@ -396,7 +389,8 @@ export default function DataTables(props) {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    props.handleChangePage(newPage, rowsPerPage);
+    if (props.handleChangePage)
+      props.handleChangePage(newPage, rowsPerPage);
   };
 
   const handleChangeRowsPerPage = event => {
@@ -444,6 +438,7 @@ export default function DataTables(props) {
             if (!value) { setSelected([]) }
           }}
           allowEdit={props.allowEdit}
+          multipleEdit={props.multipleEdit || false}
         />
         <TableContainer>
           <Table
@@ -522,7 +517,7 @@ export default function DataTables(props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={count}
+          count={-1}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -537,7 +532,6 @@ DataTables.propTypes = {
   tableName: PropTypes.string.isRequired,  //='' (string)
   allowEdit: PropTypes.bool,  //={} (boolean)
   page: PropTypes.number.isRequired, //={} (int)
-  dataLength: PropTypes.number.isRequired, //={} (int)
   headCells: PropTypes.array.isRequired,  //={headCells} (array object (there's an example at the bottom of this tag))
   data: PropTypes.array.isRequired, //={data} (array object)
   orderConfig: PropTypes.bool,  //={} (boolean)
@@ -549,4 +543,5 @@ DataTables.propTypes = {
   handleEdit: PropTypes.func, //={this.handleEdit} (function (checked))
   handleDelete: PropTypes.func, //={this.handleDelete} (function (checked))
   goToDetail: PropTypes.func, //={} (function (checked))
+  multipleEdit: PropTypes.bool,
 }

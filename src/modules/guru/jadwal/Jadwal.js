@@ -2,27 +2,46 @@ import React, { Component } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
 import { Grid, Table, TableContainer, Paper, TableHead, TableBody, TableRow, withStyles, TableCell } from '@material-ui/core';
-import { pushLoading } from '../../../components/layout/ActionLayout';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
 
 class Jadwal extends Component {
+  newJadwal;
   constructor(props) {
     super(props);
     this.state = {
-      jadwal: {
-        'senin-3': 'VII-A',
-        'senin-4': 'VII-A',
-        'selasa-4': 'VII-B',
-        'selasa-5': 'VII-B',
-        'rabu-4': 'IX-A',
-        'rabu-5': 'IX-A',
-        'jumat-1': 'IX-B',
-        'jumat-2': 'IX-B',
-      },
+      jadwal: {},
     }
   }
 
   componentDidMount() {
+    this.props.setLoading(true);
+    this.getJadwal();
+  }
 
+  getJadwal = async () => {
+    let request = {
+      collection: 'datastaff',
+      doc: this.props.userProfile.nik,
+    }
+    await HTTP_SERVICE.getFb(request)
+      .then(res => {
+        if (res.data().jadwal) {
+          this.setState({ jadwal: res.data().jadwal });
+          this.props.setLoading(false);
+        } else {
+          this.props.setAlert({
+            open: true,
+            message: 'Jadwal belum dibuat',
+            type: 'warning',
+          })
+          this.props.setLoading(false);
+        }
+      })
+      .catch(err => {
+        this.props.setLoading(false);
+        console.log(err);
+      });
   }
 
   render() {
@@ -38,7 +57,7 @@ class Jadwal extends Component {
           <TableContainer component={Paper} style={{ padding: 10 }}>
             <Table size='small' border={1} style={{ borderColor: '#fff' }}>
               <TableHead>
-                <TableRow style={{height: 50}}>
+                <TableRow style={{ height: 50 }}>
                   <StyledTblCell align='center'>Senin</StyledTblCell>
                   <StyledTblCell align='center'>Selasa</StyledTblCell>
                   <StyledTblCell align='center'>Rabu</StyledTblCell>
@@ -48,7 +67,7 @@ class Jadwal extends Component {
               </TableHead>
               <TableBody>
                 {['1', '2', '3', 'istirahat 1', '4', '5', '6', 'istirahat 2', '7', '8', '9'].map(jam => (
-                  <TableRow key={jam} style={{height: 40}}>
+                  <TableRow key={jam} style={{ height: 40 }}>
                     {['senin', 'selasa', 'rabu', 'kamis', 'jumat'].map((hari, i) => {
                       return (
                         <StyledTblCell
@@ -61,9 +80,13 @@ class Jadwal extends Component {
                           {
                             jadwal[hari + '-' + jam]
                               ?
-                              jadwal[hari + '-' + jam]
+                              `${jadwal[hari + '-' + jam].text}\n${jadwal[hari + '-' + jam].kelas}`
                               :
-                              (<p></p>)
+                              hari === 'senin' && jam === '1'
+                                ?
+                                'Upacara'
+                                :
+                                (<p></p>)
                           }
                         </StyledTblCell>
                       )
@@ -91,12 +114,15 @@ const StyledTblCell = withStyles((theme) => ({
   },
 }))(TableCell);
 
-const mapStateToProps = state => ({
-
-});
+const mapStateToProps = state => {
+  return {
+    userProfile: state.layout.resAuth,
+  }
+};
 
 const mapDispatchToProps = dispatch => ({
-  onPushLoading: value => dispatch(pushLoading(value)),
+  setLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Jadwal);

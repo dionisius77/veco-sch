@@ -22,6 +22,7 @@ export default function DatePicker(props) {
     () => {
       if (props.value !== '') {
         setSelectedDate(props.value);
+        setInputDates(props.value);
       }
     }, [props.value]
   )
@@ -63,6 +64,7 @@ export default function DatePicker(props) {
         KeyboardButtonProps={{
           'arial-label': 'ganti tanggal'
         }}
+        size={props.size || 'medium'}
       />
     </MuiPickersUtilsProvider>
   )

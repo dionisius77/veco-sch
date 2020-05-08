@@ -21,7 +21,7 @@ const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION__ ? window.__REDUX_DEV
 
 const logger = createLogger({});
 
-const middlewares = [sagaMiddleware, logger, promiseMiddleware, thunk];
+const middlewares = [sagaMiddleware, promiseMiddleware, thunk];
 
 const reduxStore = createStore(
   finalReducers,

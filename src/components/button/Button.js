@@ -29,7 +29,7 @@ export default function Button(props) {
     return btnColor;
   }
   return (
-    <Btn style={{width: 80, marginLeft: 5}} variant="contained" disabled={disable} color={colorFn(props.type)} onClick={handleClick}>
+    <Btn style={{width: 80, marginLeft: 5, color: props.type !== 'negative' ? '#fff' : '#000'}} variant="contained" disabled={disable} color={colorFn(props.type)} onClick={handleClick}>
       {props.text}
     </Btn>
   )

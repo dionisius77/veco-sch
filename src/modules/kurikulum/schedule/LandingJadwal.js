@@ -20,16 +20,11 @@ class LandingJadwal extends Component {
   }
 
   generateSchedule = () => {
-    this.props.onPushLoading(true);
-    setTimeout(() => {
-      // this.props.onPushLoading(false);
-      this.props.onPushAlert({
-        open: true,
-        message: 'Jadwal berhasil di generate',
-        type: 'success'
-      });
-      window.location.hash = '#/school/kelas';
-    }, 3000)
+    this.props.onPushAlert({
+      open: true,
+      message: 'Feature belum tersedia di versi ini',
+      type: 'warning'
+    });
   }
 
   generateManualSchedule = () => {
@@ -41,7 +36,7 @@ class LandingJadwal extends Component {
       }, 300)
     })
   }
-  
+
   goToInputLibur = () => {
     this.setState({
       pageLoaded: false
@@ -63,11 +58,11 @@ class LandingJadwal extends Component {
           justify="center"
         >
           <Grid item xs>
-            <Card style={{minHeight: 280}} onClick={() => {this.generateSchedule()}}>
+            <Card style={{ minHeight: 280 }} onClick={() => { this.generateSchedule() }}>
               <CardActionArea>
                 <CardMedia
                   component="img"
-                  style={{width: 200, marginLeft: '22%'}}
+                  style={{ width: 200, marginLeft: '22%' }}
                   image={AutomationImage}
                   title="Otomatis generate jadwal"
                 />
@@ -78,11 +73,11 @@ class LandingJadwal extends Component {
             </Card>
           </Grid>
           <Grid item xs>
-            <Card style={{minHeight: 280}} onClick={() => {this.generateManualSchedule()}}>
-              <CardActionArea style={{marginTop: 20}}>
+            <Card style={{ minHeight: 280 }} onClick={() => { this.generateManualSchedule() }}>
+              <CardActionArea style={{ marginTop: 20 }}>
                 <CardMedia
                   component="img"
-                  style={{width: 180, marginLeft: '25%'}}
+                  style={{ width: 180, marginLeft: '25%' }}
                   image={CalendarImage}
                   title="Manual generate jadwal"
                 />
@@ -93,11 +88,11 @@ class LandingJadwal extends Component {
             </Card>
           </Grid>
           <Grid item xs>
-            <Card style={{minHeight: 280}} onClick={() => {this.goToInputLibur()}}>
+            <Card style={{ minHeight: 280 }} onClick={() => { this.goToInputLibur() }}>
               <CardActionArea>
                 <CardMedia
                   component="img"
-                  style={{width: 200, marginLeft: '26%'}}
+                  style={{ width: 200, marginLeft: '26%' }}
                   image={MarkOffDay}
                   title="Mark Off Day"
                 />

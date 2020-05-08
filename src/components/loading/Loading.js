@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
     zIndex: 99
   },
   block: {
-    position: "absolute",
+    position: "fixed",
     top: 0,
     display: 'inline-block',
     width: '100%',
@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     padding: '0px',
     backgroundColor: theme.palette.text.primary,
     zIndex: 97,
-    opacity: 0.7
+    opacity: 0.4
   }
 }));
 export default function Loading(props) {

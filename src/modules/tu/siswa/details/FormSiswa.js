@@ -7,6 +7,7 @@ import InputField from '../../../../components/input_field/InputField';
 import Selects from '../../../../components/select/Select';
 import Button from '../../../../components/button/Button';
 import DatePicker from '../../../../components/date_picker/DatePicker';
+import { HTTP_SERVICE } from '../../../../services/HttpServices';
 
 class FormSiswa extends Component {
   newFormSiswa;
@@ -88,6 +89,7 @@ class FormSiswa extends Component {
         },
         noTelp: { value: '', isValid: false },
         noHp: { value: '', isValid: false },
+        emailOrtu: { value: '', isValid: false },
         email: { value: '', isValid: false },
         // data rincian peserta didik
         tinggiBadan: { value: '', isValid: false },
@@ -132,6 +134,25 @@ class FormSiswa extends Component {
       jumlahPrestasi: 0,
       idSiswa: this.idSiswa,
       buttonDisable: false,
+      agama: [],
+      jenisKelamin: [],
+      kebutuhanKhusus: [],
+      tempatTinggal: [],
+      transportasi: [],
+      pendidikan: [],
+      pekerjaan: [],
+      penghasilan: [],
+      keluarKarena: [],
+      punyaKIP: [],
+      alasanPIP: [],
+      jarak: [],
+      jenisPrestasi: [],
+      tingkatPrestasi: [],
+      jenisBeasiswa: [],
+      jenisPendaftaran: [],
+      penerimaKPS: [],
+      active: false,
+      serverStep: 0
     }
     this.inputFormOnBlur = this.inputFormOnBlur.bind(this);
     this.changeSelect = this.changeSelect.bind(this);
@@ -147,14 +168,216 @@ class FormSiswa extends Component {
   }
 
   componentDidMount() {
+    this.props.setLoading(true);
     this.newSteps = this.state.steps;
     if (this.idSiswa === '0') {
       this.newSteps.pop();
       this.setState({ steps: this.newSteps });
+      this.props.setLoading(false);
+      this.setState({ pageLoaded: true });
+    } else {
+      this.getData();
     }
     this.newFormSiswa = this.state.formSiswa;
-    this.props.setLoading(false);
-    this.setState({ pageLoaded: true });
+  }
+
+  getData = async () => {
+    const request = {
+      collection: 'datasiswa',
+      doc: this.idSiswa
+    }
+    await HTTP_SERVICE.getFb(request).then(res => {
+      const data = res.data();
+      this.newFormSiswa['nama'].value = data.dataPribadi.nama;
+      this.newFormSiswa['jenisKelamin'].value = data.dataPribadi.jenisKelamin;
+      this.newFormSiswa['nisn'].value = data.dataPribadi.nisn;
+      this.newFormSiswa['nik'].value = data.dataPribadi.nik;
+      this.newFormSiswa['tempatLahir'].value = data.dataPribadi.tempatLahir;
+      this.newFormSiswa['tglLahir'].value = data.dataPribadi.tglLahir;
+      this.newFormSiswa['noAkta'].value = data.dataPribadi.noAkta;
+      this.newFormSiswa['agama'].value = data.dataPribadi.agama;
+      this.newFormSiswa['kewarganegaraan'].value = data.dataPribadi.kewarganegaraan;
+      this.newFormSiswa['kebutuhanKhusus'].value = data.dataPribadi.kebutuhanKhusus;
+      this.newFormSiswa['alamat'].value = data.dataPribadi.alamat;
+      this.newFormSiswa['rt'].value = data.dataPribadi.rt;
+      this.newFormSiswa['rw'].value = data.dataPribadi.rw;
+      this.newFormSiswa['kelurahan'].value = data.dataPribadi.kelurahan;
+      this.newFormSiswa['kecamatan'].value = data.dataPribadi.kecamatan;
+      this.newFormSiswa['kodePos'].value = data.dataPribadi.kodePos;
+      this.newFormSiswa['tempatTinggal'].value = data.dataPribadi.tempatTinggal;
+      this.newFormSiswa['transportasi'].value = data.dataPribadi.transportasi;
+      this.newFormSiswa['nomorKKS'].value = data.dataPribadi.nomorKKS;
+      this.newFormSiswa['anakKe'].value = data.dataPribadi.anakKe;
+      this.newFormSiswa['penerimaKPS'].value = data.dataPribadi.penerimaKPS;
+      this.newFormSiswa['noKPS'].value = data.dataPribadi.noKPS;
+      this.newFormSiswa['punyaKIP'].value = data.dataPribadi.punyaKIP;
+      this.newFormSiswa['noKIP'].value = data.dataPribadi.noKIP;
+      this.newFormSiswa['namaKIP'].value = data.dataPribadi.namaKIP;
+      this.newFormSiswa['alasanPIP'].value = data.dataPribadi.alasanPIP;
+      this.newFormSiswa['nama'].isValid = data.dataPribadi.nama !== '' && data.dataPribadi.nama !== undefined;
+      this.newFormSiswa['jenisKelamin'].isValid = data.dataPribadi.jenisKelamin !== '' && data.dataPribadi.jenisKelamin !== undefined;
+      this.newFormSiswa['nisn'].isValid = data.dataPribadi.nisn !== '' && data.dataPribadi.nisn !== undefined;
+      this.newFormSiswa['nik'].isValid = data.dataPribadi.nik !== '' && data.dataPribadi.nik !== undefined;
+      this.newFormSiswa['tempatLahir'].isValid = data.dataPribadi.tempatLahir !== '' && data.dataPribadi.tempatLahir !== undefined;
+      this.newFormSiswa['tglLahir'].isValid = data.dataPribadi.tglLahir !== '' && data.dataPribadi.tglLahir !== undefined;
+      this.newFormSiswa['noAkta'].isValid = data.dataPribadi.noAkta !== '' && data.dataPribadi.noAkta !== undefined;
+      this.newFormSiswa['agama'].isValid = data.dataPribadi.agama !== '' && data.dataPribadi.agama !== undefined;
+      this.newFormSiswa['kewarganegaraan'].isValid = data.dataPribadi.kewarganegaraan !== '' && data.dataPribadi.kewarganegaraan !== undefined;
+      this.newFormSiswa['kebutuhanKhusus'].isValid = data.dataPribadi.kebutuhanKhusus !== '' && data.dataPribadi.kebutuhanKhusus !== undefined;
+      this.newFormSiswa['alamat'].isValid = data.dataPribadi.alamat !== '' && data.dataPribadi.alamat !== undefined;
+      this.newFormSiswa['rt'].isValid = data.dataPribadi.rt !== '' && data.dataPribadi.rt !== undefined;
+      this.newFormSiswa['rw'].isValid = data.dataPribadi.rw !== '' && data.dataPribadi.rw !== undefined;
+      this.newFormSiswa['kelurahan'].isValid = data.dataPribadi.kelurahan !== '' && data.dataPribadi.kelurahan !== undefined;
+      this.newFormSiswa['kecamatan'].isValid = data.dataPribadi.kecamatan !== '' && data.dataPribadi.kecamatan !== undefined;
+      this.newFormSiswa['kodePos'].isValid = data.dataPribadi.kodePos !== '' && data.dataPribadi.kodePos !== undefined;
+      this.newFormSiswa['tempatTinggal'].isValid = data.dataPribadi.tempatTinggal !== '' && data.dataPribadi.tempatTinggal !== undefined;
+      this.newFormSiswa['transportasi'].isValid = data.dataPribadi.transportasi !== '' && data.dataPribadi.transportasi !== undefined;
+      this.newFormSiswa['nomorKKS'].isValid = data.dataPribadi.nomorKKS !== '' && data.dataPribadi.nomorKKS !== undefined;
+      this.newFormSiswa['anakKe'].isValid = data.dataPribadi.anakKe !== '' && data.dataPribadi.anakKe !== undefined;
+      this.newFormSiswa['penerimaKPS'].isValid = data.dataPribadi.penerimaKPS !== '' && data.dataPribadi.penerimaKPS !== undefined;
+      this.newFormSiswa['noKPS'].isValid = data.dataPribadi.noKPS !== '' && data.dataPribadi.noKPS !== undefined;
+      this.newFormSiswa['punyaKIP'].isValid = data.dataPribadi.punyaKIP !== '' && data.dataPribadi.punyaKIP !== undefined;
+      this.newFormSiswa['noKIP'].isValid = data.dataPribadi.noKIP !== '' && data.dataPribadi.noKIP !== undefined;
+      this.newFormSiswa['namaKIP'].isValid = data.dataPribadi.namaKIP !== '' && data.dataPribadi.namaKIP !== undefined;
+      this.newFormSiswa['alasanPIP'].isValid = data.dataPribadi.alasanPIP !== '' && data.dataPribadi.alasanPIP !== undefined;
+
+      if (data.dataAyah) {
+        this.newFormSiswa['ayah']['nama'].value = data.dataAyah.nama;
+        this.newFormSiswa['ayah']['nik'].value = data.dataAyah.nik;
+        this.newFormSiswa['ayah']['tglLahir'].value = data.dataAyah.tglLahir;
+        this.newFormSiswa['ayah']['pendidikan'].value = data.dataAyah.pendidikan;
+        this.newFormSiswa['ayah']['pekerjaan'].value = data.dataAyah.pekerjaan;
+        this.newFormSiswa['ayah']['penghasilan'].value = data.dataAyah.penghasilan;
+        this.newFormSiswa['ayah']['kebutuhanKhusus'].value = data.dataAyah.kebutuhanKhusus;
+        this.newFormSiswa['ayah']['nama'].isValid = data.dataAyah.nama !== '' && data.dataAyah.nama !== undefined;
+        this.newFormSiswa['ayah']['nik'].isValid = data.dataAyah.nik !== '' && data.dataAyah.nik !== undefined;
+        this.newFormSiswa['ayah']['tglLahir'].isValid = data.dataAyah.tglLahir !== '' && data.dataAyah.tglLahir !== undefined;
+        this.newFormSiswa['ayah']['pendidikan'].isValid = data.dataAyah.pendidikan !== '' && data.dataAyah.pendidikan !== undefined;
+        this.newFormSiswa['ayah']['pekerjaan'].isValid = data.dataAyah.pekerjaan !== '' && data.dataAyah.pekerjaan !== undefined;
+        this.newFormSiswa['ayah']['penghasilan'].isValid = data.dataAyah.penghasilan !== '' && data.dataAyah.penghasilan !== undefined;
+        this.newFormSiswa['ayah']['kebutuhanKhusus'].isValid = data.dataAyah.kebutuhanKhusus !== '' && data.dataAyah.kebutuhanKhusus !== undefined;
+      }
+      if (data.dataIbu) {
+        this.newFormSiswa['ibu']['nama'].value = data.dataIbu.nama;
+        this.newFormSiswa['ibu']['nik'].value = data.dataIbu.nik;
+        this.newFormSiswa['ibu']['tglLahir'].value = data.dataIbu.tglLahir;
+        this.newFormSiswa['ibu']['pendidikan'].value = data.dataIbu.pendidikan;
+        this.newFormSiswa['ibu']['pekerjaan'].value = data.dataIbu.pekerjaan;
+        this.newFormSiswa['ibu']['penghasilan'].value = data.dataIbu.penghasilan;
+        this.newFormSiswa['ibu']['kebutuhanKhusus'].value = data.dataIbu.kebutuhanKhusus;
+        this.newFormSiswa['ibu']['nama'].isValid = data.dataIbu.nama !== '' && data.dataIbu.nama !== undefined;
+        this.newFormSiswa['ibu']['nik'].isValid = data.dataIbu.nik !== '' && data.dataIbu.nik !== undefined;
+        this.newFormSiswa['ibu']['tglLahir'].isValid = data.dataIbu.tglLahir !== '' && data.dataIbu.tglLahir !== undefined;
+        this.newFormSiswa['ibu']['pendidikan'].isValid = data.dataIbu.pendidikan !== '' && data.dataIbu.pendidikan !== undefined;
+        this.newFormSiswa['ibu']['pekerjaan'].isValid = data.dataIbu.pekerjaan !== '' && data.dataIbu.pekerjaan !== undefined;
+        this.newFormSiswa['ibu']['penghasilan'].isValid = data.dataIbu.penghasilan !== '' && data.dataIbu.penghasilan !== undefined;
+        this.newFormSiswa['ibu']['kebutuhanKhusus'].isValid = data.dataIbu.kebutuhanKhusus !== '' && data.dataIbu.kebutuhanKhusus !== undefined;
+      }
+      if (data.dataWali) {
+        this.newFormSiswa['wali']['nama'].value = data.dataWali.nama;
+        this.newFormSiswa['wali']['nik'].value = data.dataWali.nik;
+        this.newFormSiswa['wali']['tglLahir'].value = data.dataWali.tglLahir;
+        this.newFormSiswa['wali']['pendidikan'].value = data.dataWali.pendidikan;
+        this.newFormSiswa['wali']['pekerjaan'].value = data.dataWali.pekerjaan;
+        this.newFormSiswa['wali']['penghasilan'].value = data.dataWali.penghasilan;
+        this.newFormSiswa['wali']['kebutuhanKhusus'].value = data.dataWali.kebutuhanKhusus;
+        this.newFormSiswa['wali']['nama'].isValid = data.dataWali.nama !== '' && data.dataWali.nama !== undefined;
+        this.newFormSiswa['wali']['nik'].isValid = data.dataWali.nik !== '' && data.dataWali.nik !== undefined;
+        this.newFormSiswa['wali']['tglLahir'].isValid = data.dataWali.tglLahir !== '' && data.dataWali.tglLahir !== undefined;
+        this.newFormSiswa['wali']['pendidikan'].isValid = data.dataWali.pendidikan !== '' && data.dataWali.pendidikan !== undefined;
+        this.newFormSiswa['wali']['pekerjaan'].isValid = data.dataWali.pekerjaan !== '' && data.dataWali.pekerjaan !== undefined;
+        this.newFormSiswa['wali']['penghasilan'].isValid = data.dataWali.penghasilan !== '' && data.dataWali.penghasilan !== undefined;
+        this.newFormSiswa['wali']['kebutuhanKhusus'].isValid = data.dataWali.kebutuhanKhusus !== '' && data.dataWali.kebutuhanKhusus !== undefined;
+      }
+
+      if (data.kontak) {
+        this.newFormSiswa['noTelp'].value = data.kontak.noTelp;
+        this.newFormSiswa['noHp'].value = data.kontak.noHp;
+        this.newFormSiswa['emailOrtu'].value = data.kontak.emailOrtu;
+        this.newFormSiswa['email'].value = data.kontak.email;
+        this.newFormSiswa['noTelp'].isValid = data.kontak.noTelp !== '' && data.kontak.noTelp !== undefined;
+        this.newFormSiswa['noHp'].isValid = data.kontak.noHp !== '' && data.kontak.noHp !== undefined;
+        this.newFormSiswa['emailOrtu'].isValid = data.kontak.emailOrtu !== '' && data.kontak.emailOrtu !== undefined;
+        this.newFormSiswa['email'].isValid = data.kontak.email !== '' && data.kontak.email !== undefined;
+      }
+
+      if (data.dataPriodik) {
+        this.newFormSiswa['tinggiBadan'].value = data.dataPriodik.tinggiBadan;
+        this.newFormSiswa['beratBadan'].value = data.dataPriodik.beratBadan;
+        this.newFormSiswa['jumlahSaudara'].value = data.dataPriodik.jumlahSaudara;
+        this.newFormSiswa['jarak'].value = data.dataPriodik.jarak;
+        this.newFormSiswa['waktuTempuh']['jam'].value = data.dataPriodik.waktuTempuh.jam;
+        this.newFormSiswa['waktuTempuh']['menit'].value = data.dataPriodik.waktuTempuh.menit;
+        this.newFormSiswa['tinggiBadan'].isValid = data.dataPriodik.tinggiBadan !== '';
+        this.newFormSiswa['beratBadan'].isValid = data.dataPriodik.beratBadan !== '';
+        this.newFormSiswa['jumlahSaudara'].isValid = data.dataPriodik.jumlahSaudara !== '';
+        this.newFormSiswa['jarak'].isValid = data.dataPriodik.jarak !== '';
+        this.newFormSiswa['waktuTempuh']['jam'].isValid = data.dataPriodik.waktuTempuh.jam !== '';
+        this.newFormSiswa['waktuTempuh']['menit'].isValid = data.dataPriodik.waktuTempuh.menit !== '';
+      }
+
+      if (data.prestasi && data.prestasi.length > 0) {
+        this.newFormSiswa.jumlahPrestasi = data.prestasi.length;
+        for (let i = 0; i < data.prestasi.length; i++) {
+          this.newFormSiswa['prestasi'].push({
+            jenis: { value: data.prestasi[i].jenis, isValid: true },
+            tingkat: { value: data.prestasi[i].tingkat, isValid: true },
+            namaPrestasi: { value: data.prestasi[i].namaPrestasi, isValid: true },
+            tahun: { value: data.prestasi[i].tahun, isValid: true },
+            penyelenggara: { value: data.prestasi[i].penyelenggara, isValid: true },
+            peringkat: { value: data.prestasi[i].peringkat, isValid: true },
+          });
+        }
+      }
+
+      if (data.beasiswa && data.beasiswa.length > 0) {
+        for (let i = 0; i < data.beasiswa.length; i++) {
+          this.newFormSiswa['beasiswa'][i].jenis.value = data.beasiswa[i].jenis;
+          this.newFormSiswa['beasiswa'][i].keterangan.value = data.beasiswa[i].keterangan;
+          this.newFormSiswa['beasiswa'][i].tahunMulai.value = data.beasiswa[i].tahunMulai;
+          this.newFormSiswa['beasiswa'][i].tahunSelesai.value = data.beasiswa[i].tahunSelesai;
+        }
+      }
+
+      if (data.regisPesertaDidik) {
+        this.newFormSiswa['kompetensiKeahlian'].value = data.regisPesertaDidik.kompetensiKeahlian;
+        this.newFormSiswa['nis'].value = data.regisPesertaDidik.nis;
+        this.newFormSiswa['asalSekolah'].value = data.regisPesertaDidik.asalSekolah;
+        this.newFormSiswa['noIjazah'].value = data.regisPesertaDidik.noIjazah;
+        this.newFormSiswa['nomorPesertaUjian'].value = data.regisPesertaDidik.nomorPesertaUjian;
+        this.newFormSiswa['jenisPendaftaran'].value = data.regisPesertaDidik.jenisPendaftaran;
+        this.newFormSiswa['tglMasuk'].value = data.regisPesertaDidik.tglMasuk;
+        this.newFormSiswa['noSKHUS'].value = data.regisPesertaDidik.noSKHUS;
+        this.newFormSiswa['nis'].isValid = true;
+        this.newFormSiswa['asalSekolah'].isValid = true;
+        this.newFormSiswa['noIjazah'].isValid = true;
+        this.newFormSiswa['nomorPesertaUjian'].isValid = true;
+        this.newFormSiswa['jenisPendaftaran'].isValid = true;
+        this.newFormSiswa['tglMasuk'].isValid = true;
+        this.newFormSiswa['noSKHUS'].isValid = true;
+      }
+
+      this.props.setLoading(false);
+      for (let i = 0; i <= data.step; i++) {
+        this.newSteps[i].isComplete = true;
+        this.newSteps[i].submited = true;
+      }
+      if (!data.activeStudent) {
+        this.newSteps.pop();
+        this.setState({ active: false });
+      }
+      this.setState({
+        formSiswa: this.newFormSiswa,
+        pageLoaded: true,
+        steps: this.newSteps,
+        activeStep: data.step + 1,
+        serverStep: data.step,
+      }, () => {
+        this.getStatusFinish();
+      });
+    }).catch(err => {
+      // console.log(err)
+    });
   }
 
   inputFormOnBlur = (id, value, isValid) => {
@@ -186,7 +409,7 @@ class FormSiswa extends Component {
     this.newFormSiswa.beasiswa[newId[1]][newId[0]].value = value;
     this.newFormSiswa.beasiswa[newId[1]][newId[0]].isValid = isValid;
     this.setState({ formSiswa: this.newFormSiswa });
-    console.log(this.newbeasiswa)
+    // console.log(this.newbeasiswa)
   }
 
   changeBeasiswaSelect = (name, value, isValid) => {
@@ -194,7 +417,7 @@ class FormSiswa extends Component {
     this.newFormSiswa.beasiswa[newName[1]][newName[0]].value = value;
     this.newFormSiswa.beasiswa[newName[1]][newName[0]].isValid = isValid;
     this.setState({ formSiswa: this.newFormSiswa });
-    console.log(this.newbeasiswa)
+    // console.log(this.newbeasiswa)
   }
 
   inputPrestasiOnBlur = (id, value, isValid) => {
@@ -247,18 +470,21 @@ class FormSiswa extends Component {
 
   saveData = () => {
     this.setState({ isSubmit: true });
-    console.log(this.state.formSiswa);
+    // console.log(this.state.formSiswa);
   }
 
   stepClicked = (index) => {
     this.setState({ activeStep: index });
   }
 
-  nextStep = (index) => {
+  nextStep = async (index) => {
+    this.props.setLoading(true);
     const {
       formSiswa,
+      serverStep,
     } = this.state;
     const {
+      wali,
       ayah,
       ibu,
       waktuTempuh,
@@ -279,6 +505,57 @@ class FormSiswa extends Component {
         ) {
           if (formSiswa.penerimaKPS.value === 'tidak' && formSiswa.punyaKIP.value === 'tidak') {
             isValid = true;
+            const requestDataSiswa = {
+              collection: 'datasiswa',
+              doc: formSiswa.nik.value.toString(),
+              data: {
+                dataPribadi: {
+                  nama: formSiswa.nama.value,
+                  jenisKelamin: formSiswa.jenisKelamin.value,
+                  nisn: formSiswa.nisn.value.toString(),
+                  nik: formSiswa.nik.value.toString(),
+                  tempatLahir: formSiswa.tempatLahir.value,
+                  tglLahir: formSiswa.tglLahir.value,
+                  noAkta: formSiswa.noAkta.value.toString(),
+                  agama: formSiswa.agama.value,
+                  kewarganegaraan: formSiswa.kewarganegaraan.value,
+                  kebutuhanKhusus: formSiswa.kebutuhanKhusus.value,
+                  alamat: formSiswa.alamat.value,
+                  rt: formSiswa.rt.value,
+                  rw: formSiswa.rw.value,
+                  kelurahan: formSiswa.kelurahan.value,
+                  kecamatan: formSiswa.kecamatan.value,
+                  kodePos: formSiswa.kodePos.value,
+                  tempatTinggal: formSiswa.tempatTinggal.value,
+                  transportasi: formSiswa.transportasi.value,
+                  nomorKKS: formSiswa.nomorKKS.value.toString(),
+                  anakKe: formSiswa.anakKe.value,
+                  penerimaKPS: formSiswa.penerimaKPS.value,
+                  noKPS: '',
+                  punyaKIP: formSiswa.punyaKIP.value,
+                  noKIP: '',
+                  namaKIP: '',
+                  alasanPIP: formSiswa.alasanPIP.value,
+                },
+                step: serverStep >= index ? serverStep : index,
+                lulus: false,
+                author: this.props.userProfile.email,
+                authorId: this.props.userProfile.author,
+              }
+            }
+            if (this.idSiswa === '0') {
+              await HTTP_SERVICE.inputFb(requestDataSiswa).then(res => {
+                isValid = true;
+              }).catch(err => {
+                isValid = false;
+              });
+            } else {
+              await HTTP_SERVICE.updateFB(requestDataSiswa).then(res => {
+                isValid = true;
+              }).catch(err => {
+                isValid = false;
+              });
+            }
           } else {
             isValid = (formSiswa.noKPS.isValid) || (formSiswa.noKIP.isValid && formSiswa.namaKIP.isValid);
           }
@@ -291,6 +568,35 @@ class FormSiswa extends Component {
           ayah.pendidikan.isValid && ayah.pekerjaan.isValid && ayah.penghasilan.isValid &&
           ayah.kebutuhanKhusus.isValid
         );
+        if (
+          ayah.nama.isValid && ayah.nik.isValid && ayah.tglLahir.isValid &&
+          ayah.pendidikan.isValid && ayah.pekerjaan.isValid && ayah.penghasilan.isValid &&
+          ayah.kebutuhanKhusus.isValid
+        ) {
+          const requestDataAyah = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              dataAyah: {
+                nama: ayah.nama.value,
+                nik: ayah.nik.value,
+                tglLahir: ayah.tglLahir.value,
+                pendidikan: ayah.pendidikan.value,
+                pekerjaan: ayah.pekerjaan.value,
+                penghasilan: ayah.penghasilan.value,
+                kebutuhanKhusus: ayah.kebutuhanKhusus.value,
+              },
+              step: serverStep >= index ? serverStep : index,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+            }
+          }
+          await HTTP_SERVICE.updateFB(requestDataAyah).then(res => {
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       case 2:
@@ -299,46 +605,252 @@ class FormSiswa extends Component {
           ibu.pendidikan.isValid && ibu.pekerjaan.isValid && ibu.penghasilan.isValid &&
           ibu.kebutuhanKhusus.isValid
         );
+        if (
+          ibu.nama.isValid && ibu.nik.isValid && ibu.tglLahir.isValid &&
+          ibu.pendidikan.isValid && ibu.pekerjaan.isValid && ibu.penghasilan.isValid &&
+          ibu.kebutuhanKhusus.isValid
+        ) {
+          const requestDataIbu = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              dataIbu: {
+                nama: ibu.nama.value,
+                nik: ibu.nik.value,
+                tglLahir: ibu.tglLahir.value,
+                pendidikan: ibu.pendidikan.value,
+                pekerjaan: ibu.pekerjaan.value,
+                penghasilan: ibu.penghasilan.value,
+                kebutuhanKhusus: ibu.kebutuhanKhusus.value,
+              },
+              step: serverStep >= index ? serverStep : index,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+            }
+          }
+          await HTTP_SERVICE.updateFB(requestDataIbu).then(res => {
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       case 3:
-        isValid = true;
+        const requestDataWali = {
+          collection: 'datasiswa',
+          doc: formSiswa.nik.value.toString(),
+          data: {
+            dataWali: {
+              nama: wali.nama.value,
+              nik: wali.nik.value,
+              tglLahir: wali.tglLahir.value,
+              pendidikan: wali.pendidikan.value,
+              pekerjaan: wali.pekerjaan.value,
+              penghasilan: wali.penghasilan.value,
+              kebutuhanKhusus: wali.kebutuhanKhusus.value,
+            },
+            step: serverStep >= index ? serverStep : index,
+            author: this.props.userProfile.email,
+            authorId: this.props.userProfile.author,
+          }
+        }
+        await HTTP_SERVICE.updateFB(requestDataWali).then(res => {
+          isValid = true;
+        }).catch(err => {
+          isValid = false;
+        });
         break;
 
       case 4:
         isValid = (formSiswa.email.isValid && formSiswa.noHp.isValid);
+        if (formSiswa.email.isValid && formSiswa.noHp.isValid && formSiswa.emailOrtu.isValid) {
+          const requestDataKontak = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              kontak: {
+                noTelp: formSiswa.noTelp.value,
+                noHp: formSiswa.noHp.value,
+                email: formSiswa.email.value,
+                emailOrtu: formSiswa.emailOrtu.value
+              },
+              step: serverStep >= index ? serverStep : index,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+            }
+          }
+          await HTTP_SERVICE.updateFB(requestDataKontak).then(res => {
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       case 5:
         isValid = (
           formSiswa.tinggiBadan.isValid && formSiswa.beratBadan.isValid &&
-          waktuTempuh.jam.isValid && waktuTempuh.jam.isValid &&
+          waktuTempuh.jam.isValid && waktuTempuh.menit.isValid &&
           formSiswa.jumlahSaudara.isValid && formSiswa.jarak.isValid
         )
+        if (
+          formSiswa.tinggiBadan.isValid && formSiswa.beratBadan.isValid &&
+          waktuTempuh.jam.isValid && waktuTempuh.menit.isValid &&
+          formSiswa.jumlahSaudara.isValid && formSiswa.jarak.isValid
+        ) {
+          const requestDataPriodik = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              dataPriodik: {
+                tinggiBadan: formSiswa.tinggiBadan.value,
+                beratBadan: formSiswa.beratBadan.value,
+                waktuTempuh: {
+                  jam: waktuTempuh.jam.value,
+                  menit: waktuTempuh.menit.value
+                },
+                jumlahSaudara: formSiswa.jumlahSaudara.value,
+                jarak: formSiswa.jarak.value,
+              },
+              step: serverStep >= index ? serverStep : index,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+            }
+          }
+          await HTTP_SERVICE.updateFB(requestDataPriodik).then(res => {
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       case 6:
-        isValid = true;
+        let dataPrestasi = [];
+        if (formSiswa.prestasi.length > 0) {
+          for (let i = 0; i < formSiswa.prestasi.length; i++) {
+            dataPrestasi.push({
+              jenis: formSiswa.prestasi[i].jenis.value,
+              tingkat: formSiswa.prestasi[i].tingkat.value,
+              namaPrestasi: formSiswa.prestasi[i].namaPrestasi.value,
+              tahun: formSiswa.prestasi[i].tahun.value,
+              penyelenggara: formSiswa.prestasi[i].penyelenggara.value,
+              peringkat: formSiswa.prestasi[i].peringkat.value,
+            });
+          }
+        }
+        const requestDataPrestasi = {
+          collection: 'datasiswa',
+          doc: formSiswa.nik.value.toString(),
+          data: {
+            prestasi: dataPrestasi,
+            step: serverStep >= index ? serverStep : index,
+            author: this.props.userProfile.email,
+            authorId: this.props.userProfile.author,
+          },
+        }
+        await HTTP_SERVICE.updateFB(requestDataPrestasi).then(res => {
+          isValid = true;
+        }).catch(err => {
+          isValid = false;
+        });
         break;
 
       case 7:
-        isValid = true;
+        let dataBeasiswa = [];
+        for (let i = 0; i < formSiswa.beasiswa.length; i++) {
+          if (formSiswa.beasiswa[i].jenis.value !== '') {
+            dataBeasiswa.push({
+              jenis: formSiswa.beasiswa[i].jenis.value,
+              keterangan: formSiswa.beasiswa[i].keterangan.value,
+              tahunMulai: formSiswa.beasiswa[i].tahunMulai.value,
+              tahunSelesai: formSiswa.beasiswa[i].tahunSelesai.value,
+            });
+          }
+        }
+        const requestDataBeasiswa = {
+          collection: 'datasiswa',
+          doc: formSiswa.nik.value.toString(),
+          data: {
+            beasiswa: dataBeasiswa,
+            step: serverStep >= index ? serverStep : index,
+            author: this.props.userProfile.email,
+            authorId: this.props.userProfile.author,
+          },
+        }
+        await HTTP_SERVICE.updateFB(requestDataBeasiswa).then(res => {
+          isValid = true;
+        }).catch(err => {
+          isValid = false;
+        });
         break;
 
       case 8:
-        isValid = (
+        if (
           formSiswa.nis.isValid && formSiswa.asalSekolah.isValid &&
-          formSiswa.asalSekolah.isValid && formSiswa.noIjazah.isValid &&
+          formSiswa.nomorPesertaUjian.isValid && formSiswa.noIjazah.isValid &&
           formSiswa.jenisPendaftaran.isValid && formSiswa.tglMasuk.isValid &&
           formSiswa.noSKHUS.isValid
-        );
+        ) {
+          let splitTgl = formSiswa.tglMasuk.value.split('-');
+          const requestRegis = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              regisPesertaDidik: {
+                kompetensiKeahlian: formSiswa.kompetensiKeahlian.value,
+                nis: formSiswa.nis.value,
+                asalSekolah: formSiswa.asalSekolah.value,
+                noIjazah: formSiswa.noIjazah.value,
+                nomorPesertaUjian: formSiswa.nomorPesertaUjian.value,
+                jenisPendaftaran: formSiswa.jenisPendaftaran.value,
+                tglMasuk: formSiswa.tglMasuk.value,
+                noSKHUS: formSiswa.noSKHUS.value,
+                thnMasuk: splitTgl[0],
+              },
+              step: serverStep >= index ? serverStep : index,
+              activeStudent: true,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+              kelas: '',
+            },
+          }
+          await HTTP_SERVICE.updateFB(requestRegis).then(async res => {
+            await HTTP_SERVICE.registerAcc({ email: formSiswa.email.value, password: 'Password123' })
+            await HTTP_SERVICE.registerAcc({ email: formSiswa.emailOrtu.value, password: 'Password123' })
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       case 9:
-        isValid = (
-          formSiswa.keluarKarena.isValid && formSiswa.tanggalKeluar.isValid &&
-          formSiswa.alasan.isValid
-        )
+        if (
+          formSiswa.keluarKarena.isValid && formSiswa.tanggalKeluar.isValid
+        ) {
+          const requestKeluar = {
+            collection: 'datasiswa',
+            doc: formSiswa.nik.value.toString(),
+            data: {
+              pendaftaranKeluar: {
+                keluarKarena: formSiswa.keluarKarena.value,
+                tanggalKeluar: formSiswa.tanggalKeluar.value,
+                alasan: formSiswa.alasan.value,
+              },
+              step: serverStep >= index ? serverStep : index,
+              activeStudent: false,
+              author: this.props.userProfile.email,
+              authorId: this.props.userProfile.author,
+            },
+          }
+          await HTTP_SERVICE.updateFB(requestKeluar).then(res => {
+            isValid = true;
+          }).catch(err => {
+            isValid = false;
+          });
+        }
         break;
 
       default:
@@ -346,8 +858,9 @@ class FormSiswa extends Component {
     }
     if (isValid) {
       this.newSteps[index].isComplete = true;
-      this.setState({ activeStep: index + 1, steps: this.newSteps });
+      this.setState({ activeStep: serverStep >= index ? serverStep : index + 1, steps: this.newSteps });
     }
+    this.props.setLoading(false);
     this.getStatusFinish();
   }
 
@@ -511,11 +1024,12 @@ class FormSiswa extends Component {
         return (
           <Grid container spacing={5}>
             <Grid item xs>
-              <InputField id='noTelp' label='No telepon Rumah' required={false} type="number" value={formSiswa.noTelp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' setFocus={true} />
+              <InputField id='noTelp' label='No telepon Rumah' required={false} type="tel" value={formSiswa.noTelp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' setFocus={true} />
               <InputField id='email' label='email' required={true} type="email" value={formSiswa.email.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
             </Grid>
             <Grid item xs>
-              <InputField id='noHp' label='No Hand Phone' required={true} type="number" value={formSiswa.noHp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
+              <InputField id='noHp' label='No HP Anak' required={true} type="tel" value={formSiswa.noHp.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
+              <InputField id='emailOrtu' label='Email Orang tua / Wali' required={true} type="email" value={formSiswa.emailOrtu.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
               <div style={{ display: 'flex', marginTop: 30 }}>
                 <div style={{ flexGrow: 1 }}></div>
                 <Button type='default' disabled={false} text='Lanjut' onClick={() => { this.nextStep(index) }} />
@@ -661,7 +1175,7 @@ class FormSiswa extends Component {
             </Grid>
             <Grid item xs>
               <Selects name='jenisPendaftaran' id='jenisPendaftaran' label='Jenis Pendaftaran' variant='outlined' options={jenisPendaftaran} value={formSiswa.jenisPendaftaran.value} onChange={this.changeSelect} isSubmit={steps[index].submited} disable={false} required={true} />
-              <InputField id='tglMasuk' label='Tanggal Masuk Sekolah' required={true} type="text" value={formSiswa.tglMasuk.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
+              <DatePicker id='tglMasuk' label='Tanggal Masuk Sekolah' required={true} value={formSiswa.tglMasuk.value} onChange={this.dateChange} isSubmit={steps[index].submited} />
               <InputField id='nomorPesertaUjian' label='Nomor Peserta Ujian' required={true} type="number" value={formSiswa.nomorPesertaUjian.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
               <InputField id='noSKHUS' label='No. Seri SKHUS' required={true} type="number" value={formSiswa.noSKHUS.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
               <div style={{ display: 'flex', marginTop: 30 }}>
@@ -680,7 +1194,7 @@ class FormSiswa extends Component {
               <DatePicker id='tanggalKeluar' label='Tanggal Keluar' required={true} value={formSiswa.tanggalKeluar.value} onChange={this.dateChange} isSubmit={steps[index].submited} />
             </Grid>
             <Grid item xs>
-              <InputField id='alasan' label='Alasan Keluar' required={true} type="text" value={formSiswa.alasan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
+              <InputField id='alasan' label='Alasan Keluar' required={false} type="text" value={formSiswa.alasan.value} disabled={false} onBlur={this.inputFormOnBlur} isSubmit={steps[index].submited} variant='outlined' />
               <div style={{ display: 'flex', marginTop: 30 }}>
                 <div style={{ flexGrow: 1 }}></div>
                 <Button type='default' disabled={false} text='Lanjut' onClick={() => { this.nextStep(index) }} />
@@ -702,9 +1216,13 @@ class FormSiswa extends Component {
       steps[4].isComplete && steps[5].isComplete &&
       steps[6].isComplete && steps[7].isComplete &&
       steps[8].isComplete &&
-      (steps[9].isComplete || this.idSiswa === '0')
+      (this.idSiswa === '0' || !this.state.active ? !this.state.active : steps[9].isComplete)
     );
     this.setState({ finished: finish });
+  }
+
+  sendData = async () => {
+    window.history.back();
   }
 
   render() {
@@ -749,13 +1267,13 @@ class FormSiswa extends Component {
                 <Grid container>
                   <Grid item xs>
                     <p>
-                      Semua form sudah di isi. Silahkan check kembali data yang sudah anda input atau click finish jika data sudah benar.
+                      Semua form sudah di isi. Silahkan periksa kembali data yang sudah anda input atau click finish jika data sudah benar.
                     </p>
                   </Grid>
                   <Grid item xs>
                     <div style={{ display: 'flex', marginTop: 30 }}>
                       <div style={{ flexGrow: 1 }}></div>
-                      <Button type='default' disabled={false} text='Selesai' onClick={() => { console.log('finish') }} />
+                      <Button type='default' disabled={false} text='Finish' onClick={() => { this.sendData() }} />
                     </div>
                   </Grid>
                 </Grid>
@@ -768,161 +1286,47 @@ class FormSiswa extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  jenisKelamin: [
-    { value: 'l', text: 'Laki - laki' },
-    { value: 'p', text: 'Perempuan' },
-  ],
-  agama: [
-    { value: 1, text: 'Islam' },
-    { value: 2, text: 'Kristen / Protestan' },
-    { value: 3, text: 'Khatolik' },
-    { value: 4, text: 'Hindu' },
-    { value: 5, text: 'Budha' },
-    { value: 6, text: 'Kong hu chu' },
-    { value: 7, text: 'Kepercayaan Kepada Tuhan YME' },
-  ],
-  kebutuhanKhusus: [
-    { value: 1, text: 'Tidak' },
-    { value: 2, text: 'Netra' },
-    { value: 3, text: 'Rungu' },
-    { value: 4, text: 'Grahita Ringan' },
-    { value: 5, text: 'Grahita Sedang' },
-    { value: 6, text: 'Daksa Ringan' },
-    { value: 7, text: 'Daksa Sedang' },
-    { value: 8, text: 'Laras' },
-    { value: 9, text: 'Wicara' },
-    { value: 10, text: 'Tuna Ganda' },
-    { value: 11, text: 'Hiperaktif' },
-    { value: 12, text: 'Cerdas Istimewa' },
-    { value: 13, text: 'Bakat Istimewa' },
-    { value: 14, text: 'Kesulitan Belajar' },
-    { value: 15, text: 'Indigo' },
-    { value: 16, text: 'Down Sindrome' },
-    { value: 17, text: 'Autis' },
-  ],
-  tempatTinggal: [
-    { value: 1, text: 'Bersama Orang Tua' },
-    { value: 2, text: 'Wali' },
-    { value: 3, text: 'Kos' },
-    { value: 4, text: 'Asrama' },
-    { value: 5, text: 'Panti Asuhan' },
-    { value: 99, text: 'Lainnya' },
-  ],
-  transportasi: [
-    { value: 1, text: 'Jalan Kaki' },
-    { value: 2, text: 'Kendaraan Pribadi' },
-    { value: 3, text: 'Kendaraan Umum / Angkot / Pete-pete' },
-    { value: 4, text: 'Jemputan Sekolah' },
-    { value: 5, text: 'Kereta Api' },
-    { value: 6, text: 'Ojek' },
-    { value: 7, text: 'Andong / Bendi / Sado / Dokar / Delman / Beca' },
-    { value: 8, text: 'Perahu Penyebrangan / Rakit / Getek' },
-    { value: 99, text: 'Lainnya' },
-  ],
-  pendidikan: [
-    { value: 1, text: 'Tidak Sekolah' },
-    { value: 2, text: 'Putus SD' },
-    { value: 3, text: 'SD Sederajat' },
-    { value: 4, text: 'SMP Sederajat' },
-    { value: 5, text: 'SMA Sederajat' },
-    { value: 6, text: 'D1' },
-    { value: 7, text: 'D2' },
-    { value: 8, text: 'D3' },
-    { value: 9, text: 'D4 / S1' },
-    { value: 10, text: 'S2' },
-    { value: 11, text: 'S3' },
-  ],
-  pekerjaan: [
-    { value: 1, text: 'Tidak Bekerja' },
-    { value: 2, text: 'Nelayan' },
-    { value: 3, text: 'Petani' },
-    { value: 4, text: 'Peternak' },
-    { value: 5, text: 'PNS / TNI / Polri' },
-    { value: 6, text: 'Karyawan Swasta' },
-    { value: 7, text: 'Pedagang Kecil' },
-    { value: 8, text: 'Pedagang Besar' },
-    { value: 9, text: 'Wiraswasta' },
-    { value: 10, text: 'Wirausaha' },
-    { value: 11, text: 'Buruh' },
-    { value: 12, text: 'Pensiunan' },
-    { value: 13, text: 'Tenaga Kerja Indonesia' },
-    { value: 14, text: 'Tidak dapat diterapkan' },
-    { value: 15, text: 'Sudah Meninggal' },
-    { value: 99, text: 'Lainnya' },
-  ],
-  penghasilan: [
-    { value: 1, text: 'Kurang dari Rp. 1.000.000' },
-    { value: 2, text: 'Rp. 1.000.000 - Rp. 2.000.000' },
-    { value: 3, text: 'Lebih dari Rp. 2.000.000' },
-    { value: 4, text: 'Kurang dari Rp. 500.000' },
-    { value: 5, text: 'Rp. 500.000 - Rp. 999.999' },
-    { value: 6, text: 'Rp. 1.000.000 - Rp. 1.999.999' },
-    { value: 7, text: 'Rp. 2.000.000 - Rp. 4.999.999' },
-    { value: 8, text: 'Rp. 5.000.000 - Rp. 20.000.000' },
-    { value: 9, text: 'Lebih dari Rp. 20.000.000' },
-    { value: 10, text: 'Tidak Berpenghasilan' },
-    { value: 99, text: 'Lainnya' },
-  ],
-  keluarKarena: [
-    { value: 1, text: 'Lulus' },
-    { value: 2, text: 'Mutasi' },
-    { value: 3, text: 'Dikeluarkan' },
-    { value: 4, text: 'Mengundurkan Diri' },
-    { value: 5, text: 'Putus Sekolah' },
-    { value: 6, text: 'Wafat' },
-    { value: 7, text: 'Hilang' },
-    { value: 8, text: 'Lainnya' },
-  ],
-  punyaKIP: [
-    { value: 'ya', text: 'Ya' },
-    { value: 'tidak', text: 'Tidak' },
-  ],
-  alasanPIP: [
-    { value: 1, text: 'Daerah Konflik' },
-    { value: 2, text: 'Dampak Bencana Alam' },
-    { value: 3, text: 'Kelainan Fisik' },
-    { value: 4, text: 'Pernah Drop Out' },
-    { value: 5, text: 'Keluarga Pidana / Berada di LAPAS' },
-    { value: 6, text: 'Pemegang PKH/PKS/KKS' },
-    { value: 7, text: 'Siswa Miskin / Rentan Miskin' },
-    { value: 8, text: 'Yatim Piatu / Panti Asuhan / Panti Sosial' },
-  ],
-  jarak: [
-    { value: 'Kurang Dari 1 Km', text: 'Kurang Dari 1 Km' },
-    { value: 'Lebih Dari 1 Km', text: 'Lebih Dari 1 Km' }
-  ],
-  jenisPrestasi: [
-    { value: 'Sains', text: 'Sains' },
-    { value: 'Seni', text: 'Seni' },
-    { value: 'Olahraga', text: 'Olahraga' },
-    { value: 'Lain - lain', text: 'Lain - lain' },
-  ],
-  tingkatPrestasi: [
-    { value: 'Sekolah', text: 'Sekolah' },
-    { value: 'Kecamatan', text: 'Kecamatan' },
-    { value: 'Kabupaten', text: 'Kabupaten' },
-    { value: 'Provinsi', text: 'Provinsi' },
-    { value: 'Nasional', text: 'Nasional' },
-    { value: 'International', text: 'International' },
-  ],
-  jenisBeasiswa: [
-    { value: 'Anak berprestasi', text: 'Anak berprestasi' },
-    { value: 'Anak kurang mampu', text: 'Anak kurang mampu' },
-    { value: 'Pendidikan', text: 'Pendidikan' },
-    { value: 'Unggulan', text: 'Unggulan' },
-    { value: 'Lain - lain', text: 'Lain - lain' },
-  ],
-  jenisPendaftaran: [
-    { value: 'Siswa Baru', text: 'Siswa Baru' },
-    { value: 'Pindahan', text: 'Pindahan' },
-    { value: 'Kembali Bersekolah', text: 'Kembali Bersekolah' },
-  ],
-  penerimaKPS: [
-    { value: 'tidak', text: 'Tidak' },
-    { value: 'ya', text: 'Ya' },
-  ]
-});
+const mapStateToProps = state => {
+  const {
+    jenisKelamin,
+    agama,
+    kebutuhanKhusus,
+    tempatTinggal,
+    transportasi,
+    pendidikan,
+    pekerjaan,
+    penghasilan,
+    keluarKarena,
+    punyaKIP,
+    alasanPIP,
+    jarak,
+    jenisPrestasi,
+    tingkatPrestasi,
+    jenisBeasiswa,
+    jenisPendaftaran,
+    penerimaKPS,
+  } = state.layout.resMasterData;
+  return {
+    jenisKelamin: jenisKelamin,
+    agama: agama,
+    kebutuhanKhusus: kebutuhanKhusus,
+    tempatTinggal: tempatTinggal,
+    transportasi: transportasi,
+    pendidikan: pendidikan,
+    pekerjaan: pekerjaan,
+    penghasilan: penghasilan,
+    keluarKarena: keluarKarena,
+    punyaKIP: punyaKIP,
+    alasanPIP: alasanPIP,
+    jarak: jarak,
+    jenisPrestasi: jenisPrestasi,
+    tingkatPrestasi: tingkatPrestasi,
+    jenisBeasiswa: jenisBeasiswa,
+    jenisPendaftaran: jenisPendaftaran,
+    penerimaKPS: penerimaKPS,
+    userProfile: state.layout.resAuth,
+  }
+};
 
 const useStyles = (theme) => ({
   titleHeader: {

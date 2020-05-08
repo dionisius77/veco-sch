@@ -89,14 +89,15 @@ class ListKBM extends Component {
 
 const mapStateToProps = state => ({
   dataTables: [
-    { uniqueId: '001', kegiatan: 'Tugas', tanggal: '23 Maret 2020', kelas: 'IX-A', selesai: 'Sudah Input Nilai' },
-    { uniqueId: '002', kegiatan: 'Ulangan Harian', tanggal: '30 Maret 2020', kelas: 'IX-B', selesai: 'Belum Input Nilai' },
-    { uniqueId: '003', kegiatan: 'Tugas', tanggal: '1 April 2020', kelas: 'VII-A', selesai: 'Belum Input Nilai' },
-    { uniqueId: '004', kegiatan: 'Tugas', tanggal: '4 April 2020', kelas: 'VIII-A', selesai: 'Sudah Input Nilai' },
+    { uniqueId: '001', kegiatan: 'Tugas', mataPelajaran: 'Matematika', tanggal: '23 Maret 2020', kelas: 'IX-A', selesai: 'Sudah Input Nilai' },
+    { uniqueId: '002', kegiatan: 'Ulangan Harian', mataPelajaran: 'Matematika', tanggal: '30 Maret 2020', kelas: 'IX-B', selesai: 'Belum Input Nilai' },
+    { uniqueId: '003', kegiatan: 'Tugas', mataPelajaran: 'Matematika', tanggal: '1 April 2020', kelas: 'VII-A', selesai: 'Belum Input Nilai' },
+    { uniqueId: '004', kegiatan: 'Tugas', mataPelajaran: 'Matematika', tanggal: '4 April 2020', kelas: 'VIII-A', selesai: 'Sudah Input Nilai' },
   ],
   headCells: [
     { id: 'kegiatan', numeric: false, disablePadding: true, label: 'Kegiatan' },
     { id: 'kelas', numeric: true, disablePadding: false, label: 'Kelas' },
+    { id: 'mataPelajaran', numeric: true, disablePadding: false, label: 'Mata Pelajaran' },
     { id: 'tanggal', numeric: true, disablePadding: false, label: 'Tanggal' },
     { id: 'selesai', numeric: true, disablePadding: false, label: 'Nilai' },
   ],

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { pushLogin } from "../../components/layout/ActionLayout";
+import { authFetch, pushAlert } from "../../components/layout/ActionLayout";
 import {
   Grid,
   Typography,
@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Loading from "../../components/loading/Loading";
+import AlertCustom from "../../components/alert/Alert";
 
 function Copyright() {
   return (
@@ -70,20 +71,53 @@ class LandingPage extends React.Component {
       loggedIn: this.props.login.loggedin,
       email: '',
       password: '',
-      loadingFlag: true
+      loadingFlag: true,
+      alert: {
+        open: false,
+        message: '',
+        type: ''
+      },
     }
     this.login = this.login.bind(this);
+    this.closeAlert = this.closeAlert.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.login.action === "PUSH_LOGIN") {
+    if (nextProps.login.action === "AUTH_SUCCESS") {
       window.location.hash = '/school';
+    }
+    if (nextProps.login.action === "AUTH_FAILED") {
+      let message;
+      switch (nextProps.login.errAuth.code) {
+        case 'auth/user-not-found':
+          message = 'Email tidak terdaftar'
+          break;
+
+        case 'auth/wrong-password':
+          message = 'Password Salah'
+          break;
+        
+        case 'auth/too-many-requests':
+          message = 'Terlalu banyak kesalahan password, silahkan coba lagi nanti'
+          break;
+
+        default:
+          message = 'Akun tidak terdaftar'
+          break;
+      }
+      prevState.loadingFlag = false;
+      prevState.alert.message = message;
+      prevState.alert.type = 'error';
+      prevState.alert.open = true;
+    }
+    if (nextProps.login.action === "PUSH_ALERT") {
+      prevState.alert = nextProps.login.alert;
     }
     return null;
   }
 
   componentDidMount() {
-    if (this.state.loggedIn) {
+    if (this.props.userProfile !== null) {
       window.location.hash = '/school/home';
     } else {
       this.setState({
@@ -110,23 +144,31 @@ class LandingPage extends React.Component {
       password,
       remember
     } = event.target;
-    this.setState({ loadingFlag: true }, () => {
-      setTimeout(() => {
-        if (remember.checked) {
-          localStorage.setItem('session', JSON.stringify({
-            email: email.value,
-            password: password.value,
-          }));
-        }
-        localStorage.setItem('role', 'TU');
-        this.props.onLogin(true);
-      }, 3000);
-    })
+    this.setState({ loadingFlag: true })
+    if (remember.checked) {
+      localStorage.setItem('session', JSON.stringify({
+        email: email.value,
+        password: password.value,
+      }));
+    }
+    this.props.onLogin({
+      email: email.value,
+      password: password.value,
+    });
+  }
+
+  closeAlert = async () => {
+    let alertConfig = {
+      open: false,
+      message: '',
+      type: 'success'
+    }
+    this.props.onCloseAlert(alertConfig);
   }
 
   render() {
     const { classes } = this.props;
-    const { email, password, loadingFlag } = this.state;
+    const { email, password, loadingFlag, alert } = this.state;
 
     return (
       <div>
@@ -140,7 +182,7 @@ class LandingPage extends React.Component {
               </Avatar>
               <Typography component="h1" variant="h5">
                 VeCo Sch
-          </Typography>
+              </Typography>
               <form className={classes.form} onSubmit={this.login}>
                 <TextField
                   variant="outlined"
@@ -180,7 +222,7 @@ class LandingPage extends React.Component {
                   className={classes.submit}
                 >
                   Log In
-            </Button>
+                </Button>
                 <Grid container>
                   <Grid item xs={4}>
                     <Link href="#" variant="body2">
@@ -198,6 +240,12 @@ class LandingPage extends React.Component {
         {loadingFlag &&
           <Loading color='white' />
         }
+        <AlertCustom
+          isOpen={alert.open}
+          message={alert.message}
+          onClose={() => { this.closeAlert() }}
+          type={alert.type}
+        />
       </div>
     );
   }
@@ -205,12 +253,14 @@ class LandingPage extends React.Component {
 
 const mapStateToProps = state => {
   return {
+    userProfile: state.layout.resAuth,
     login: state.layout
   }
 };
 
 const mapDispatchToProps = dispatch => ({
-  onLogin: value => dispatch(pushLogin(value)),
+  onLogin: value => dispatch(authFetch(value)),
+  onCloseAlert: value => dispatch(pushAlert(value)),
 });
 
 export default withStyles(useStyles)(connect(mapStateToProps, mapDispatchToProps)(LandingPage));
