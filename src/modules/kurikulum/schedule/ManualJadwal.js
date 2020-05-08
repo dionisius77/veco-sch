@@ -190,6 +190,8 @@ class ManualJadwal extends Component {
           collection: 'datastaff',
           doc: idMP[1],
           data: newobject,
+          author: this.props.userProfile.email,
+          authorId: this.props.userProfile.author,
         }
         await HTTP_SERVICE.updateFB(requestDataStaff)
           .then(res => {

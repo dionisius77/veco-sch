@@ -91,7 +91,7 @@ class ListSiswa extends Component {
   takeAction = async (nik, destination, sourceIndex) => {
     let request;
     if (destination === 'droppableA') {
-      if (this.state.listA.length < 40) {
+      if (this.state.listA.length < this.kapasitas) {
         request = {
           collection: 'datasiswa',
           doc: nik,

@@ -6,6 +6,8 @@ import { Grid, TableContainer, Paper, TableHead, TableBody, TableRow, TableCell,
 import Selects from '../../../components/select/Select';
 import Button from '../../../components/button/Button';
 import InputSimple from '../../../components/input_simple/InputSimple';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
+import DatePicker from '../../../components/date_picker/DatePicker';
 
 class InputAbsensi extends Component {
   newDataSiswa;
@@ -13,34 +15,62 @@ class InputAbsensi extends Component {
     super(props);
     this.state = {
       selectedClass: '',
-      dataSiswa: this.props.dataSiswa,
-      dataLoaded: false
+      dataSiswa: [],
+      dataLoaded: false,
+      jadwal: {},
+      classOption: [],
     }
     this.newDataSiswa = this.state.dataSiswa;
+    this.dateOnchange = this.dateOnchange.bind(this);
   }
 
   componentDidMount() {
-    this.props.onPushAlert({
-      open: true,
-      message: 'Pilih kelas terlebih dahulu!',
-      type: 'warning'
-    });
+    this.props.setLoading(true)
+    this.getJadwal();
+  }
+
+  getJadwal = async () => {
+    const req = {
+      collection: 'datastaff',
+      doc: this.props.userProfile.nik
+    }
+    await HTTP_SERVICE.getFb(req)
+      .then(res => {
+        if (res.data().jadwal) {
+          this.setState({ jadwal: res.data().jadwal });
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Pilih tanggal terlebih dahulu',
+            type: 'warning'
+          });
+        } else {
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Jadwal belum dibuat',
+            type: 'warning'
+          });
+        }
+      })
+      .catch(err => {
+        this.props.setLoading(false);
+        this.props.setAlert({
+          open: true,
+          message: 'Terjadi kesalahan saat mengambil data',
+          type: 'error'
+        });
+      });
   }
 
   selectOnChange = (name, value) => {
     if (name === 'kelas') {
-      this.props.onPushLoading(true);
+      this.props.setLoading(true);
       this.setState({
         selectedClass: value,
         dataLoaded: false
-      }, () => {
-        setTimeout(() => {
-          this.props.onPushLoading(false);
-          this.setState({
-            dataLoaded: true
-          });
-        }, 3000);
       });
+      this.getDataSiswa(value);
     } else {
       this.newDataSiswa.map((data, index) => {
         if (data.id === name) {
@@ -50,6 +80,55 @@ class InputAbsensi extends Component {
         return null;
       });
     }
+  }
+
+  getDataSiswa = async (selected) => {
+    const splited = selected.split('__');
+    const idKelas = splited[1];
+    const req = {
+      collection: 'datasiswa',
+      params: 'kelas',
+      operator: '==',
+      value: idKelas,
+      orderBy: 'dataPribadi.nama',
+      directions: 'asc',
+      lastVisible: '',
+      limit: 100,
+    }
+    await HTTP_SERVICE.getFBFilter(req)
+      .then(res => {
+        if (res.docs.length > 0) {
+          res.forEach(doc => {
+            this.newDataSiswa.push({
+              id: doc.id,
+              nama: doc.data().dataPribadi.nama,
+              checked: false,
+              keterangan: '',
+              ketTambahan: '',
+            });
+          });
+          this.props.setLoading(false);
+          this.setState({
+            dataLoaded: true,
+            dataSiswa: this.newDataSiswa,
+          });
+        } else {
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Belum ada siswa yang terdaftar di kelas ini',
+            type: 'error',
+          });
+        }
+      })
+      .catch(err => {
+        this.props.setLoading(false);
+        this.props.setAlert({
+          open: true,
+          message: 'Terjadi kesalahan saat mengambil data',
+          type: 'error',
+        });
+      });
   }
 
   checkBoxOnChange = (id) => {
@@ -74,6 +153,68 @@ class InputAbsensi extends Component {
     this.setState({ dataSiswa: this.newDataSiswa });
   }
 
+  getDayName = (index) => {
+    let hari;
+    switch (index) {
+      case 1:
+        hari = 'senin';
+        break;
+
+      case 2:
+        hari = 'selasa';
+        break;
+
+      case 3:
+        hari = 'rabu';
+        break;
+
+      case 4:
+        hari = 'kamis';
+        break;
+
+      case 5:
+        hari = 'jumat';
+        break;
+
+      default:
+        break;
+    }
+    return hari;
+  }
+
+  distinctSelect = (array) => {
+    const result = [];
+    const map = new Map();
+    for (const item of array) {
+      if (!map.has(item.value)) {
+        map.set(item.value, true);    // set any value to Map
+        result.push({
+          value: item.value,
+          text: item.text
+        });
+      }
+    }
+    return result;
+  }
+
+  dateOnchange = async (id, value) => {
+    const { jadwal } = this.state;
+    let newSelect = [];
+    let fullDate = new Date(value);
+    const hari = this.getDayName(fullDate.getDay());
+    for (let data in jadwal) {
+      let splitJadwal = data.split('-');
+      if (splitJadwal[0] === hari) {
+        newSelect.push({
+          value: `${jadwal[data].text}__${jadwal[data].kelas}`,
+          text: `${jadwal[data].text} ${jadwal[data].kelas}`
+        })
+      }
+    }
+    const distinctSelect = this.distinctSelect(newSelect);
+    this.setState({ classOption: distinctSelect });
+  }
+
   onSave = () => {
 
   }
@@ -82,25 +223,15 @@ class InputAbsensi extends Component {
     const {
       selectedClass,
       dataSiswa,
-      dataLoaded
+      dataLoaded,
+      classOption
     } = this.state;
     return (
       <Fade right duration={500}>
         <Paper style={{ padding: 10, margin: -10, minHeight: 550 }}>
           <Grid style={{ marginTop: -20 }} container justify='space-between' alignItems="center">
             <Grid item xs={2}>
-              <Selects
-                name='kelas'
-                id='kelas'
-                label='Pilih Kelas'
-                variant='outlined'
-                options={this.props.classOption}
-                value={selectedClass}
-                onChange={(name, value) => { this.selectOnChange(name, value) }}
-                isSubmit={false}
-                required={false}
-                size='small'
-              />
+              <DatePicker id='tgl' label='Tanggal' required={false} value='' onChange={this.dateOnchange} isSubmit={true} size='small' />
             </Grid>
             <Grid item xs={3}>
               <h1 style={{ textAlign: 'left' }}>Input Absensi</h1>
@@ -114,6 +245,22 @@ class InputAbsensi extends Component {
                 onClick={() => { this.onSave() }}
               />
               {/* </div> */}
+            </Grid>
+          </Grid>
+          <Grid style={{ marginTop: -20 }} container>
+            <Grid item xs={2}>
+              <Selects
+                name='kelas'
+                id='kelas'
+                label='Pilih Kelas'
+                variant='outlined'
+                options={classOption}
+                value={selectedClass}
+                onChange={(name, value) => { this.selectOnChange(name, value) }}
+                isSubmit={false}
+                required={false}
+                size='small'
+              />
             </Grid>
           </Grid>
           <Zoom duration={500} when={dataLoaded}>
@@ -193,27 +340,17 @@ const StyledTblCell = withStyles((theme) => ({
 }))(TableCell);
 
 const mapStateToProps = state => ({
-  classOption: [
-    { value: '001', text: 'VII A' },
-    { value: '002', text: 'VII B' },
-    { value: '003', text: 'VIII' },
-    { value: '004', text: 'IX' },
-  ],
+  userProfile: state.layout.resAuth,
   keteranganOption: [
     { value: 'aplha', text: 'Alpha' },
     { value: 'izin', text: 'Izin' },
     { value: 'sakit', text: 'Sakit' },
   ],
-  dataSiswa: [
-    { id: '1', nama: 'Dionisius Aditya Octa Nugraha', checked: false, keterangan: '', ketTambahan: '' },
-    { id: '2', nama: 'yoshi', checked: false, keterangan: '', ketTambahan: '' },
-    { id: '3', nama: 'dimas', checked: false, keterangan: '', ketTambahan: '' },
-  ]
 });
 
 const mapDispatchToProps = dispatch => ({
-  onPushLoading: value => dispatch(pushLoading(value)),
-  onPushAlert: value => dispatch(pushAlert(value)),
+  setLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(InputAbsensi);

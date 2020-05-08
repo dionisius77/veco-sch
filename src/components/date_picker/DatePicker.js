@@ -64,6 +64,7 @@ export default function DatePicker(props) {
         KeyboardButtonProps={{
           'arial-label': 'ganti tanggal'
         }}
+        size={props.size || 'medium'}
       />
     </MuiPickersUtilsProvider>
   )

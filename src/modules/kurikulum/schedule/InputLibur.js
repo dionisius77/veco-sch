@@ -201,6 +201,8 @@ class InputLibur extends Component {
           title: this.state.title,
           start: this.state.start,
           end: this.state.end,
+          author: this.props.userProfile.email,
+          authorId: this.props.userProfile.author,
         }
       }
       await HTTP_SERVICE.updateFB(reqUpdate)
@@ -225,6 +227,8 @@ class InputLibur extends Component {
           start: this.state.start,
           end: this.state.end,
           title: this.state.title,
+          author: this.props.userProfile.email,
+          authorId: this.props.userProfile.author,
         }
       }
       await HTTP_SERVICE.inputFb(request)
@@ -379,20 +383,8 @@ const localizer = dateFnsLocalizer({
 })
 
 const mapStateToProps = state => ({
-  events: [
-    {
-      id: 15,
-      title: 'Puasa',
-      start: '2020-04-10',
-      end: '2020-04-18',
-    },
-    {
-      id: 14,
-      title: 'Lebaran',
-      start: '2020-04-10',
-      end: '2020-04-18',
-    },
-  ]
+  events: [],
+  userProfile: state.layout.resAuth,
 });
 
 const mapDispatchToProps = dispatch => ({
