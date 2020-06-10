@@ -371,7 +371,7 @@ class FormSiswa extends Component {
         pageLoaded: true,
         steps: this.newSteps,
         activeStep: data.step + 1,
-        serverStep: data.step,
+        serverStep: data.step || 0,
       }, () => {
         this.getStatusFinish();
       });
@@ -800,13 +800,13 @@ class FormSiswa extends Component {
             data: {
               regisPesertaDidik: {
                 kompetensiKeahlian: formSiswa.kompetensiKeahlian.value,
-                nis: formSiswa.nis.value,
+                nis: formSiswa.nis.value.toString(),
                 asalSekolah: formSiswa.asalSekolah.value,
-                noIjazah: formSiswa.noIjazah.value,
-                nomorPesertaUjian: formSiswa.nomorPesertaUjian.value,
+                noIjazah: formSiswa.noIjazah.value.toString(),
+                nomorPesertaUjian: formSiswa.nomorPesertaUjian.value.toString(),
                 jenisPendaftaran: formSiswa.jenisPendaftaran.value,
                 tglMasuk: formSiswa.tglMasuk.value,
-                noSKHUS: formSiswa.noSKHUS.value,
+                noSKHUS: formSiswa.noSKHUS.value.toString(),
                 thnMasuk: splitTgl[0],
               },
               step: serverStep >= index ? serverStep : index,
@@ -817,8 +817,43 @@ class FormSiswa extends Component {
             },
           }
           await HTTP_SERVICE.updateFB(requestRegis).then(async res => {
-            await HTTP_SERVICE.registerAcc({ email: formSiswa.email.value, password: 'Password123' })
-            await HTTP_SERVICE.registerAcc({ email: formSiswa.emailOrtu.value, password: 'Password123' })
+            await HTTP_SERVICE.registerAcc({ email: formSiswa.email.value, password: 'Password123' });
+            await HTTP_SERVICE.registerAcc({ email: formSiswa.emailOrtu.value, password: 'Password123' });
+            const reqAccountSiswa = {
+              collection: 'user',
+              doc: formSiswa.email.value,
+              data: {
+                nis: formSiswa.nis.value,
+                nik: formSiswa.nik.value,
+                active: true,
+                email: formSiswa.email.value,
+                role: 'student',
+              },
+            };
+            const reqAccountOrtu = {
+              collection: 'user',
+              doc: formSiswa.emailOrtu.value,
+              data: {
+                nikSiswa: formSiswa.nik.value,
+                active: true,
+                email: formSiswa.emailOrtu.value,
+                role: 'parent',
+              },
+            };
+            await HTTP_SERVICE.inputFb(reqAccountSiswa)
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => {
+                console.log(err);
+              });
+            await HTTP_SERVICE.inputFb(reqAccountOrtu)
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => {
+                console.log(err);
+              });
             isValid = true;
           }).catch(err => {
             isValid = false;

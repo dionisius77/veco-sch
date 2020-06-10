@@ -64,7 +64,11 @@ class ListAlumni extends Component {
       });
       this.setState({ listData: this.newListData });
     }).catch(err => {
-      // console.log(err)
+      this.props.setAlert({
+        open: true,
+        message: err.message,
+        type: 'error',
+      });
     });
     this.props.setLoading(false);
   }

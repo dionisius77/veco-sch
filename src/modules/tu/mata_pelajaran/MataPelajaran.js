@@ -77,7 +77,11 @@ class MataPelajaran extends Component {
         lastVisible: res.docs[res.docs.length - 1]
       });
     }).catch(err => {
-      // console.log(err)
+      this.props.setAlert({
+        open: true,
+        message: err.message,
+        type: 'error',
+      });
     });
     this.setState({ pageLoaded: true });
     this.props.setLoading(false);
@@ -312,7 +316,7 @@ class MataPelajaran extends Component {
   }
 
   render() {
-    const { dataTables, modalFlag, edit, formData, modalConfirm, confirmValue } = this.state;
+    const { dataTables, modalFlag, edit, formData, modalConfirm, confirmValue, hashMore } = this.state;
     const deleteVal = confirmValue.length > 0 ? confirmValue.join(', ') : '';
     return (
       <Fade right opposite when={this.state.pageLoaded} duration={500}>
@@ -331,6 +335,7 @@ class MataPelajaran extends Component {
           handleEdit={this.handleEdit}
           handleDelete={(checked) => this.confirmDelete(checked)}
           goToDetail={this.handleEdit}
+          hasMore={hashMore}
         />
         <Modals
           open={modalFlag}

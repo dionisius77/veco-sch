@@ -74,7 +74,11 @@ class Kelas extends Component {
       this.props.setLoading(false);
     }).catch(err => {
       this.props.setLoading(false);
-      // console.log(err);
+      this.props.setAlert({
+        open: true,
+        message: err.message,
+        type: 'error',
+      });
     });
   }
 

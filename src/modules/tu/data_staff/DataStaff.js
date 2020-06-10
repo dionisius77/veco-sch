@@ -61,7 +61,11 @@ class DataStaff extends Component {
       });
       this.setState({ dataTables: this.newDataTables });
     }).catch(err => {
-      // console.log(err)
+      this.props.setAlert({
+        open: true,
+        message: err.message,
+        type: 'error',
+      });
     });
     this.props.onPushLoading(false);
   }

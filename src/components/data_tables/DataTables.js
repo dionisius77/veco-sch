@@ -321,6 +321,7 @@ export default function DataTables(props) {
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
   const [showConfigs, setShowConfigs] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
 
   React.useEffect(
     () => {
@@ -338,6 +339,12 @@ export default function DataTables(props) {
     () => {
       setLabel(props.tableName);
     }, [props.tableName]
+  )
+
+  React.useEffect(
+    () => {
+      setHasMore(props.hasMore);
+    }, [props.hasMore]
   )
 
   // React.useEffect(
@@ -517,7 +524,7 @@ export default function DataTables(props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={-1}
+          count={hasMore ? -1 : rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -529,6 +536,7 @@ export default function DataTables(props) {
 }
 
 DataTables.propTypes = {
+  hasMore: PropTypes.bool,
   tableName: PropTypes.string.isRequired,  //='' (string)
   allowEdit: PropTypes.bool,  //={} (boolean)
   page: PropTypes.number.isRequired, //={} (int)

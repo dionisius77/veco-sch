@@ -100,7 +100,7 @@ class InputLibur extends Component {
         this.props.onPushLoading(false);
         this.props.setAlert({
           open: true,
-          message: 'Data tidak berhasil dimuat',
+          message: err.message,
           type: 'error',
         });
       })

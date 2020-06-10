@@ -1,0 +1,20 @@
+Siswa:
+11 > Notif jadwal kelas
+12 > Notif jadwal tugas / ulangan harian
+13 > Notif nilai tugas / ulangan harian
+
+Orang Tua:
+21 > Notif jadwal anak
+22 > 
+23 > Notif nilai tugas / ulangan harian anak
+
+tugas db structure
+idDoc		> [unique]
+mapel		> String
+kelas		> String
+title		> String
+author		> String
+type		> String
+typeDoc		> String
+location	> String
+authorId	> String

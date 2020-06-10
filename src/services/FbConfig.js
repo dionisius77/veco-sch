@@ -16,8 +16,10 @@ const firebaseConfig = {
 
 let firebaseMain = firebase.initializeApp(firebaseConfig);
 let firebaseSecondary = firebase.initializeApp(firebaseConfig, "secondary");
+let fieldValue = firebase.firestore.FieldValue;
 
 export default {
   firebaseMain: firebaseMain,
   firebaseSecondary: firebaseSecondary,
+  fieldValue: fieldValue,
 }

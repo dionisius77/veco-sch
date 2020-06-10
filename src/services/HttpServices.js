@@ -1,7 +1,7 @@
 import axios from 'axios';
 import firebase from './FbConfig';
 // import 'firebase/performance';
-const { firebaseMain, firebaseSecondary } = firebase;
+const { firebaseMain, firebaseSecondary, fieldValue } = firebase;
 const server = 'http://dionisius77.pythonanywhere.com/';
 const db = firebaseMain.firestore();
 const storageRef = firebaseMain.storage().ref();
@@ -88,7 +88,11 @@ export const HTTP_SERVICE = {
   },
   getFbSubCollection(request) {
     let userRef;
-    userRef = db.collection(request.collection).doc(request.doc).collection(request.subCollection).get();
+    if(request.subDoc){
+      userRef = db.collection(request.collection).doc(request.doc).collection(request.subCollection).doc(request.subDoc).get();
+    } else {
+      userRef = db.collection(request.collection).doc(request.doc).collection(request.subCollection).get();
+    }
     return userRef;
   },
   inputFbSubCollection(request) {
@@ -133,4 +137,14 @@ export const HTTP_SERVICE = {
     const userRef = storageRef.child('profilePicture/'+req.uid).put(req.file, metadata);
     return userRef;
   },
+  updateFbArray(req){
+    let data = {};
+    if (req.action === 'union') {
+      data[req.field] = fieldValue.arrayUnion(req.value);
+    } else if (req.action === 'remove') {
+      data[req.field] = fieldValue.arrayRemove(req.value);
+    }
+    const collectionRef = db.collection(req.collection).doc(req.doc).update(data)
+    return collectionRef;
+  }
 }

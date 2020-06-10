@@ -1,15 +1,16 @@
 import React, { Component, Children } from 'react';
 import { Fade } from 'react-reveal';
 import { connect } from 'react-redux';
-import { pushLoading } from '../../../components/layout/ActionLayout';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import Modals from '../../../components/modal/Modal';
 import InputField from '../../../components/input_field/InputField';
 import DatePicker from '../../../components/date_picker/DatePicker';
-import { Paper, withStyles, Grid } from '@material-ui/core';
+import { Paper, withStyles, Grid, Tooltip } from '@material-ui/core';
 import Selects from '../../../components/select/Select';
+import { HTTP_SERVICE } from '../../../services/HttpServices';
 
 const styles = (theme) => ({
   toolbar: {
@@ -49,15 +50,84 @@ class JadwalUjian extends Component {
       kegiatan: '',
       kelas: '',
       jenis: '',
+      optionKelas: [],
     }
     this.clickedCalendar = this.clickedCalendar.bind(this);
     this.customEvent = this.customEvent.bind(this);
     this.customCells = this.customCells.bind(this);
     this.newEvents = this.state.events;
+    this.customEventWrapper = this.customEventWrapper.bind(this);
   }
 
   componentDidMount() {
-    this.props.onPushLoading(false);
+    this.props.setLoading(true);
+    this.getJadwalKbm();
+  }
+
+  getJadwalKbm = async () => {
+    const current = new Date().toLocaleDateString();
+    const splittedCurrent = current.split('/');
+    const formatedDate = `${splittedCurrent[2]}-${splittedCurrent[0].length === 1 ? '0' + splittedCurrent[0] : splittedCurrent[0]}-${splittedCurrent[1].length === 1 ? '0' + splittedCurrent[1] : splittedCurrent[1]}`
+    const req = {
+      collection: 'jadwalkbm',
+      params: 'end', operator: '>=', value: formatedDate,
+      params2: 'authorId', operator2: '==', value2: this.props.userProfile.author,
+      orderBy: 'end',
+      directions: 'asc',
+      lastVisible: '',
+      limit: 500,
+    }
+    await HTTP_SERVICE.getFBTwoFilter(req)
+      .then(async res => {
+        if (!res.empty) {
+          res.forEach(doc => {
+            this.newEvents.push({ id: doc.id, ...doc.data() });
+          });
+          this.setState({ events: this.newEvents });
+        }
+        const req = {
+          collection: 'datastaff',
+          doc: this.props.userProfile.nik
+        }
+        await HTTP_SERVICE.getFb(req)
+          .then(res => {
+            if (res.data().jadwal) {
+              const newOptionKelas = this.distinctSelect(res.data().jadwal);
+              this.setState({ optionKelas: newOptionKelas });
+              this.props.setLoading(false);
+            } else {
+              this.props.setLoading(false);
+              this.props.setAlert({
+                open: true,
+                message: 'Jadwal belum dibuat',
+                type: 'warning'
+              });
+            }
+          });
+      })
+      .catch(err => {
+        this.props.setAlert({
+          open: true,
+          message: err.message,
+          type: 'error',
+        });
+        this.props.setLoading(false);
+      });
+  }
+
+  distinctSelect = (array) => {
+    const result = [];
+    const map = new Map();
+    for (const item in array) {
+      if (!map.has(`${array[item].text}_${array[item].kelas}`)) {
+        map.set(`${array[item].text}_${array[item].kelas}`, true);    // set any value to Map
+        result.push({
+          value: `${array[item].text}_${array[item].kelas}`,
+          text: `${array[item].text} ${array[item].kelas}`
+        });
+      }
+    }
+    return result;
   }
 
   CustomToolbar = (toolbar) => {
@@ -126,15 +196,14 @@ class JadwalUjian extends Component {
   }
 
   clickEvent = (event) => {
-    let data = event.title.split('_');
     this.setState({
       start: event.start,
       end: event.end,
       title: event.title,
       id: event.id,
-      jenis: data[0],
-      kegiatan: data[1],
-      kelas: data[2],
+      jenis: event.jenis,
+      kegiatan: event.title,
+      kelas: event.kelas,
       openModal: true
     });
   }
@@ -143,7 +212,9 @@ class JadwalUjian extends Component {
     this.setState({ openModal: false });
   }
 
-  submitModal = () => {
+  submitModal = async () => {
+    this.setState({ openModal: false });
+    this.props.setLoading(true);
     let events = this.newEvents;
     let hasRegistered;
     events.map((value, index) => {
@@ -152,24 +223,81 @@ class JadwalUjian extends Component {
       }
       return index;
     });
-    let titleForSave = this.state.jenis + '_' + this.state.kegiatan + '_' + this.state.kelas;
     if (hasRegistered !== undefined) {
-      events[hasRegistered].title = titleForSave;
-      this.state.jenis === 'Tugas' ? events[hasRegistered].end = this.state.end : events[hasRegistered].end = this.state.start;
-      events[hasRegistered].start = this.state.start;
+      const req = {
+        collection: 'jadwalkbm',
+        doc: this.state.id,
+        data: {
+          start: this.state.start,
+          end: this.state.end,
+          title: this.state.kegiatan,
+          jenis: this.state.jenis,
+          kelas: this.state.kelas,
+        }
+      }
+      await HTTP_SERVICE.updateFB(req)
+        .then(res => {
+          this.props.setLoading(false);
+          events[hasRegistered].title = this.state.kegiatan;
+          this.state.jenis === 'Tugas' ? events[hasRegistered].end = this.state.end : events[hasRegistered].end = this.state.start;
+          events[hasRegistered].start = this.state.start;
+          events[hasRegistered].jenis = this.state.jenis;
+          events[hasRegistered].kelas = this.state.kelas;
+          this.setState({ events: events });
+        })
+        .catch(err => {
+          this.setState({ openModal: true });
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Menyimpan data gagal, terjadi kesalahan.',
+            type: 'error',
+          });
+        })
     } else {
-      let _newEvent = {
-        id: this.state.id,
-        start: this.state.start,
-        end: this.state.end,
-        title: titleForSave,
-      };
-      events.push(_newEvent);
+      const splittedKelas = this.state.kelas.split('_');
+      const req = {
+        collection: 'jadwalkbm',
+        data: {
+          start: this.state.start,
+          end: this.state.end,
+          title: this.state.kegiatan,
+          jenis: this.state.jenis,
+          kelas: this.state.kelas,
+          rawKelas: splittedKelas[1],
+          author: this.props.userProfile.email,
+          authorId: this.props.userProfile.author,
+        }
+      }
+      await HTTP_SERVICE.inputFb(req)
+        .then(res => {
+          let _newEvent = {
+            id: res.id,
+            start: this.state.start,
+            end: this.state.end,
+            title: this.state.kegiatan,
+            jenis: this.state.jenis,
+            kelas: this.state.kelas,
+          };
+          events.push(_newEvent);
+          this.setState({ events: events });
+          this.props.setLoading(false);
+          this.props.setAlert({
+            open: true,
+            message: 'Data berhasil disimpan',
+            type: 'success',
+          });
+        })
+        .catch(err => {
+          this.props.setLoading(false);
+          this.setState({ openModal: true });
+          this.props.setAlert({
+            open: true,
+            message: 'Menyimpan data gagal, terjadi kesalahan.',
+            type: 'error',
+          });
+        })
     }
-    this.setState({
-      events: events,
-      openModal: false
-    });
   }
 
   onBlurInput = (id, value) => {
@@ -203,32 +331,74 @@ class JadwalUjian extends Component {
     )
   }
 
+  customEventWrapper = (e) => {
+    return (
+      React.cloneElement(Children.only(e.children), {
+        style: {
+          ...e.children.style,
+          backgroundColor: e.event.jenis === 'Tugas' ? '#3174ad' : '#ffc107',
+          borderColor: e.event.jenis === 'Tugas' ? '#3174ad' : '#ffc107',
+        }
+      })
+    )
+  }
+
   customEvent = (e) => {
     return (
-      <div
-        tabIndex={e.event.id}
-        style={{
-          border: 'none',
-          boxSizing: 'border-box',
-          boxShadow: 'none',
-          margin: '0',
-          padding: '2px 5px',
-          backgroundColor: '#3174ad',
-          borderRadius: '5px',
-          color: '#fff',
-          cursor: 'pointer',
-          width: '100 %',
-          textAlign: 'left',
-        }}
-        onContextMenu={(event) => { this.onRightClickEvent(event, e.event.id) }}
-      >
-        {e.event.title}
-      </div >
+      <Tooltip title={`${e.event.jenis} ${e.event.title} ${e.event.kelas}`} placement='top' arrow={true}>
+        <div
+          tabIndex={e.event.id}
+          style={{
+            border: 'none',
+            boxSizing: 'border-box',
+            boxShadow: 'none',
+            margin: '0',
+            padding: '2px 5px',
+            backgroundColor: e.event.jenis === 'Tugas' ? '#3174ad' : '#ffc107',
+            borderColor: e.event.jenis === 'Tugas' ? '#3174ad' : '#ffc107',
+            borderRadius: '5px',
+            color: '#fff',
+            cursor: 'pointer',
+            width: '100 %',
+            textAlign: 'left',
+          }}
+          onContextMenu={(event) => { this.onRightClickEvent(event, e.event.id) }}
+          onClick={() => { this.clickEvent(e.event) }}
+        >
+          {`${e.event.jenis} ${e.event.title} ${e.event.kelas}`}
+        </div >
+      </Tooltip>
     )
   }
 
   onRightClickEvent = async (e, id) => {
+    this.props.setLoading(true);
     e.preventDefault();
+    let events = this.newEvents;
+    let hasRegistered;
+    events.map((value, index) => {
+      if (value.id === id) {
+        hasRegistered = index;
+      }
+      return index;
+    });
+    const req = {
+      collection: 'jadwalkbm',
+      doc: id,
+    }
+    await HTTP_SERVICE.deleteFB(req)
+      .then(res => {
+        events.splice(hasRegistered, 1);
+        this.setState({ events: events });
+        this.props.setLoading(false);
+      })
+      .catch(err => {
+        this.props.setAlert({
+          open: true,
+          message: 'Terjadi kesalahan saat menghapus data, silahkan coba lagi.',
+          type: 'error',
+        });
+      });
   }
 
   render() {
@@ -239,11 +409,11 @@ class JadwalUjian extends Component {
       kegiatan,
       jenis,
       kelas,
-      openModal
+      openModal,
+      optionKelas,
     } = this.state;
     const {
       optionJenis,
-      optionKelas
     } = this.props;
     return (
       <Fade right duration={500}>
@@ -254,6 +424,7 @@ class JadwalUjian extends Component {
             components={{
               toolbar: this.CustomToolbar,
               event: this.customEvent,
+              eventWrapper: this.customEventWrapper,
               dateCellWrapper: this.customCells,
             }}
             views={['month']}
@@ -263,7 +434,7 @@ class JadwalUjian extends Component {
             onNavigate={this.onNext}
             onSelectSlot={this.clickedCalendar}
             selectable={true}
-            style={{ color: '#fff', height: 600 }}
+            style={{ color: '#fff', minHeight: 600 }}
             onSelectEvent={(event) => this.clickEvent(event)}
             popup={true}
           />
@@ -303,21 +474,16 @@ const localizer = dateFnsLocalizer({
 const mapStateToProps = state => ({
   events: [
   ],
-  optionKelas: [
-    { value: 'VII-A', text: 'VII-A' },
-    { value: 'VII-B', text: 'VII-B' },
-    { value: 'VIII-A', text: 'VIII-A' },
-    { value: 'VIII-B', text: 'VIII-B' },
-    { value: 'X-A', text: 'X-A' },
-  ],
   optionJenis: [
     { value: 'Ulangan Harian', text: 'Ulangan Harian' },
     { value: 'Tugas', text: 'Tugas' },
   ],
+  userProfile: state.layout.resAuth,
 });
 
 const mapDispatchToProps = dispatch => ({
-  onPushLoading: value => dispatch(pushLoading(value)),
+  setLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(JadwalUjian));

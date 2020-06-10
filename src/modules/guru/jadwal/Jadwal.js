@@ -34,13 +34,17 @@ class Jadwal extends Component {
             open: true,
             message: 'Jadwal belum dibuat',
             type: 'warning',
-          })
+          });
           this.props.setLoading(false);
         }
       })
       .catch(err => {
         this.props.setLoading(false);
-        console.log(err);
+        this.props.setAlert({
+          open: true,
+          message: err.message,
+          type: 'error',
+        });
       });
   }
 

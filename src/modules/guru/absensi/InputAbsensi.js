@@ -19,6 +19,9 @@ class InputAbsensi extends Component {
       dataLoaded: false,
       jadwal: {},
       classOption: [],
+      absenIsExists: '',
+      tanggal: '',
+      disableButton: true,
     }
     this.newDataSiswa = this.state.dataSiswa;
     this.dateOnchange = this.dateOnchange.bind(this);
@@ -57,7 +60,7 @@ class InputAbsensi extends Component {
         this.props.setLoading(false);
         this.props.setAlert({
           open: true,
-          message: 'Terjadi kesalahan saat mengambil data',
+          message: err.message,
           type: 'error'
         });
       });
@@ -65,12 +68,14 @@ class InputAbsensi extends Component {
 
   selectOnChange = (name, value) => {
     if (name === 'kelas') {
-      this.props.setLoading(true);
-      this.setState({
-        selectedClass: value,
-        dataLoaded: false
-      });
-      this.getDataSiswa(value);
+      if(value !== ''){
+        this.props.setLoading(true);
+        this.setState({
+          selectedClass: value,
+          dataLoaded: false
+        });
+        this.getDataAbsensi(value);
+      }
     } else {
       this.newDataSiswa.map((data, index) => {
         if (data.id === name) {
@@ -82,7 +87,41 @@ class InputAbsensi extends Component {
     }
   }
 
+  getDataAbsensi = async (selected) => {
+    const splited = selected.split('__');
+    const idKelas = splited[1];
+    const mapelSplit = splited[0].split('_');
+    const req = {
+      collection: 'absensi',
+      doc: this.state.tanggal,
+      subCollection: idKelas,
+      subDoc: mapelSplit[0],
+    }
+    await HTTP_SERVICE.getFbSubCollection(req)
+      .then(res => {
+        if (res.exists) {
+          this.newDataSiswa = res.data().absensi;
+          this.props.setLoading(false);
+          this.setState({
+            dataLoaded: true,
+            dataSiswa: this.newDataSiswa,
+            disableButton: false,
+          });
+        } else {
+          this.getDataSiswa(selected);
+        }
+      })
+      .catch(err => {
+        this.props.setAlert({
+          open: true,
+          message: 'Terjadi kesalahan saat mengambil data silahkan coba lagi',
+          type: 'error',
+        });
+      });
+  }
+
   getDataSiswa = async (selected) => {
+    this.newDataSiswa = [];
     const splited = selected.split('__');
     const idKelas = splited[1];
     const req = {
@@ -111,6 +150,7 @@ class InputAbsensi extends Component {
           this.setState({
             dataLoaded: true,
             dataSiswa: this.newDataSiswa,
+            disableButton: false,
           });
         } else {
           this.props.setLoading(false);
@@ -206,17 +246,105 @@ class InputAbsensi extends Component {
       let splitJadwal = data.split('-');
       if (splitJadwal[0] === hari) {
         newSelect.push({
-          value: `${jadwal[data].text}__${jadwal[data].kelas}`,
+          value: `${jadwal[data].id}__${jadwal[data].kelas}`,
           text: `${jadwal[data].text} ${jadwal[data].kelas}`
         })
       }
     }
-    const distinctSelect = this.distinctSelect(newSelect);
-    this.setState({ classOption: distinctSelect });
+    if (newSelect.length > 0) {
+      const distinctSelect = this.distinctSelect(newSelect);
+      this.setState({
+        classOption: distinctSelect,
+        tanggal: value,
+      });
+      await HTTP_SERVICE.getFb({
+        collection: 'absensi',
+        doc: value,
+      }).then(res => {
+        this.setState({ absenIsExists: res.exists });
+      }).catch(err => { });
+    } else {
+      this.props.setAlert({
+        open: true,
+        message: 'Tidak ada jadwal pada hari yang dipilih',
+        type: 'warning',
+      });
+    }
   }
 
-  onSave = () => {
-
+  onSave = async () => {
+    this.props.setLoading(true);
+    const selectedSplited = this.state.selectedClass.split('__');
+    const idSplited = selectedSplited[0].split('_');
+    const reqInputJadwal = {
+      collection: 'absensi',
+      doc: this.state.tanggal,
+      subCollection: selectedSplited[1],
+      subDoc: idSplited[0],
+      data: {
+        absensi: this.state.dataSiswa,
+      },
+      author: this.props.userProfile.email,
+      authorId: this.props.userProfile.author,
+    }
+    await HTTP_SERVICE.inputFbSubCollection(reqInputJadwal)
+      .then(async res => {
+        if (this.state.absenIsExists) {
+          await HTTP_SERVICE.updateFbArray({
+            collection: 'absensi',
+            doc: this.state.tanggal,
+            field: 'subcollection',
+            value: selectedSplited[1],
+          }).then(resp => {
+            this.props.setLoading(false);
+            this.props.setAlert({
+              open: true,
+              message: 'Absensi berhasil di simpan',
+              type: 'success',
+            });
+            window.history.back();
+          }).catch(err => {
+            this.props.setLoading(false);
+            this.props.setAlert({
+              open: true,
+              message: 'Terjadi kesalahan saat menyimpan data silahkan coba lagi',
+              type: 'error',
+            });
+          });
+        } else {
+          await HTTP_SERVICE.inputFb({
+            collection: 'absensi',
+            doc: this.state.tanggal,
+            data: {
+              subcollection: [selectedSplited[1]],
+              tanggal: this.state.tanggal
+            }
+          }).then(resp => {
+            this.props.setLoading(false);
+            this.props.setAlert({
+              open: true,
+              message: 'Absensi berhasil di simpan',
+              type: 'success',
+            });
+            window.history.back();
+          }).catch(err => {
+            this.props.setLoading(false);
+            this.props.setAlert({
+              open: true,
+              message: 'Terjadi kesalahan saat menyimpan data silahkan coba lagi',
+              type: 'error',
+            });
+          });
+        }
+      })
+      .catch(err => {
+        this.props.setLoading(false);
+        this.props.setAlert({
+          open: true,
+          message: 'Terjadi kesalahan saat menyimpan data silahkan coba lagi',
+          type: 'error',
+        });
+      })
   }
 
   render() {
@@ -224,7 +352,8 @@ class InputAbsensi extends Component {
       selectedClass,
       dataSiswa,
       dataLoaded,
-      classOption
+      classOption,
+      disableButton,
     } = this.state;
     return (
       <Fade right duration={500}>
@@ -240,7 +369,7 @@ class InputAbsensi extends Component {
               {/* <div> */}
               <Button
                 type="default"
-                disabled={false}
+                disabled={disableButton}
                 text="Simpan"
                 onClick={() => { this.onSave() }}
               />
