@@ -66,7 +66,7 @@ const LEFT_MENU_GURU = [
   {
     name: 'Bank Materi',
     translateId: '',
-    onClick: () => { window.location.hash = '#/school/bank_materi' },
+    onClick: () => { window.location.hash = '#/school/landing_bank_materi' },
     icon: <MateriIcon style={{ color: '#fff' }} />
   },
   {
