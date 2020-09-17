@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 import { connect } from 'react-redux';
-import { Paper, Grid, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, withStyles } from '@material-ui/core';
+import { Paper, Grid } from '@material-ui/core';
 import Selects from '../../../components/select/Select';
-import { HTTP_SERVICE } from '../../../services/HttpServices';
-import Button from '../../../components/button/Button';
 import DataTables from '../../../components/data_tables/DataTables';
 class LandingBankMateri extends Component {
   constructor(props) {
@@ -30,31 +28,19 @@ class LandingBankMateri extends Component {
     return finalList;
   }
 
-  getDataMapel = async () => {
-    await HTTP_SERVICE.getFb({
-      collection: 'datastaff',
-      doc: this.props.userProfile.nik,
-    }).then(res => {
-      if (res.exists) {
-        const mapelList = this.generateMapelList(res.data().bidangStudi);
-        this.setState({ optionMapel: mapelList });
-        this.props.setLoading(false);
-      } else {
-        this.props.setLoading(false);
-        this.props.setAlert({
-          open: true,
-          message: 'Data bidang studi belum ada.',
-          type: 'error',
-        });
-      }
-    }).catch(err => {
+  getDataMapel = () => {
+    if (this.props.userProfile.bidangStudi) {
+      const mapelList = this.generateMapelList(this.props.userProfile.bidangStudi);
+      this.setState({ optionMapel: mapelList });
+      this.props.setLoading(false);
+    } else {
       this.props.setLoading(false);
       this.props.setAlert({
         open: true,
-        message: err.message,
+        message: 'Data bidang studi belum ada.',
         type: 'error',
       });
-    });
+    }
   }
 
   goToDetail = (id) => {
@@ -62,7 +48,7 @@ class LandingBankMateri extends Component {
   }
 
   handleAdd = () => {
-    
+    window.location.hash = '#/school/input_bank_materi';
   }
 
   selectOnChange = (name, value) => {
@@ -122,9 +108,9 @@ class LandingBankMateri extends Component {
           data={dataTables}
           orderConfig={false}
           orderBy='name'
-          handleDownload={() => {  }}
+          handleDownload={() => { }}
           handleChangePage={(page, limit) => { this.onChangePage(page, limit) }}
-          handleSearch={(value) => {  }}
+          handleSearch={(value) => { }}
           handleAdd={() => { this.handleAdd() }}
           handleDelete={(checked) => { this.handleDelete(checked) }}
           goToDetail={(checked) => { this.goToDetail(checked) }}
@@ -133,20 +119,6 @@ class LandingBankMateri extends Component {
     )
   }
 }
-
-const StyledTblCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: theme.palette.secondary.light,
-    color: theme.palette.common.grey,
-    fontWeight: 600,
-    fontSize: 14
-  },
-  body: {
-    fontSize: 14,
-    paddingTop: 2,
-    paddingBottom: 0
-  },
-}))(TableCell);
 
 const mapStateToProps = state => ({
   userProfile: state.layout.resAuth,
