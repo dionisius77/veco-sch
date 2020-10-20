@@ -80,7 +80,7 @@ class ListKBM extends Component {
   }
 
   handleAdd = () => {
-    this.props.onPushLoading(true);
+    this.props.setLoading(true);
     this.setState({
       pageLoaded: false
     }, () => {
@@ -91,7 +91,7 @@ class ListKBM extends Component {
   }
 
   handleEdit = (checked) => {
-    this.props.onPushLoading(true);
+    this.props.setLoading(true);
     this.setState({
       pageLoaded: false
     }, () => {
