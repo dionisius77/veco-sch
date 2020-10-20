@@ -58,7 +58,7 @@ class ManualJadwal extends Component {
         this.props.onSetLoading(false);
         this.props.onSetAlert({
           open: true,
-          message: 'Gagal mengambil data',
+          message: err.message,
           type: 'error'
         });
       });
@@ -79,6 +79,7 @@ class ManualJadwal extends Component {
           this.setState({ listMataPelajaran: this.newListMataPelajaran });
           this.getJadwal();
         } else {
+          this.props.onSetLoading(false);
           this.props.onSetAlert({
             open: true,
             message: 'Silahkan input Mata Pelajaran untuk kelas terlebih dahulu',
@@ -202,12 +203,14 @@ class ManualJadwal extends Component {
           });
       }
       if (failed > 0) {
+        this.props.onSetLoading(false);
         this.props.onSetAlert({
           open: true,
           message: 'Jadwal gagal di simpan, silahkan coba lagi',
           type: 'error'
         });
       } else {
+        this.props.onSetLoading(false);
         this.props.onSetAlert({
           open: true,
           message: 'Jadwal berhasil simpan',

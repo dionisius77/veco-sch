@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Fade } from 'react-reveal';
-import { pushLoading } from '../../../components/layout/ActionLayout';
+import { pushLoading, pushAlert } from '../../../components/layout/ActionLayout';
 import { connect } from 'react-redux';
 import { Card, CardMedia, CardContent, Typography, Grid } from '@material-ui/core';
 import JadwalIcon from '../../../shared/automation.png';
@@ -20,7 +20,12 @@ class LandingAbsensi extends Component {
 
   cardOnclick = (page) => {
     if(page === 'rekap') {
-      window.location.hash = '#/school/rekap_absensi';
+      this.props.setAlert({
+        open: true,
+        message: 'Feature sedang dalam pengembangan',
+        type: 'warning',
+      });
+      // window.location.hash = '#/school/rekap_absensi';
     } else {
       window.location.hash = '#/school/input_absensi';
     }
@@ -69,6 +74,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   onPushLoading: value => dispatch(pushLoading(value)),
+  setAlert: value => dispatch(pushAlert(value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LandingAbsensi);

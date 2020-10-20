@@ -48,7 +48,8 @@ import SearchField from '../search_field/SearchField';
 import ConfigIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
 import Arrow from '@material-ui/icons/KeyboardArrowRight';
-import { Zoom } from 'react-reveal';
+import FilterIcon from '@material-ui/icons/FilterList';
+import { Zoom, Fade } from 'react-reveal';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -197,6 +198,7 @@ const EnhancedTableToolbar = props => {
   const [showConfigs, setShowConfigs] = React.useState(false);
   const [showParent, setShowParent] = React.useState(true);
   const [showChild, setShowChild] = React.useState(false);
+  const [showFilter, setShowFilter] = React.useState(false);
 
   const handleConfigs = () => {
     props.handleConfigs(!showConfigs);
@@ -207,78 +209,96 @@ const EnhancedTableToolbar = props => {
     }, 500);
   }
 
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: showConfigs,
-      })}
-    >
-      {showConfigs ? (
-        <Typography className={classes.title} color="inherit" variant="subtitle1">
-          {
-            (props.handleDelete || props.handleEdit) &&
-            <div>{numSelected} selected</div>
-          }
-        </Typography>
-      ) : (
-          <Typography className={classes.title} variant="h6" id="tableTitle" noWrap>
-            {props.label}
-          </Typography>
-        )}
+  const handleFilter = () => {
+    setShowFilter(!showFilter);
+  }
 
-      {showConfigs ? (
-        <Zoom collapse bottom cascade opposite duration={500} when={showChild}>
-          <div>
-            {props.handleAdd &&
-              <Tooltip title="Add Data" className={classes.icon}>
-                <IconButton aria-label="add Data" onClick={() => { handleConfigs(); props.handleAdd() }}>
-                  <AddIcon style={{ color: '#424242' }} />
-                </IconButton>
-              </Tooltip>
+  return (
+    <div>
+      <Toolbar
+        className={clsx(classes.root, {
+          [classes.highlight]: showConfigs,
+        })}
+      >
+        {showConfigs ? (
+          <Typography className={classes.title} color="inherit" variant="subtitle1">
+            {
+              (props.handleDelete || props.handleEdit) &&
+              <div>{numSelected} selected</div>
             }
-            {props.handleEdit && props.multipleEdit &&
-              <Tooltip title="Edit">
-                <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
-                  <EditIcon style={{ color: '#424242' }} />
-                </IconButton>
-              </Tooltip>
-            }
-            {props.handleDelete &&
-              <Tooltip title="Delete">
-                <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
-                  <DeleteIcon style={{ color: '#424242' }} />
-                </IconButton>
-              </Tooltip>
-            }
-            <Tooltip title="Close">
-              <IconButton aria-label="close" onClick={handleConfigs}>
-                <CloseIcon style={{ color: '#424242' }} />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </Zoom>
-      ) : (
-          <Zoom collapse bottom cascade opposite duration={500} when={showParent}>
+          </Typography>
+        ) : (
+            <Typography className={classes.title} variant="h6" id="tableTitle" noWrap>
+              {props.label}
+            </Typography>
+          )}
+
+        {showConfigs ? (
+          <Zoom collapse bottom cascade opposite duration={500} when={showChild}>
             <div>
-              <SearchField searchHandleChange={props.handleSearch} />
-              {props.allowEdit &&
-                <Tooltip title="Configuration" className={classes.icon}>
-                  <IconButton aria-label="configuration" onClick={handleConfigs}>
-                    <ConfigIcon style={{ color: '#fff' }} />
+              {props.handleAdd &&
+                <Tooltip title="Add Data" className={classes.icon}>
+                  <IconButton aria-label="add Data" onClick={() => { handleConfigs(); props.handleAdd() }}>
+                    <AddIcon style={{ color: '#424242' }} />
                   </IconButton>
                 </Tooltip>
               }
-              {props.handleDownload &&
-                <Tooltip title="Download Excel" className={classes.icon}>
-                  <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
-                    <DownloadIcon style={{ color: '#fff' }} />
+              {props.handleEdit && props.multipleEdit &&
+                <Tooltip title="Edit">
+                  <IconButton aria-label="edit" onClick={() => { props.handleEdit() }}>
+                    <EditIcon style={{ color: '#424242' }} />
                   </IconButton>
                 </Tooltip>
               }
+              {props.handleDelete &&
+                <Tooltip title="Delete">
+                  <IconButton aria-label="delete" onClick={() => { props.handleDelete() }}>
+                    <DeleteIcon style={{ color: '#424242' }} />
+                  </IconButton>
+                </Tooltip>
+              }
+              <Tooltip title="Close">
+                <IconButton aria-label="close" onClick={handleConfigs}>
+                  <CloseIcon style={{ color: '#424242' }} />
+                </IconButton>
+              </Tooltip>
             </div>
           </Zoom>
-        )}
-    </Toolbar>
+        ) : (
+            <Zoom collapse bottom cascade opposite duration={500} when={showParent}>
+              <div>
+                <SearchField searchHandleChange={props.handleSearch} />
+                {props.allowEdit &&
+                  <Tooltip title="Configuration" className={classes.icon}>
+                    <IconButton aria-label="configuration" onClick={handleConfigs}>
+                      <ConfigIcon style={{ color: '#fff' }} />
+                    </IconButton>
+                  </Tooltip>
+                }
+                {props.filter !== undefined &&
+                  <Tooltip title="Filter" className={classes.icon}>
+                    <IconButton aria-label="filter" onClick={handleFilter}>
+                      <FilterIcon style={{ color: '#fff' }} />
+                    </IconButton>
+                  </Tooltip>
+                }
+                {props.handleDownload &&
+                  <Tooltip title="Download Excel" className={classes.icon}>
+                    <IconButton aria-label="download excel" onClick={() => { props.handleDownload() }}>
+                      <DownloadIcon style={{ color: '#fff' }} />
+                    </IconButton>
+                  </Tooltip>
+                }
+              </div>
+            </Zoom>
+          )}
+      </Toolbar>
+      {showFilter &&
+        <Fade top duration={500} opposite>
+          {props.filter}
+        </Fade>
+      }
+    </div>
   );
 };
 
@@ -321,6 +341,7 @@ export default function DataTables(props) {
   const [rows, setRows] = React.useState([]);
   const [label, setLabel] = React.useState('');
   const [showConfigs, setShowConfigs] = React.useState(false);
+  const [hasMore, setHasMore] = React.useState(true);
 
   React.useEffect(
     () => {
@@ -338,6 +359,12 @@ export default function DataTables(props) {
     () => {
       setLabel(props.tableName);
     }, [props.tableName]
+  )
+
+  React.useEffect(
+    () => {
+      setHasMore(props.hasMore);
+    }, [props.hasMore]
   )
 
   // React.useEffect(
@@ -439,6 +466,7 @@ export default function DataTables(props) {
           }}
           allowEdit={props.allowEdit}
           multipleEdit={props.multipleEdit || false}
+          filter={props.filter}
         />
         <TableContainer>
           <Table
@@ -517,7 +545,7 @@ export default function DataTables(props) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={-1}
+          count={hasMore ? -1 : rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -529,6 +557,8 @@ export default function DataTables(props) {
 }
 
 DataTables.propTypes = {
+  filter: PropTypes.element,
+  hasMore: PropTypes.bool,
   tableName: PropTypes.string.isRequired,  //='' (string)
   allowEdit: PropTypes.bool,  //={} (boolean)
   page: PropTypes.number.isRequired, //={} (int)

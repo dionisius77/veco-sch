@@ -18,6 +18,7 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Loading from "../../components/loading/Loading";
 import AlertCustom from "../../components/alert/Alert";
+import BackgroundImage from "../../shared/background-login.gif";
 
 function Copyright() {
   return (
@@ -37,7 +38,7 @@ const useStyles = (theme) => ({
     height: '100vh',
   },
   image: {
-    backgroundImage: 'url(https://source.unsplash.com/random)',
+    backgroundImage: `url(${BackgroundImage})`,
     backgroundRepeat: 'no-repeat',
     backgroundColor:
       theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],

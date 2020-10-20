@@ -99,6 +99,7 @@ class InputMataPelajaran extends Component {
                     title: tempMP.namaMP,
                     description: e.data().nama,
                   });
+                  return '';
                 })
               }
             });

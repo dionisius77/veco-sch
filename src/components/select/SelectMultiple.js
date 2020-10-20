@@ -54,6 +54,7 @@ export default function SelectMultiple(props) {
         return opt.value === val;
       });
       returned.push(sel[0].text);
+      return '';
     });
     return returned.join(', ');
   }
