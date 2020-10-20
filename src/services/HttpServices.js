@@ -97,7 +97,7 @@ export const HTTP_SERVICE = {
   },
   inputFbSubCollection(request) {
     let userRef;
-    if (request.doc) {
+    if (request.subDoc) {
       userRef = db.collection(request.collection).doc(request.doc).collection(request.subCollection).doc(request.subDoc).set(request.data);
     } else {
       userRef = db.collection(request.collection).doc(request.doc).collection(request.subCollection).add(request.data);
@@ -146,5 +146,18 @@ export const HTTP_SERVICE = {
     }
     const collectionRef = db.collection(req.collection).doc(req.doc).update(data)
     return collectionRef;
+  },
+  fileUpload(req){
+    const userRef = storageRef.child('materi/'+req.fileName).putString(req.base64file, 'data_url');
+    return userRef;
+  },
+  fileDelete(req){
+    const userRef = storageRef.child('materi/'+req).delete();
+    return userRef;
+  },
+  getFbFilterOnly(request){
+    const userRef = db.collection(request.collection)
+      .where(request.params, request.operator, request.value).get();
+    return userRef;
   }
 }
